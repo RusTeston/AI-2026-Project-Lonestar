@@ -2,7 +2,8 @@
 
 **AI Portfolio and Project Showcase**  
 **Project Start**: March 11, 2026  
-**Status**: ✅ LIVE - OPERATIONAL
+**Latest Updates**: March 20, 2026  
+**Status**: ✅ LIVE - OPERATIONAL - CI/CD ENABLED
 
 ---
 
@@ -38,28 +39,37 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
    - Cloud Architecture Advisor powered by Amazon Bedrock Nova Lite
    - Full-stack serverless application (Lambda + API Gateway + S3)
 
-### **In Development**
 2. **Agentic RAG** - Coming Soon
    - Enhanced chatbot with Retrieval Augmented Generation
    - Bedrock Knowledge Base + OpenSearch Serverless
-   - AWS documentation corpus integration
 
 3. **Language Translator** - ✅ LIVE (March 12, 2026)
    - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/03-language-translator/index.html
    - Multi-language translation using AWS Translate
-   - Support for 75+ languages
    - Serverless architecture (Lambda Function URL + S3)
-   - Simple, fast, cost-effective translation service
 
-4. **Document Intelligence Pipeline** - 🚧 IN DEVELOPMENT (March 12, 2026)
+4. **Document Intelligence Pipeline** - ✅ LIVE
+   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/04-document-intelligence/index.html
    - AI-powered document processing with Textract and Bedrock
-   - Automatic text extraction from PDF, PNG, JPG documents
-   - AI-generated summaries and intelligent field extraction
-   - Document type classification (invoices, receipts, reports, etc.)
    - Event-driven serverless architecture (S3 + Lambda + Textract + Bedrock)
-   - Cost-optimized design (~$2.35/month)
 
-- Projects 5-9: Coming Soon
+5. **Text-to-Speech Reader** - ✅ LIVE
+   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/index.html
+   - AI-powered voice narration using Amazon Polly
+   - Serverless architecture (Lambda Function URL + S3)
+
+6. **Superhero Transformer** - ✅ LIVE
+   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/06-superhero-transformer/index.html
+   - AI-powered image transformation using Bedrock Nova Lite
+
+7. **Project 7** - Coming Soon
+
+8. **AI Log Analyzer** - ✅ LIVE
+   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/08-log-analyzer/index.html
+   - Intelligent log analysis & troubleshooting using Bedrock Nova Lite
+   - Event-driven serverless architecture (S3 + Lambda + Bedrock)
+
+9. **Project 9** - Coming Soon
 
 ---
 
@@ -72,9 +82,18 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - **Access**: Public read access for website content
 
 **Projects:**
-- **Project 1**: AI Chatbot (Lambda + API Gateway + Bedrock Nova Lite) - $4.30/month
-- **Project 3**: Language Translator (Lambda Function URL + AWS Translate) - $7.60/month
-- **Project 4**: Document Intelligence (Lambda + Textract + Bedrock Nova Lite) - $2.35/month (in development)
+- **Project 1**: AI Chatbot (Lambda + API Gateway + Bedrock Nova Lite)
+- **Project 3**: Language Translator (Lambda Function URL + AWS Translate)
+- **Project 4**: Document Intelligence (Lambda + Textract + Bedrock Nova Lite)
+- **Project 5**: Text-to-Speech Reader (Lambda Function URL + Amazon Polly)
+- **Project 6**: Superhero Transformer (Lambda Function URL + Bedrock Nova Lite)
+- **Project 8**: AI Log Analyzer (Lambda + S3 Events + Bedrock Nova Lite)
+
+**CI/CD Pipeline:**
+- **GitHub Repos**: Public repos at github.com/RusTeston
+- **GitHub Actions**: Auto-deploy on push to main branch
+- **OIDC Federation**: Secure AWS authentication (no stored credentials)
+- **IAM Role**: `GitHubActions-Deploy` with least-privilege permissions
 
 **Website Features:**
 - Single-page portfolio design
@@ -112,7 +131,16 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Add custom domain (future)
 - Implement CloudFront CDN (future)
 - Configure SSL/TLS with ACM (future)
+- Add automated testing to CI/CD workflows
+- Migrate infrastructure to SAM/CloudFormation (IaC)
 - Expand project portfolio as new AI projects are completed
+
+**Recent Updates:**
+- ✅ **CI/CD Pipeline** (March 20, 2026): GitHub Actions + OIDC federation for both repos
+- ✅ **CI/CD Pipeline diagrams** added to Projects 1, 3, 4, 5, 8
+- ✅ **Well-Architected designs** created for Projects 1, 3, 4, 5, 8
+- ✅ **Error pages** deployed for both sites
+- ✅ **Project 8: AI Log Analyzer** built and deployed
 
 ---
 

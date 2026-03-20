@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech Reader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔊 Text-to-Speech Reader</h1>
+            <p class="project-label">Project 5: Text-to-Speech Reader</p>
+            <p class="subtitle">AI-Powered Voice Narration</p>
+            <p class="powered-by">Powered by Amazon Polly</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="voice-settings">
+                <div class="setting-group">
+                    <label for="voiceEngine">Voice Quality:</label>
+                    <select id="voiceEngine">
+                        <option value="neural">Neural (Higher Quality)</option>
+                        <option value="standard">Standard (Faster)</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="voiceId">Voice:</label>
+                    <select id="voiceId">
+                        <option value="Joanna">Joanna (Female, US)</option>
+                        <option value="Matthew">Matthew (Male, US)</option>
+                        <option value="Ruth">Ruth (Female, US)</option>
+                        <option value="Stephen">Stephen (Male, US)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <p class="upload-text">Drop your text file here or click to browse</p>
+                <p class="upload-hint">Supports TXT and PDF files (max 3000 characters)</p>
+                <input type="file" id="fileInput" accept=".txt,.pdf" hidden>
+            </div>
+            
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <h2>Audio Ready</h2>
+            
+            <div class="audio-player">
+                <audio id="audioPlayer" controls>
+                    <source id="audioSource" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+
+            <div class="result-info">
+                <div class="info-item">
+                    <span class="info-label">Voice:</span>
+                    <span id="voiceInfo" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Text Length:</span>
+                    <span id="textLength" class="info-value"></span>
+                </div>
+                <div id="truncatedWarning" class="warning-message" style="display: none;">
+                    ⚠️ Text was truncated to 3000 characters (Polly limit)
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a id="downloadBtn" class="download-button" download>
+                    Download MP3
+                </a>
+                <button class="clear-button" onclick="clearResults()">
+                    Convert Another File
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <p><a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/project-5-architecture.png" target="_blank" class="diagram-link">Demo Diagram</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/WELL-ARCHITECTED-DESIGN.md" target="_blank" class="diagram-link">WAF Design</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/project-5-well-architected.png" target="_blank" class="diagram-link">WAF Diagram</a></p>
+            <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="back-link">← Back to Projects</a>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

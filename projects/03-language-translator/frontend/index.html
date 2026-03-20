@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Translator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 Language Translator</h1>
+            <p class="project-label">Project 3: Language Translator</p>
+            <p class="subtitle">AI-Powered Translation</p>
+            <p class="powered-by">Powered by AWS Translate</p>
+        </header>
+
+        <div class="translator-container">
+            <!-- Language Selectors -->
+            <div class="language-selectors">
+                <div class="selector-group">
+                    <label for="sourceLanguage">From:</label>
+                    <select id="sourceLanguage">
+                        <!-- Populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="selector-group">
+                    <label for="targetLanguage">To:</label>
+                    <select id="targetLanguage">
+                        <!-- Populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Input Text Area -->
+            <div class="text-area-group">
+                <div class="text-area-header">
+                    <label for="inputText">Enter text to translate:</label>
+                    <span id="charCounter" class="char-counter">0 / 5000 characters</span>
+                </div>
+                <textarea 
+                    id="inputText" 
+                    placeholder="Type or paste your text here..."
+                    oninput="updateCharCounter()"
+                    maxlength="5000"
+                ></textarea>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message"></div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button id="translateButton" class="translate-button" onclick="translateText()">
+                    Translate
+                </button>
+                <button class="clear-button" onclick="clearAll()">
+                    Clear
+                </button>
+            </div>
+
+            <!-- Translation Result -->
+            <div class="text-area-group">
+                <label>Translation:</label>
+                <div id="resultBox" class="result-box empty">
+                    Translation will appear here...
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/03-language-translator/project-3-architecture.png" target="_blank" class="diagram-link">Demo Diagram</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/03-language-translator/WELL-ARCHITECTED-DESIGN.md" target="_blank" class="diagram-link">WAF Design</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/03-language-translator/project-3-well-architected.png" target="_blank" class="diagram-link">WAF Diagram</a></p>
+            <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="back-link">← Back to Projects</a>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

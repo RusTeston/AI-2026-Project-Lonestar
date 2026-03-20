@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>404 - Page Not Found</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      padding:20px;
+    }
+    .error-container{
+      max-width:600px;
+      background:white;
+      border-radius:12px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.2);
+      overflow:hidden;
+      text-align:center;
+    }
+    .error-header{
+      background:linear-gradient(135deg, #002868 0%, #004ba0 100%);
+      color:white;
+      padding:30px;
+    }
+    .error-graphic{
+      font-size:6rem;
+      margin-bottom:10px;
+      animation: tip 2s ease-in-out infinite;
+    }
+    @keyframes tip{
+      0%,100%{transform:rotate(0deg)}
+      25%{transform:rotate(-10deg)}
+      75%{transform:rotate(10deg)}
+    }
+    .error-code{
+      font-size:3rem;
+      font-weight:700;
+      opacity:0.9;
+    }
+    .error-body{
+      padding:40px;
+    }
+    .error-title{
+      font-size:1.5rem;
+      font-weight:600;
+      color:#002868;
+      margin-bottom:15px;
+    }
+    .error-message{
+      font-size:1rem;
+      color:#666;
+      line-height:1.6;
+      margin-bottom:25px;
+    }
+    .error-joke{
+      font-size:0.9rem;
+      color:#666;
+      font-style:italic;
+      margin-bottom:25px;
+      padding:12px 18px;
+      border:1px solid #e0e0e0;
+      border-left:4px solid #BF0A30;
+      border-radius:6px;
+      background:#f8f9fa;
+    }
+    .home-button{
+      display:inline-block;
+      padding:14px 40px;
+      background:#002868;
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      font-size:1rem;
+      font-weight:600;
+      transition:all 0.3s;
+    }
+    .home-button:hover{
+      background:#004ba0;
+      transform:translateY(-2px);
+      box-shadow:0 4px 16px rgba(0,40,104,0.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <div class="error-header">
+      <div class="error-graphic">&#x1F920;</div>
+      <div class="error-code">404</div>
+    </div>
+    <div class="error-body">
+      <h1 class="error-title">Well, This Ain't Right, Partner</h1>
+      <p class="error-message">
+        The page you're looking for has ridden off into the sunset.
+        It's either been moved, deleted, or it was just a tumbleweed all along.
+      </p>
+      <div class="error-joke">
+        "Why did the web page go to Texas? <br>
+        <strong>Because it heard everything is bigger here... except 404 errors."</strong> &#x1F335;
+      </div>
+      <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="home-button">&#x1F920; Back to the Ranch</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Project: Lone Star</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.20;
+            z-index: 0;
+            pointer-events: none;
+            background: linear-gradient(to right, 
+                #002868 0%, 
+                #002868 33.33%, 
+                white 33.33%, 
+                white 66.67%, 
+                white 66.67%, 
+                white 100%
+            );
+        }
+        
+        .container::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            opacity: 0.20;
+            z-index: 0;
+            pointer-events: none;
+            background: linear-gradient(to right, 
+                transparent 0%, 
+                transparent 33.33%, 
+                transparent 33.33%, 
+                transparent 66.67%, 
+                #BF0A30 66.67%, 
+                #BF0A30 100%
+            );
+        }
+        
+        .star {
+            position: absolute;
+            top: 30px;
+            width: 40px;
+            height: 40px;
+            opacity: 0.5;
+            z-index: 1;
+        }
+        
+        .star-left {
+            left: 40px;
+        }
+        
+        .star-right {
+            right: 40px;
+        }
+        
+        .star svg {
+            width: 100%;
+            height: 100%;
+            fill: #002868;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #002868;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            color: #002868;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .tagline {
+            font-size: 1.3rem;
+            color: #BF0A30;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+        
+        .intro {
+            font-size: 1.1rem;
+            color: #002868;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        
+        .projects-section {
+            margin-top: 50px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .project-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .project-card.active:hover {
+            box-shadow: 0 4px 16px rgba(0, 40, 104, 0.25);
+        }
+        
+        .project-card.active {
+            background: white;
+            border-color: #002868;
+            box-shadow: 0 2px 12px rgba(0, 40, 104, 0.15);
+        }
+        
+        .project-card.coming-soon {
+            opacity: 0.6;
+        }
+        
+        .project-number {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .project-card.active .project-number {
+            color: #BF0A30;
+        }
+        
+        .project-title {
+            font-size: 1.5rem;
+            color: #002868;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .project-card.coming-soon .project-title {
+            color: #adb5bd;
+        }
+        
+        .project-status {
+            font-size: 0.95rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                padding: 40px 40px;
+            }
+            
+            .projects-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2.3rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="star star-left">
+            <svg viewBox="0 0 100 100">
+                <polygon points="50,10 61,40 95,40 68,60 79,90 50,70 21,90 32,60 5,40 39,40" />
+            </svg>
+        </div>
+        
+        <div class="star star-right">
+            <svg viewBox="0 0 100 100">
+                <polygon points="50,10 61,40 95,40 68,60 79,90 50,70 21,90 32,60 5,40 39,40" />
+            </svg>
+        </div>
+        
+        <header>
+            <h1>AI Project: Lone Star</h1>
+            <p class="tagline">Building Tomorrow's AI Solutions Today</p>
+            <p class="intro">
+                Welcome to my AI project showcase. I am exploring the frontier of artificial intelligence through hands-on development. This portfolio highlights my current work and upcoming initiatives as I learn, build, and grow in the AI space.
+            </p>
+        </header>
+        
+        <section class="projects-section">
+            <div class="projects-grid">
+                <a href="projects/01-ai-chatbot/index.html" class="project-card active">
+                    <div class="project-number">Project 01</div>
+                    <h3 class="project-title">AI Chatbot</h3>
+                    <p class="project-status">Live - Click to view</p>
+                </a>
+                
+                <div class="project-card active" style="cursor: not-allowed;">
+                    <div class="project-number">Project 02</div>
+                    <h3 class="project-title">Agentic RAG</h3>
+                    <p class="project-status">Coming soon</p>
+                </div>
+                
+                <div class="project-card coming-soon">
+                    <div class="project-number">Project 03</div>
+                    <h3 class="project-title">Coming Soon</h3>
+                    <p class="project-status">In development</p>
+                </div>
+                
+                <div class="project-card coming-soon">
+                    <div class="project-number">Project 04</div>
+                    <h3 class="project-title">Coming Soon</h3>
+                    <p class="project-status">In development</p>
+                </div>
+                
+                <div class="project-card coming-soon">
+                    <div class="project-number">Project 05</div>
+                    <h3 class="project-title">Coming Soon</h3>
+                    <p class="project-status">In development</p>
+                </div>
+                
+                <div class="project-card coming-soon">
+                    <div class="project-number">Project 06</div>
+                    <h3 class="project-title">Coming Soon</h3>
+                    <p class="project-status">In development</p>
+                </div>
+                
+                <div class="project-card coming-soon">
+                    <div class="project-number">Project 07</div>
+                    <h3 class="project-title">Coming Soon</h3>
+                    <p class="project-status">In development</p>
+                </div>
+                
+                <div class="project-card coming-soon">
+                    <div class="project-number">Project 08</div>
+                    <h3 class="project-title">Coming Soon</h3>
+                    <p class="project-status">In development</p>
+                </div>
+                
+                <div class="project-card coming-soon">
+                    <div class="project-number">Project 09</div>
+                    <h3 class="project-title">Coming Soon</h3>
+                    <p class="project-status">In development</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2026 AI Project: Lone Star | Collaborative AI Development</p>
+        </footer>
+    </div>
+</body>
+</html>

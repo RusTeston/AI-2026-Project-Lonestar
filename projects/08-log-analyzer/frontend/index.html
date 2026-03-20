@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Log Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 AI Log Analyzer</h1>
+            <p class="project-label">Project 8: AI Log Analyzer</p>
+            <p class="subtitle">Intelligent Log Analysis & Troubleshooting</p>
+            <p class="powered-by">Powered by AWS Bedrock (Nova Lite)</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📋</div>
+                <p class="upload-text">Drop your log file here or click to browse</p>
+                <p class="upload-hint">Supports LOG, TXT, CSV, and JSON files</p>
+                <input type="file" id="fileInput" accept=".log,.txt,.csv,.json" hidden>
+            </div>
+            
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <h2>📊 Analysis Report</h2>
+
+            <!-- Severity & Log Type -->
+            <div class="result-card severity-card">
+                <div class="severity-row">
+                    <div>
+                        <span class="result-label">Log Type:</span>
+                        <span id="logType" class="result-value"></span>
+                    </div>
+                    <div>
+                        <span class="result-label">Severity:</span>
+                        <span id="severity" class="severity-badge"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-label">📝 Summary</span>
+                </div>
+                <p id="summary" class="summary-text"></p>
+            </div>
+
+            <!-- Timeline -->
+            <div id="timelineCard" class="result-card" style="display: none;">
+                <div class="result-header">
+                    <span class="result-label">⏱️ Timeline</span>
+                </div>
+                <p id="timeline" class="summary-text"></p>
+            </div>
+
+            <!-- Errors -->
+            <div id="errorsCard" class="result-card" style="display: none;">
+                <div class="result-header">
+                    <span class="result-label">🚨 Errors Found</span>
+                    <span id="errorCount" class="count-badge error-count"></span>
+                </div>
+                <div id="errorsList" class="items-list"></div>
+            </div>
+
+            <!-- Warnings -->
+            <div id="warningsCard" class="result-card" style="display: none;">
+                <div class="result-header">
+                    <span class="result-label">⚠️ Warnings</span>
+                    <span id="warningCount" class="count-badge warning-count"></span>
+                </div>
+                <div id="warningsList" class="items-list"></div>
+            </div>
+
+            <!-- Patterns -->
+            <div id="patternsCard" class="result-card" style="display: none;">
+                <div class="result-header">
+                    <span class="result-label">🔄 Patterns Detected</span>
+                </div>
+                <div id="patternsList" class="items-list"></div>
+            </div>
+
+            <!-- Recommended Actions -->
+            <div id="actionsCard" class="result-card" style="display: none;">
+                <div class="result-header">
+                    <span class="result-label">✅ Recommended Actions</span>
+                </div>
+                <div id="actionsList" class="items-list"></div>
+            </div>
+
+            <!-- Prevention Tips -->
+            <div id="preventionCard" class="result-card" style="display: none;">
+                <div class="result-header">
+                    <span class="result-label">🛡️ Prevention Tips</span>
+                </div>
+                <ul id="preventionList" class="prevention-list"></ul>
+            </div>
+
+            <button class="clear-button" onclick="clearResults()">Analyze Another Log</button>
+        </div>
+
+        <footer>
+            <p><a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/08-log-analyzer/project-8-architecture.png" target="_blank" class="diagram-link">Demo Diagram</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/08-log-analyzer/WELL-ARCHITECTED-DESIGN.md" target="_blank" class="diagram-link">WAF Design</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/08-log-analyzer/project-8-well-architected.png" target="_blank" class="diagram-link">WAF Diagram</a></p>
+            <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="back-link">← Back to Projects</a>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

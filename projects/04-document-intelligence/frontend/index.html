@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Intelligence</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 Document Intelligence</h1>
+            <p class="project-label">Project 4: Document Intelligence</p>
+            <p class="subtitle">AI-Powered Document Analysis</p>
+            <p class="powered-by">Powered by AWS Textract & Bedrock (Nova Lite)</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📤</div>
+                <p class="upload-text">Drop your document here or click to browse</p>
+                <p class="upload-hint">Supports PDF, PNG, and JPEG files (max 10MB)</p>
+                <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg" hidden>
+            </div>
+            
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <h2>Analysis Results</h2>
+            
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-label">Document Type:</span>
+                    <span id="documentType" class="result-value"></span>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-label">Summary:</span>
+                </div>
+                <p id="summary" class="summary-text"></p>
+            </div>
+
+            <div id="keyFieldsCard" class="result-card" style="display: none;">
+                <div class="result-header">
+                    <span class="result-label">Key Fields:</span>
+                </div>
+                <div id="keyFields" class="key-fields"></div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-label">Extracted Text:</span>
+                </div>
+                <div id="extractedText" class="extracted-text"></div>
+            </div>
+
+            <button class="clear-button" onclick="clearResults()">Upload Another Document</button>
+        </div>
+
+        <footer>
+            <p><a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/04-document-intelligence/project-4-architecture.png" target="_blank" class="diagram-link">Demo Diagram</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/04-document-intelligence/WELL-ARCHITECTED-DESIGN.md" target="_blank" class="diagram-link">WAF Design</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/04-document-intelligence/project-4-well-architected.png" target="_blank" class="diagram-link">WAF Diagram</a></p>
+            <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="back-link">← Back to Projects</a>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

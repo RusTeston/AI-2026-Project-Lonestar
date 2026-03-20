@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superhero Transformer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦸 Superhero Transformer</h1>
+            <p class="subtitle">AI-Powered Photo Transformation</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📸</div>
+                <p class="upload-text">Drop your photo here or click to browse</p>
+                <p class="upload-hint">Supports JPG and PNG files (max 5MB)</p>
+                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" hidden>
+            </div>
+            
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <h2>Transformation Complete</h2>
+            
+            <div class="comparison">
+                <div class="image-card">
+                    <h3>Original</h3>
+                    <img id="originalImage" src="" alt="Original photo">
+                </div>
+                <div class="arrow">→</div>
+                <div class="image-card">
+                    <h3>Superhero</h3>
+                    <img id="superheroImage" src="" alt="Superhero transformation">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a id="downloadBtn" class="download-button" download>
+                    Download Superhero Image
+                </a>
+                <button class="clear-button" onclick="clearResults()">
+                    Transform Another Photo
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by AWS Bedrock Titan Image Generator | Project 6: Superhero Transformer | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/06-superhero-transformer/project-6-architecture.png" target="_blank" class="diagram-link">See Diagram</a></p>
+            <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="back-link">← Back to Projects</a>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

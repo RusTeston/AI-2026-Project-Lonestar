@@ -1,0 +1,37 @@
+name: Deploy Lonestar Site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+      - 'projects/*/frontend/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::901779867920:role/GitHubActions-Deploy
+          aws-region: us-east-1
+
+      - name: Deploy Landing Page
+        run: aws s3 cp website/index.html s3://ai-2026-project-lonestar/index.html
+
+      - name: Deploy Error Page
+        run: aws s3 cp website/error.html s3://ai-2026-project-lonestar/error.html
+
+      - name: Deploy Project Frontends
+        run: |
+          for project_dir in projects/*/frontend/; do
+            project_name=$(echo "$project_dir" | cut -d'/' -f2)
+            aws s3 sync "$project_dir" "s3://ai-2026-project-lonestar/projects/$project_name/" --exclude "*.DS_Store"
+          done

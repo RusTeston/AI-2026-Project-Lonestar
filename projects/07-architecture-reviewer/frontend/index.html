@@ -212,7 +212,7 @@
         </header>
 
         <div class="input-section">
-            <label>Paste your CloudFormation or SAM template</label>
+            <label>Paste your CloudFormation or SAM template in the box below</label>
             <textarea id="templateInput" placeholder="AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: My application
@@ -224,7 +224,7 @@ Resources:
         <div class="actions">
             <button class="btn btn-primary" id="submitBtn" onclick="submitTemplate()">Analyze Template</button>
             <button class="btn btn-sample" onclick="loadSample()">Try a Demo Template<br><span style="font-size:0.75rem;font-weight:400;opacity:0.7;">(auto-creates a template)</span></button>
-            <button class="btn btn-sample" id="resetBtn" onclick="resetAll()" style="display:none;">Clear & Reset</button>
+            <button class="btn btn-sample" id="resetBtn" onclick="resetAll()">Clear & Reset</button>
         </div>
 
         <div class="status" id="status"></div>
@@ -291,7 +291,6 @@ Resources:
                         hideStatus();
                         renderResults(data.results);
                         document.getElementById('submitBtn').disabled = false;
-                        document.getElementById('resetBtn').style.display = 'inline-block';
                     } else if (data.status === 'FAILED') {
                         clearInterval(poll);
                         showError(data.error || 'Analysis failed.');

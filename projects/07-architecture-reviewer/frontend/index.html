@@ -64,16 +64,18 @@
         }
         textarea:focus { border-color: rgba(255,255,255,0.25); }
         textarea::placeholder { color: #5a7a8e; }
-        .actions { display: flex; gap: 12px; align-items: center; }
+        .actions { display: flex; gap: 12px; align-items: stretch; }
         .btn {
             padding: 12px 28px;
             border-radius: 10px;
             border: none;
             font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            flex: 1;
+            text-align: center;
         }
         .btn-primary {
             background: linear-gradient(90deg, #0ea5e9, #0369a1);

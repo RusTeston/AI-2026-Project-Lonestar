@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Project 07 - Intelligent AWS Architecture Reviewer
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 128
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref ResultsTable
+        QUEUE_URL: !Ref AnalysisQueue
+        BUCKET_NAME: !Ref TemplateBucket
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
+
+Resources:
+
+  # --- Storage ---
+  TemplateBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            ExpirationInDays: 7
+
+  ResultsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: jobId
+        Type: String
+
+  # --- Async Buffer ---
+  AnalysisQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 300
+
+  # --- Functions ---
+  IngestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ingest.handler
+      CodeUri: functions/ingest/
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /analyze
+            Method: post
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref TemplateBucket
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt AnalysisQueue.QueueName
+
+  AnalyzeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: analyze.handler
+      CodeUri: functions/analyze/
+      Timeout: 300
+      MemorySize: 256
+      Events:
+        Queue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AnalysisQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref ResultsTable
+        - S3ReadPolicy:
+            BucketName: !Ref TemplateBucket
+        - Statement:
+          - Effect: Allow
+            Action: bedrock:InvokeModel
+            Resource: "arn:aws:bedrock:us-east-1::foundation-model/us.amazon.nova-lite-v1:0"
+
+  ResultsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: results.handler
+      CodeUri: functions/results/
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /results/{jobId}
+            Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ResultsTable
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  TemplateBucketName:
+    Description: S3 bucket for uploaded templates
+    Value: !Ref TemplateBucket

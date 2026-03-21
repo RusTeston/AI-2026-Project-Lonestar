@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<!-- CI/CD: Deployed via GitHub Actions -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Architecture Reviewer — Project 07</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(180deg, #071029 0%, #02263f 40%, #052a4d 100%);
+            color: #e6f3ff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            padding: 40px 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        .tagline {
+            font-size: 1rem;
+            color: #cfeeff;
+        }
+        .input-section { margin-bottom: 24px; }
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #cfeeff;
+            margin-bottom: 8px;
+        }
+        textarea {
+            width: 100%;
+            height: 280px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #e6f3ff;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            padding: 16px;
+            resize: vertical;
+            outline: none;
+        }
+        textarea:focus { border-color: rgba(255,255,255,0.25); }
+        textarea::placeholder { color: #5a7a8e; }
+        .actions { display: flex; gap: 12px; align-items: center; }
+        .btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #0ea5e9, #0369a1);
+            color: white;
+            box-shadow: 0 4px 12px rgba(3,105,161,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-sample {
+            background: rgba(255,255,255,0.06);
+            color: #cfeeff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-sample:hover { background: rgba(255,255,255,0.1); }
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+        }
+        .status.loading {
+            display: block;
+            background: rgba(14,165,233,0.08);
+            border: 1px solid rgba(14,165,233,0.2);
+            color: #cfeeff;
+        }
+        .status.error {
+            display: block;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #fca5a5;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: #0ea5e9;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Results */
+        .results { display: none; margin-top: 24px; }
+        .results.visible { display: block; }
+        .summary {
+            background: rgba(14,165,233,0.06);
+            border: 1px solid rgba(14,165,233,0.15);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: #cfeeff;
+            line-height: 1.6;
+        }
+        .finding {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .finding-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .severity {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .severity.CRITICAL { background: #991b1b; color: #fecaca; }
+        .severity.HIGH { background: #9a3412; color: #fed7aa; }
+        .severity.MEDIUM { background: #854d0e; color: #fef08a; }
+        .severity.LOW { background: #1e3a5f; color: #93c5fd; }
+        .severity.INFO { background: #14532d; color: #bbf7d0; }
+        .pillar {
+            font-size: 0.75rem;
+            color: #95c4e6;
+            font-weight: 600;
+        }
+        .finding-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e6f3ff;
+        }
+        .finding-desc {
+            font-size: 0.9rem;
+            color: #cfeeff;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .finding-rec {
+            font-size: 0.85rem;
+            color: #95c4e6;
+            padding-left: 12px;
+            border-left: 2px solid rgba(14,165,233,0.3);
+            line-height: 1.5;
+        }
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #95c4e6;
+        }
+        footer a { color: #0ea5e9; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        @media (max-width: 600px) {
+            .container { padding: 30px 20px; }
+            h1 { font-size: 1.5rem; }
+            textarea { height: 200px; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AWS Architecture Reviewer</h1>
+            <p class="tagline">AI-powered review against the Well-Architected Framework</p>
+        </header>
+
+        <div class="input-section">
+            <label>Paste your CloudFormation or SAM template</label>
+            <textarea id="templateInput" placeholder="AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: My application
+
+Resources:
+  ..."></textarea>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="submitBtn" onclick="submitTemplate()">Analyze Template</button>
+            <button class="btn btn-sample" onclick="loadSample()">Load Sample Template</button>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="results" id="results"></div>
+
+        <footer>
+            <p>Project 07 — Intelligent AWS Architecture Reviewer</p>
+            <p style="margin-top: 6px;">
+                <a href="../../index.html">← Back to Projects</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // REPLACE WITH YOUR API GATEWAY URL AFTER SAM DEPLOY
+        const API_URL = 'https://09gdl2y743.execute-api.us-east-1.amazonaws.com/Prod';
+
+        async function submitTemplate() {
+            const template = document.getElementById('templateInput').value.trim();
+            if (!template) return showError('Please paste a template first.');
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            showLoading('Submitting template for analysis...');
+
+            try {
+                const res = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ template })
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+                showLoading('Analyzing against Well-Architected Framework...');
+                pollResults(data.jobId);
+            } catch (e) {
+                showError(e.message);
+                btn.disabled = false;
+            }
+        }
+
+        async function pollResults(jobId) {
+            const maxAttempts = 60;
+            let attempts = 0;
+
+            const poll = setInterval(async () => {
+                attempts++;
+                if (attempts > maxAttempts) {
+                    clearInterval(poll);
+                    showError('Analysis timed out. Please try again.');
+                    document.getElementById('submitBtn').disabled = false;
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`${API_URL}/results/${jobId}`);
+                    const data = await res.json();
+
+                    if (data.status === 'COMPLETE') {
+                        clearInterval(poll);
+                        hideStatus();
+                        renderResults(data.results);
+                        document.getElementById('submitBtn').disabled = false;
+                    } else if (data.status === 'FAILED') {
+                        clearInterval(poll);
+                        showError(data.error || 'Analysis failed.');
+                        document.getElementById('submitBtn').disabled = false;
+                    }
+                } catch (e) {
+                    // Keep polling on network errors
+                }
+            }, 3000);
+        }
+
+        function renderResults(results) {
+            const el = document.getElementById('results');
+            let html = '';
+
+            if (results.summary) {
+                html += `<div class="summary"><strong>Summary:</strong> ${results.summary}</div>`;
+            }
+
+            if (results.findings && results.findings.length > 0) {
+                results.findings.forEach(f => {
+                    html += `
+                        <div class="finding">
+                            <div class="finding-header">
+                                <span class="severity ${f.severity}">${f.severity}</span>
+                                <span class="pillar">${f.pillar}</span>
+                            </div>
+                            <div class="finding-title">${f.title}</div>
+                            <p class="finding-desc">${f.description}</p>
+                            <div class="finding-rec"><strong>Recommendation:</strong> ${f.recommendation}</div>
+                        </div>`;
+                });
+            } else {
+                html += '<div class="summary">No findings — your template looks good!</div>';
+            }
+
+            el.innerHTML = html;
+            el.classList.add('visible');
+        }
+
+        function loadSample() {
+            document.getElementById('templateInput').value = `AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-public-bucket
+      AccessControl: PublicRead
+
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: my-processor
+      Runtime: python3.9
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          import json
+          def handler(event, context):
+              return {'statusCode': 200}
+      Role: !GetAtt MyRole.Arn
+      Timeout: 900
+      MemorySize: 3008
+
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: FullAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: my-data
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 100
+        WriteCapacityUnits: 100`;
+            document.getElementById('results').classList.remove('visible');
+            hideStatus();
+        }
+
+        function showLoading(msg) {
+            const el = document.getElementById('status');
+            el.className = 'status loading';
+            el.innerHTML = `<span class="spinner"></span>${msg}`;
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('status');
+            el.className = 'status error';
+            el.textContent = msg;
+        }
+
+        function hideStatus() {
+            document.getElementById('status').className = 'status';
+        }
+    </script>
+</body>
+</html>

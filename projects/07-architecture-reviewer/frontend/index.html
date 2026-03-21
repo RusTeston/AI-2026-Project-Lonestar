@@ -224,6 +224,7 @@ Resources:
         <div class="actions">
             <button class="btn btn-primary" id="submitBtn" onclick="submitTemplate()">Analyze Template</button>
             <button class="btn btn-sample" onclick="loadSample()">Load Sample Template</button>
+            <button class="btn btn-sample" id="resetBtn" onclick="resetAll()" style="display:none;">Clear & Reset</button>
         </div>
 
         <div class="status" id="status"></div>
@@ -290,6 +291,7 @@ Resources:
                         hideStatus();
                         renderResults(data.results);
                         document.getElementById('submitBtn').disabled = false;
+                        document.getElementById('resetBtn').style.display = 'inline-block';
                     } else if (data.status === 'FAILED') {
                         clearInterval(poll);
                         showError(data.error || 'Analysis failed.');
@@ -404,6 +406,14 @@ Resources:
 
         function hideStatus() {
             document.getElementById('status').className = 'status';
+        }
+
+        function resetAll() {
+            document.getElementById('templateInput').value = '';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('results').classList.remove('visible');
+            document.getElementById('resetBtn').style.display = 'none';
+            hideStatus();
         }
     </script>
 </body>

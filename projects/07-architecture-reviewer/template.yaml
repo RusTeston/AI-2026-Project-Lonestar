@@ -81,7 +81,7 @@ Resources:
         - Statement:
           - Effect: Allow
             Action: bedrock:InvokeModel
-            Resource: "arn:aws:bedrock:us-east-1::foundation-model/us.amazon.nova-lite-v1:0"
+            Resource: "*"
 
   ResultsFunction:
     Type: AWS::Serverless::Function

@@ -5,318 +5,211 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Project: Lone Star</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #2c3e50;
-            line-height: 1.6;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(180deg, #071029 0%, #02263f 40%, #052a4d 100%);
+            color: #e6f3ff;
             min-height: 100vh;
             padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
         }
-        
+
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 60px 80px;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            padding: 50px 60px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.20;
-            z-index: 0;
-            pointer-events: none;
-            background: linear-gradient(to right, 
-                #002868 0%, 
-                #002868 33.33%, 
-                white 33.33%, 
-                white 66.67%, 
-                white 66.67%, 
-                white 100%
-            );
-        }
-        
-        .container::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 50%;
-            opacity: 0.20;
-            z-index: 0;
-            pointer-events: none;
-            background: linear-gradient(to right, 
-                transparent 0%, 
-                transparent 33.33%, 
-                transparent 33.33%, 
-                transparent 66.67%, 
-                #BF0A30 66.67%, 
-                #BF0A30 100%
-            );
-        }
-        
-        .star {
-            position: absolute;
-            top: 30px;
-            width: 40px;
-            height: 40px;
-            opacity: 0.5;
-            z-index: 1;
-        }
-        
-        .star-left {
-            left: 40px;
-        }
-        
-        .star-right {
-            right: 40px;
-        }
-        
-        .star svg {
-            width: 100%;
-            height: 100%;
-            fill: #002868;
-        }
-        
+
         header {
             text-align: center;
             margin-bottom: 50px;
             padding-bottom: 30px;
-            border-bottom: 3px solid #002868;
-            position: relative;
-            z-index: 1;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
         }
-        
+
         h1 {
-            font-size: 3rem;
-            color: #002868;
-            margin-bottom: 15px;
+            font-size: 2.5rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 12px;
         }
-        
+
         .tagline {
-            font-size: 1.3rem;
-            color: #BF0A30;
-            font-weight: 500;
-            margin-bottom: 25px;
+            font-size: 1.15rem;
+            color: #cfeeff;
+            font-weight: 400;
+            margin-bottom: 20px;
         }
-        
+
         .intro {
-            font-size: 1.1rem;
-            color: #002868;
-            max-width: 800px;
+            font-size: 1rem;
+            color: #cfeeff;
+            max-width: 700px;
             margin: 0 auto;
-            line-height: 1.8;
+            line-height: 1.7;
         }
-        
-        .projects-section {
-            margin-top: 50px;
-            position: relative;
-            z-index: 1;
-        }
-        
+
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-top: 40px;
+            gap: 20px;
+            margin-top: 10px;
         }
-        
+
         .project-card {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            padding: 35px 25px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 28px 22px;
             text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
             text-decoration: none;
             display: block;
+            transition: all 0.3s ease;
         }
-        
-        .project-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .project-card.active:hover {
-            box-shadow: 0 4px 16px rgba(0, 40, 104, 0.25);
-        }
-        
+
         .project-card.active {
-            background: white;
-            border-color: #002868;
-            box-shadow: 0 2px 12px rgba(0, 40, 104, 0.15);
+            border-color: rgba(255,255,255,0.12);
         }
-        
+
+        .project-card.active:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.25);
+            box-shadow: 0 8px 24px rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.05);
+        }
+
         .project-card.coming-soon {
-            opacity: 0.6;
+            opacity: 0.35;
         }
-        
+
+        .project-card.highlight {
+            background: rgba(251,191,36,0.05);
+            border-color: rgba(251,191,36,0.25);
+        }
+
         .project-number {
-            font-size: 0.9rem;
-            color: #6c757d;
+            font-size: 0.8rem;
+            color: #95c4e6;
             font-weight: 600;
-            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .project-card.active .project-number {
-            color: #BF0A30;
-        }
-        
-        .project-title {
-            font-size: 1.5rem;
-            color: #002868;
-            font-weight: 600;
+            letter-spacing: 1.5px;
             margin-bottom: 10px;
         }
-        
+
+        .project-card.active .project-number {
+            color: #cfeeff;
+        }
+
+        .project-title {
+            font-size: 1.3rem;
+            color: #e6f3ff;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
         .project-card.coming-soon .project-title {
-            color: #adb5bd;
+            color: #5a7a8e;
         }
-        
+
         .project-status {
-            font-size: 0.95rem;
-            color: #6c757d;
-            font-style: italic;
+            font-size: 0.85rem;
+            color: #95c4e6;
         }
-        
+
+        .project-card.active .project-status {
+            color: #cfeeff;
+        }
+
         footer {
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 2px solid #e9ecef;
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.06);
             text-align: center;
-            color: #6c757d;
-            font-size: 0.95rem;
-            position: relative;
-            z-index: 1;
+            color: #95c4e6;
+            font-size: 0.9rem;
         }
-        
+
         @media (max-width: 900px) {
-            .container {
-                padding: 40px 40px;
-            }
-            
-            .projects-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            
-            h1 {
-                font-size: 2.3rem;
-            }
-            
-            .tagline {
-                font-size: 1.1rem;
-            }
+            .container { padding: 40px 30px; }
+            .projects-grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 2rem; }
         }
-        
+
         @media (max-width: 600px) {
-            .container {
-                padding: 30px 25px;
-            }
-            
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
+            .container { padding: 30px 20px; }
+            .projects-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.7rem; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="star star-left">
-            <svg viewBox="0 0 100 100">
-                <polygon points="50,10 61,40 95,40 68,60 79,90 50,70 21,90 32,60 5,40 39,40" />
-            </svg>
-        </div>
-        
-        <div class="star star-right">
-            <svg viewBox="0 0 100 100">
-                <polygon points="50,10 61,40 95,40 68,60 79,90 50,70 21,90 32,60 5,40 39,40" />
-            </svg>
-        </div>
-        
         <header>
-
+            <h1>AI Project: Lone Star</h1>
             <p class="tagline">Building Tomorrow's AI Solutions Today</p>
             <p class="intro">
-                I am exploring the frontier of artificial intelligence through hands-on development. This portfolio highlights my current work and upcoming initiatives as I learn, build, and grow in the AI space.
+                Exploring the frontier of artificial intelligence through hands-on development. This portfolio highlights current work and upcoming initiatives as I learn, build, and grow in the AI space.
             </p>
         </header>
-        
-        <section class="projects-section">
+
+        <section>
             <div class="projects-grid">
                 <a href="projects/01-ai-chatbot/index.html" class="project-card active">
                     <div class="project-number">Project 01</div>
                     <h3 class="project-title">AI Chatbot</h3>
-                    <p class="project-status">Live - Click to view</p>
+                    <p class="project-status">Live — Click to view</p>
                 </a>
-                
-                <div class="project-card active" style="cursor: not-allowed; background: #fff9e6; border-color: #ffc107;">
+
+                <div class="project-card highlight" style="cursor: default;">
                     <div class="project-number">Project 02</div>
                     <h3 class="project-title">Agentic RAG</h3>
-                    <p class="project-status">Coming soon</p>
+                    <p class="project-status" style="color: #fbbf24;">Coming soon</p>
                 </div>
-                
+
                 <a href="projects/03-language-translator/index.html" class="project-card active">
                     <div class="project-number">Project 03</div>
                     <h3 class="project-title">Language Translator</h3>
-                    <p class="project-status">Live - Click to view</p>
+                    <p class="project-status">Live — Click to view</p>
                 </a>
-                
+
                 <a href="projects/04-document-intelligence/index.html" class="project-card active">
                     <div class="project-number">Project 04</div>
                     <h3 class="project-title">Document Intelligence</h3>
-                    <p class="project-status">Live - Click to view</p>
+                    <p class="project-status">Live — Click to view</p>
                 </a>
-                
+
                 <a href="projects/05-text-to-speech/index.html" class="project-card active">
                     <div class="project-number">Project 05</div>
                     <h3 class="project-title">Text-to-Speech Reader</h3>
-                    <p class="project-status">Live - Click to view</p>
+                    <p class="project-status">Live — Click to view</p>
                 </a>
-                
+
                 <div class="project-card coming-soon">
                     <div class="project-number">Project 06</div>
                     <h3 class="project-title">Coming Soon</h3>
                     <p class="project-status">In development</p>
                 </div>
-                
+
                 <div class="project-card coming-soon">
                     <div class="project-number">Project 07</div>
                     <h3 class="project-title">Coming Soon</h3>
                     <p class="project-status">In development</p>
                 </div>
-                
+
                 <a href="projects/08-log-analyzer/index.html" class="project-card active">
                     <div class="project-number">Project 08</div>
                     <h3 class="project-title">AI Log Analyzer</h3>
-                    <p class="project-status">Live - Click to view</p>
+                    <p class="project-status">Live — Click to view</p>
                 </a>
-                
+
                 <div class="project-card coming-soon">
                     <div class="project-number">Project 09</div>
                     <h3 class="project-title">Coming Soon</h3>
@@ -324,9 +217,9 @@
                 </div>
             </div>
         </section>
-        
+
         <footer>
-            <p>&copy; 2026 AI Project: Lone Star | Collaborative AI Development</p>
+            <p>&copy; 2026 AI Project: Lone Star | AI Development Portfolio</p>
         </footer>
     </div>
 </body>

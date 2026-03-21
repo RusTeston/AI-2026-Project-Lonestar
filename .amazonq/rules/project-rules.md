@@ -23,3 +23,5 @@
 - Always have a rollback plan
 - Clean up test data from S3 after testing
 - Back up current files before making UI changes
+- Before any CI/CD workflow that syncs or deletes from S3, compare S3 contents against local files and download any S3-only files first
+- Never use `--delete` flag on S3 sync without first verifying all S3 assets exist locally

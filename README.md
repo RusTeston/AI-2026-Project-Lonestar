@@ -2,7 +2,7 @@
 
 **AI Portfolio and Project Showcase**  
 **Project Start**: March 11, 2026  
-**Latest Updates**: March 20, 2026  
+**Latest Updates**: March 21, 2026  
 **Status**: ✅ LIVE - OPERATIONAL - CI/CD ENABLED
 
 ---
@@ -62,7 +62,11 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
    - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/06-superhero-transformer/index.html
    - AI-powered image transformation using Bedrock Nova Lite
 
-7. **Project 7** - Coming Soon
+7. **Architecture Reviewer** - ✅ LIVE (March 21, 2026)
+   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/07-architecture-reviewer/index.html
+   - AI-powered CloudFormation/SAM template review against Well-Architected Framework
+   - Async serverless pipeline (API Gateway + Lambda + SQS + S3 + DynamoDB + Bedrock Nova Lite)
+   - First project using SAM/IaC deployment
 
 8. **AI Log Analyzer** - ✅ LIVE
    - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/08-log-analyzer/index.html
@@ -87,6 +91,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - **Project 4**: Document Intelligence (Lambda + Textract + Bedrock Nova Lite)
 - **Project 5**: Text-to-Speech Reader (Lambda Function URL + Amazon Polly)
 - **Project 6**: Superhero Transformer (Lambda Function URL + Bedrock Nova Lite)
+- **Project 7**: Architecture Reviewer (API Gateway + Lambda + SQS + S3 + DynamoDB + Bedrock Nova Lite + SAM IaC)
 - **Project 8**: AI Log Analyzer (Lambda + S3 Events + Bedrock Nova Lite)
 
 **CI/CD Pipeline:**
@@ -97,8 +102,8 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 
 **Website Features:**
 - Single-page portfolio design
-- Texas flag themed branding
-- Professional corporate aesthetic
+- Dark modern theme with Inter font
+- Professional grid layout for projects
 - Responsive layout (desktop/tablet optimized)
 - No external dependencies
 
@@ -113,9 +118,8 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Corporate-standard Arial/Helvetica fonts
 
 **Design Elements:**
-- Texas flag color scheme (Blue #002868, White, Red #BF0A30)
-- Subtle Texas flag watermark background
-- Dual lone star accents
+- Dark modern theme (navy gradient background, white/light blue text)
+- Inter font (matching rus-teston.com)
 - Professional grid layout for projects
 
 ---
@@ -132,10 +136,12 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Implement CloudFront CDN (future)
 - Configure SSL/TLS with ACM (future)
 - Add automated testing to CI/CD workflows
-- Migrate infrastructure to SAM/CloudFormation (IaC)
+- Migrate infrastructure to SAM/CloudFormation (IaC) — ✅ Started with Project 7
 - Expand project portfolio as new AI projects are completed
 
 **Recent Updates:**
+- ✅ **Project 7: Architecture Reviewer** (March 21, 2026): First SAM/IaC project, async pipeline with Bedrock
+- ✅ **Landing page redesign** (March 21, 2026): Dark modern theme, dropped Texas branding
 - ✅ **CI/CD Pipeline** (March 20, 2026): GitHub Actions + OIDC federation for both repos
 - ✅ **CI/CD Pipeline diagrams** added to Projects 1, 3, 4, 5, 8
 - ✅ **Well-Architected designs** created for Projects 1, 3, 4, 5, 8

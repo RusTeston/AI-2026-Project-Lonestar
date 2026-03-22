@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<!-- CI/CD: Deployed via GitHub Actions -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Optimization Advisor — Project 06</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(180deg, #071029 0%, #02263f 40%, #052a4d 100%);
+            color: #e6f3ff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            padding: 40px 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        h1 { font-size: 2rem; font-weight: 700; color: #ffffff; margin-bottom: 8px; }
+        .tagline { font-size: 1rem; color: #cfeeff; }
+        .description {
+            font-size: 0.9rem;
+            color: #95c4e6;
+            max-width: 650px;
+            margin: 16px auto 0;
+            line-height: 1.6;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+            margin: 24px 0;
+        }
+        .btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #059669, #047857);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.06);
+            color: #cfeeff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+        }
+        .status.loading {
+            display: block;
+            background: rgba(5,150,105,0.08);
+            border: 1px solid rgba(5,150,105,0.2);
+            color: #cfeeff;
+        }
+        .status.error {
+            display: block;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #fca5a5;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: #059669;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Results */
+        .results { display: none; margin-top: 24px; }
+        .results.visible { display: block; }
+        .savings-banner {
+            background: rgba(5,150,105,0.1);
+            border: 1px solid rgba(5,150,105,0.25);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .savings-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #34d399;
+        }
+        .savings-label {
+            font-size: 0.85rem;
+            color: #95c4e6;
+            margin-top: 4px;
+        }
+        .summary {
+            background: rgba(14,165,233,0.06);
+            border: 1px solid rgba(14,165,233,0.15);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: #cfeeff;
+            line-height: 1.6;
+        }
+        .finding {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .finding-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .severity {
+            font-size: 0.7rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 4px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .severity.CRITICAL { background: #991b1b; color: #fecaca; }
+        .severity.HIGH { background: #9a3412; color: #fed7aa; }
+        .severity.MEDIUM { background: #854d0e; color: #fef08a; }
+        .severity.LOW { background: #1e3a5f; color: #93c5fd; }
+        .severity.INFO { background: #14532d; color: #bbf7d0; }
+        .category { font-size: 0.75rem; color: #95c4e6; font-weight: 600; }
+        .finding-savings { font-size: 0.85rem; color: #34d399; font-weight: 600; margin-left: auto; }
+        .finding-title { font-size: 1rem; font-weight: 600; color: #e6f3ff; }
+        .finding-desc { font-size: 0.9rem; color: #cfeeff; margin-bottom: 8px; line-height: 1.5; }
+        .finding-fix {
+            font-size: 0.85rem; color: #95c4e6;
+            padding-left: 12px;
+            border-left: 2px solid rgba(5,150,105,0.3);
+            line-height: 1.5;
+        }
+        footer {
+            margin-top: 40px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center; font-size: 0.85rem; color: #95c4e6;
+        }
+        footer a { color: #0ea5e9; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        @media (max-width: 600px) {
+            .container { padding: 30px 20px; }
+            h1 { font-size: 1.5rem; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Cost Optimization Advisor</h1>
+            <p class="tagline">AI-powered AWS cost analysis and recommendations</p>
+            <p class="description">
+                Scans your AWS account for wasteful resources — unattached EBS volumes, idle EC2/RDS instances,
+                S3 buckets without lifecycle rules, and oversized Lambda functions. Uses Bedrock to generate
+                plain-English recommendations ranked by potential savings.
+            </p>
+        </header>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="scanBtn" onclick="runScan()">Run Cost Scan Now</button>
+            <button class="btn btn-secondary" id="resetBtn" onclick="resetAll()">Clear & Reset</button>
+        </div>
+
+        <div class="status" id="status"></div>
+        <div class="results" id="results"></div>
+
+        <footer>
+            <p>Project 06 — AI-Powered Cost Optimization Advisor</p>
+            <p style="margin-top: 6px;">
+                <a href="end-to-end-deployment-flow.png" target="_blank">CI/CD Pipeline</a>
+                <span style="margin: 0 8px; opacity: 0.4;">|</span>
+                <a href="project-6-architecture.png" target="_blank">Demo Diagram</a>
+                <span style="margin: 0 8px; opacity: 0.4;">|</span>
+                <a href="WELL-ARCHITECTED-DESIGN.md" target="_blank">WAF Design</a>
+                <span style="margin: 0 8px; opacity: 0.4;">|</span>
+                <a href="project-6-well-architected.png" target="_blank">WAF Diagram</a>
+            </p>
+            <p style="margin-top: 6px;">
+                <a href="../../index.html">← Back to Projects</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = 'https://lrgznk1b2g.execute-api.us-east-1.amazonaws.com/Prod';
+
+        async function runScan() {
+            const btn = document.getElementById('scanBtn');
+            btn.disabled = true;
+            document.getElementById('results').classList.remove('visible');
+            showLoading('Scanning your AWS account for cost optimization opportunities...');
+
+            try {
+                const res = await fetch(`${API_URL}/scan`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Scan failed');
+
+                hideStatus();
+                renderResults(data.results);
+                btn.disabled = false;
+            } catch (e) {
+                showError(e.message);
+                btn.disabled = false;
+            }
+        }
+
+        function renderResults(results) {
+            const el = document.getElementById('results');
+            let html = '';
+
+            const total = results.total_estimated_savings || 0;
+            html += `
+                <div class="savings-banner">
+                    <div class="savings-amount">~$${total.toFixed(2)}/month</div>
+                    <div class="savings-label">Estimated potential savings</div>
+                </div>`;
+
+            if (results.summary) {
+                html += `<div class="summary"><strong>Summary:</strong> ${results.summary}</div>`;
+            }
+
+            if (results.findings && results.findings.length > 0) {
+                results.findings.forEach(f => {
+                    const savings = f.estimated_monthly_savings || 0;
+                    html += `
+                        <div class="finding">
+                            <div class="finding-header">
+                                <span class="severity ${f.severity}">${f.severity}</span>
+                                <span class="category">${f.category}</span>
+                                ${savings > 0 ? `<span class="finding-savings">~$${savings.toFixed(2)}/mo</span>` : ''}
+                            </div>
+                            <div class="finding-title">${f.title}</div>
+                            <p class="finding-desc">${f.description}</p>
+                            <div class="finding-fix"><strong>Fix:</strong> ${f.remediation}</div>
+                        </div>`;
+                });
+            } else {
+                html += '<div class="summary">No cost optimization issues found — your account looks efficient!</div>';
+            }
+
+            el.innerHTML = html;
+            el.classList.add('visible');
+        }
+
+        function resetAll() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('results').classList.remove('visible');
+            hideStatus();
+        }
+
+        function showLoading(msg) {
+            const el = document.getElementById('status');
+            el.className = 'status loading';
+            el.innerHTML = `<span class="spinner"></span>${msg}`;
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('status');
+            el.className = 'status error';
+            el.textContent = msg;
+        }
+
+        function hideStatus() {
+            document.getElementById('status').className = 'status';
+        }
+    </script>
+</body>
+</html>

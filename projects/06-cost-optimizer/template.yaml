@@ -1,0 +1,182 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Project 06 - AI-Powered Cost Optimization Advisor
+
+Parameters:
+  NotificationEmail:
+    Type: String
+    Default: rus.teston@gmail.com
+    Description: Email address for weekly digest
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 128
+    Environment:
+      Variables:
+        BUCKET_NAME: !Ref ReportsBucket
+        NOTIFICATION_EMAIL: !Ref NotificationEmail
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
+
+Resources:
+
+  # --- Storage ---
+  ReportsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            ExpirationInDays: 30
+
+  # --- Scheduled Trigger ---
+  WeeklySchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub '${AWS::StackName}-weekly-scan'
+      ScheduleExpression: 'cron(0 8 ? * MON *)'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt CollectFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeCollectLambda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt CollectFunction.Arn
+
+  # --- Functions ---
+  CollectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: collect.handler
+      CodeUri: functions/collect/
+      Timeout: 60
+      MemorySize: 256
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref ReportsBucket
+        - Statement:
+          - Effect: Allow
+            Action:
+              - ce:GetCostAndUsage
+              - ec2:DescribeVolumes
+              - ec2:DescribeInstances
+              - rds:DescribeDBInstances
+              - s3:ListAllMyBuckets
+              - s3:GetBucketLifecycleConfiguration
+              - lambda:ListFunctions
+              - lambda:GetFunctionConfiguration
+              - cloudwatch:GetMetricStatistics
+            Resource: "*"
+        - Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: !GetAtt AnalyzeFunction.Arn
+      Environment:
+        Variables:
+          ANALYZE_FUNCTION: !Ref AnalyzeFunction
+
+  AnalyzeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: analyze.handler
+      CodeUri: functions/analyze/
+      Timeout: 300
+      MemorySize: 256
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref ReportsBucket
+        - S3WritePolicy:
+            BucketName: !Ref ReportsBucket
+        - Statement:
+          - Effect: Allow
+            Action: bedrock:InvokeModel
+            Resource: "*"
+        - Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: !GetAtt NotifyFunction.Arn
+      Environment:
+        Variables:
+          NOTIFY_FUNCTION: !Ref NotifyFunction
+
+  NotifyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: notify.handler
+      CodeUri: functions/notify/
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref ReportsBucket
+        - Statement:
+          - Effect: Allow
+            Action:
+              - ses:SendEmail
+              - ses:SendRawEmail
+            Resource: "*"
+
+  # --- On-Demand API ---
+  OnDemandFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: collect.on_demand_handler
+      CodeUri: functions/collect/
+      Timeout: 60
+      MemorySize: 256
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /scan
+            Method: post
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref ReportsBucket
+        - S3ReadPolicy:
+            BucketName: !Ref ReportsBucket
+        - Statement:
+          - Effect: Allow
+            Action:
+              - ce:GetCostAndUsage
+              - ec2:DescribeVolumes
+              - ec2:DescribeInstances
+              - rds:DescribeDBInstances
+              - s3:ListAllMyBuckets
+              - s3:GetBucketLifecycleConfiguration
+              - lambda:ListFunctions
+              - lambda:GetFunctionConfiguration
+              - cloudwatch:GetMetricStatistics
+            Resource: "*"
+        - Statement:
+          - Effect: Allow
+            Action: bedrock:InvokeModel
+            Resource: "*"
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  ReportsBucketName:
+    Description: S3 bucket for reports
+    Value: !Ref ReportsBucket

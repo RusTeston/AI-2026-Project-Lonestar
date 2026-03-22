@@ -1,0 +1,211 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Project 09 - Intelligent Multi-Region Failover Orchestrator
+
+Parameters:
+  SlackWebhookUrl:
+    Type: String
+    Default: ''
+    Description: Slack incoming webhook URL for incident notifications
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 128
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref FailoverTable
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
+
+Resources:
+
+  # --- Storage ---
+  FailoverTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # --- Simulated Primary Region Endpoint ---
+  SimulatedEndpointFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: endpoint.handler
+      CodeUri: functions/simulated-endpoint/
+      FunctionUrlConfig:
+        AuthType: NONE
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FailoverTable
+
+  # --- Health Check Function ---
+  HealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: healthcheck.handler
+      CodeUri: functions/healthcheck/
+      Timeout: 15
+      Environment:
+        Variables:
+          ENDPOINT_URL: !GetAtt SimulatedEndpointFunctionUrl.FunctionUrl
+          STATE_MACHINE_ARN: !Ref FailoverStateMachine
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FailoverTable
+        - Statement:
+          - Effect: Allow
+            Action: states:StartExecution
+            Resource: !Ref FailoverStateMachine
+
+  # --- Decide Function (Bedrock Reasoning) ---
+  DecideFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: decide.handler
+      CodeUri: functions/decide/
+      Timeout: 60
+      MemorySize: 256
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FailoverTable
+        - Statement:
+          - Effect: Allow
+            Action: bedrock:InvokeModel
+            Resource: "*"
+
+  # --- Failover Function (Simulated Actions) ---
+  FailoverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: failover.handler
+      CodeUri: functions/failover/
+      Timeout: 30
+      Environment:
+        Variables:
+          SLACK_WEBHOOK_URL: !Ref SlackWebhookUrl
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FailoverTable
+
+  # --- Step Functions State Machine ---
+  FailoverStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/failover.asl.json
+      DefinitionSubstitutions:
+        DecideFunctionArn: !GetAtt DecideFunction.Arn
+        FailoverFunctionArn: !GetAtt FailoverFunction.Arn
+      Type: STANDARD
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref DecideFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref FailoverFunction
+
+  # --- Scheduled Health Check (every 2 minutes) ---
+  HealthCheckSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub '${AWS::StackName}-health-check'
+      ScheduleExpression: 'rate(2 minutes)'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt HealthCheckFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeHealthCheck
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt HealthCheckFunction.Arn
+
+  # --- API Endpoints ---
+  TriggerFailureFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: endpoint.toggle_handler
+      CodeUri: functions/simulated-endpoint/
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /simulate
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FailoverTable
+
+  StatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: healthcheck.status_handler
+      CodeUri: functions/healthcheck/
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /status
+            Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FailoverTable
+
+  HistoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: healthcheck.history_handler
+      CodeUri: functions/healthcheck/
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /history
+            Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FailoverTable
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  SimulatedEndpointUrl:
+    Description: Simulated primary region endpoint
+    Value: !GetAtt SimulatedEndpointFunctionUrl.FunctionUrl
+  FailoverTableName:
+    Description: DynamoDB table name
+    Value: !Ref FailoverTable
+  StateMachineArn:
+    Description: Step Functions state machine ARN
+    Value: !Ref FailoverStateMachine

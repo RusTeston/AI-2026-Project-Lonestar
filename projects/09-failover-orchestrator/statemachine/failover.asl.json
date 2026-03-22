@@ -1,0 +1,45 @@
+{
+  "Comment": "Intelligent Multi-Region Failover Orchestrator",
+  "StartAt": "Decide",
+  "States": {
+    "Decide": {
+      "Type": "Task",
+      "Resource": "${DecideFunctionArn}",
+      "ResultPath": "$.verdict",
+      "Next": "EvaluateVerdict"
+    },
+    "EvaluateVerdict": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.verdict.failover_warranted",
+              "BooleanEquals": true
+            },
+            {
+              "Variable": "$.verdict.confidence",
+              "StringEquals": "high"
+            }
+          ],
+          "Next": "ExecuteFailover"
+        }
+      ],
+      "Default": "NoAction"
+    },
+    "ExecuteFailover": {
+      "Type": "Task",
+      "Resource": "${FailoverFunctionArn}",
+      "ResultPath": "$.failover_result",
+      "End": true
+    },
+    "NoAction": {
+      "Type": "Pass",
+      "Result": {
+        "action": "none",
+        "reason": "Failover not warranted or confidence too low"
+      },
+      "End": true
+    }
+  }
+}

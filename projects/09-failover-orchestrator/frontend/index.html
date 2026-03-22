@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<!-- CI/CD: Deployed via GitHub Actions -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Failover Orchestrator — Project 09</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(180deg, #071029 0%, #02263f 40%, #052a4d 100%);
+            color: #e6f3ff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            padding: 40px 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        header { text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .tagline { font-size: 1rem; color: #cfeeff; }
+
+        /* Simulation banner */
+        .sim-banner {
+            background: rgba(234,179,8,0.1);
+            border: 1px solid rgba(234,179,8,0.3);
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: #fde68a;
+            font-weight: 600;
+        }
+
+        /* Grid layout */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .full-width { grid-column: 1 / -1; }
+
+        /* Cards */
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .card h2 { font-size: 0.95rem; font-weight: 600; color: #cfeeff; margin-bottom: 14px; }
+
+        /* Health status indicator */
+        .health-display { text-align: center; padding: 16px 0; }
+        .health-dot {
+            width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+        }
+        .health-dot.healthy { background: rgba(34,197,94,0.2); box-shadow: 0 0 20px rgba(34,197,94,0.15); }
+        .health-dot.unhealthy { background: rgba(239,68,68,0.2); box-shadow: 0 0 20px rgba(239,68,68,0.15); animation: pulse 1.5s infinite; }
+        .health-dot.unknown { background: rgba(148,163,184,0.2); }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+        .health-label { font-size: 1.1rem; font-weight: 700; }
+        .health-label.healthy { color: #4ade80; }
+        .health-label.unhealthy { color: #f87171; }
+        .health-label.unknown { color: #94a3b8; }
+        .health-meta { font-size: 0.8rem; color: #95c4e6; margin-top: 6px; }
+
+        /* Controls */
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; flex: 1; text-align: center;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        .btn-success { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+        .btn-primary { background: linear-gradient(90deg, #0ea5e9, #0369a1); color: white; }
+
+        /* Recent checks table */
+        .checks-list { max-height: 260px; overflow-y: auto; }
+        .check-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 6px; margin-bottom: 4px;
+            font-size: 0.8rem; background: rgba(255,255,255,0.02);
+        }
+        .check-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .check-dot.healthy { background: #4ade80; }
+        .check-dot.unhealthy { background: #f87171; }
+        .check-time { color: #95c4e6; min-width: 140px; }
+        .check-latency { color: #64748b; margin-left: auto; }
+
+        /* Verdict display */
+        .verdict-box {
+            background: rgba(0,0,0,0.2); border-radius: 8px; padding: 14px;
+            font-size: 0.85rem; line-height: 1.6; color: #cfeeff;
+            min-height: 80px; display: flex; align-items: center; justify-content: center;
+        }
+        .verdict-box.waiting { color: #64748b; font-style: italic; }
+        .verdict-field { margin-bottom: 6px; }
+        .verdict-field strong { color: #e6f3ff; }
+        .confidence-high { color: #f87171; font-weight: 700; }
+        .confidence-medium { color: #fbbf24; font-weight: 700; }
+        .confidence-low { color: #4ade80; font-weight: 700; }
+
+        /* Incident timeline */
+        .timeline { max-height: 320px; overflow-y: auto; }
+        .timeline-item {
+            padding: 10px 12px; margin-bottom: 8px; border-radius: 8px;
+            background: rgba(255,255,255,0.02); border-left: 3px solid rgba(14,165,233,0.4);
+        }
+        .timeline-action { font-size: 0.8rem; font-weight: 700; color: #e6f3ff; margin-bottom: 4px; }
+        .timeline-detail { font-size: 0.78rem; color: #95c4e6; line-height: 1.4; }
+        .timeline-time { font-size: 0.72rem; color: #64748b; margin-top: 4px; }
+        .no-data { color: #64748b; font-size: 0.85rem; font-style: italic; text-align: center; padding: 20px; }
+
+        /* Status toast */
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
+            border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+            display: none; z-index: 100; max-width: 360px;
+        }
+        .toast.success { background: rgba(34,197,94,0.9); color: white; display: block; }
+        .toast.error { background: rgba(239,68,68,0.9); color: white; display: block; }
+        .toast.info { background: rgba(14,165,233,0.9); color: white; display: block; }
+
+        footer {
+            margin-top: 40px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center; font-size: 0.85rem; color: #95c4e6;
+        }
+        footer a { color: #0ea5e9; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 700px) {
+            .container { padding: 30px 20px; }
+            .grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.5rem; }
+            .controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Failover Orchestrator</h1>
+            <p class="tagline">Intelligent Multi-Region Failover with AI-Powered Decision Making</p>
+        </header>
+
+        <div class="sim-banner">
+            ⚠️ SIMULATION MODE — Failover actions (Route 53, resource warming) are simulated. Health checks and AI reasoning are real.
+        </div>
+
+        <div class="grid">
+            <!-- Health Status -->
+            <div class="card">
+                <h2>🏥 Primary Region Health</h2>
+                <div class="health-display">
+                    <div class="health-dot unknown" id="healthDot">?</div>
+                    <div class="health-label unknown" id="healthLabel">Loading...</div>
+                    <div class="health-meta" id="healthMeta"></div>
+                </div>
+            </div>
+
+            <!-- Simulation Controls -->
+            <div class="card">
+                <h2>🎮 Simulation Controls</h2>
+                <div class="controls" style="margin-bottom: 12px;">
+                    <button class="btn btn-danger" id="btnFail" onclick="simulateFailure()">Simulate Failure</button>
+                    <button class="btn btn-success" id="btnRestore" onclick="simulateRestore()">Restore Healthy</button>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="refreshStatus()">Refresh Status</button>
+                </div>
+                <p style="font-size:0.75rem; color:#64748b; margin-top:12px; text-align:center;">
+                    Toggle the simulated endpoint, then wait for the next 2-minute health check cycle to trigger the AI decision pipeline.
+                </p>
+            </div>
+
+            <!-- Recent Health Checks -->
+            <div class="card">
+                <h2>📊 Recent Health Checks</h2>
+                <div class="checks-list" id="checksList">
+                    <div class="no-data">Loading...</div>
+                </div>
+            </div>
+
+            <!-- AI Verdict -->
+            <div class="card">
+                <h2>🧠 Latest AI Verdict</h2>
+                <div class="verdict-box waiting" id="verdictBox">
+                    Waiting for health check failure to trigger AI analysis...
+                </div>
+            </div>
+
+            <!-- Incident Timeline -->
+            <div class="card full-width">
+                <h2>📋 Incident Timeline</h2>
+                <div class="timeline" id="timeline">
+                    <div class="no-data">No incidents recorded yet. Simulate a failure to trigger the pipeline.</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Project 09 — Intelligent Multi-Region Failover Orchestrator</p>
+            <p style="margin-top: 6px;">
+                <a href="end-to-end-deployment-flow.png" target="_blank">CI/CD Pipeline</a>
+                <span style="margin: 0 8px; opacity: 0.4;">|</span>
+                <a href="project-9-architecture.png" target="_blank">Architecture Diagram</a>
+                <span style="margin: 0 8px; opacity: 0.4;">|</span>
+                <a href="WELL-ARCHITECTED-DESIGN.md" target="_blank">WAF Design</a>
+                <span style="margin: 0 8px; opacity: 0.4;">|</span>
+                <a href="project-9-well-architected.png" target="_blank">WAF Diagram</a>
+            </p>
+            <p style="margin-top: 6px;">
+                <a href="../../index.html">← Back to Projects</a>
+            </p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_URL = 'https://d6dnpz3c39.execute-api.us-east-1.amazonaws.com/Prod';
+        let autoRefresh;
+
+        async function refreshStatus() {
+            try {
+                const res = await fetch(`${API_URL}/status`);
+                const data = await res.json();
+                renderHealth(data.current);
+                renderChecks(data.recent_checks);
+                if (data.active_incident) renderActiveIncident(data.active_incident);
+            } catch (e) {
+                console.error('Status fetch failed:', e);
+            }
+
+            // Also fetch incident history
+            try {
+                const res = await fetch(`${API_URL}/history`);
+                const data = await res.json();
+                renderTimeline(data.incidents);
+            } catch (e) {
+                console.error('History fetch failed:', e);
+            }
+        }
+
+        function renderHealth(current) {
+            const dot = document.getElementById('healthDot');
+            const label = document.getElementById('healthLabel');
+            const meta = document.getElementById('healthMeta');
+            const status = current.status || 'unknown';
+
+            dot.className = `health-dot ${status}`;
+            dot.textContent = status === 'healthy' ? '✓' : status === 'unhealthy' ? '✕' : '?';
+            label.className = `health-label ${status}`;
+            label.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+            const parts = [];
+            if (current.latency_ms) parts.push(`${current.latency_ms}ms`);
+            if (current.last_check) parts.push(`Last: ${formatTime(current.last_check)}`);
+            meta.textContent = parts.join(' • ');
+        }
+
+        function renderChecks(checks) {
+            const el = document.getElementById('checksList');
+            if (!checks || checks.length === 0) {
+                el.innerHTML = '<div class="no-data">No health checks recorded yet.</div>';
+                return;
+            }
+            el.innerHTML = checks.map(c => `
+                <div class="check-row">
+                    <span class="check-dot ${c.status}"></span>
+                    <span class="check-time">${formatTime(c.timestamp)}</span>
+                    <span>${c.status}</span>
+                    <span class="check-latency">${c.latency_ms}ms</span>
+                </div>
+            `).join('');
+        }
+
+        function renderTimeline(incidents) {
+            const el = document.getElementById('timeline');
+            if (!incidents || incidents.length === 0) {
+                el.innerHTML = '<div class="no-data">No incidents recorded yet. Simulate a failure to trigger the pipeline.</div>';
+                return;
+            }
+
+            let html = '';
+            incidents.forEach(inc => {
+                // Show verdict
+                if (inc.verdict) {
+                    const v = inc.verdict;
+                    const confClass = `confidence-${v.confidence || 'low'}`;
+                    const verdictEl = document.getElementById('verdictBox');
+                    verdictEl.className = 'verdict-box';
+                    verdictEl.innerHTML = `
+                        <div>
+                            <div class="verdict-field"><strong>Warranted:</strong> ${v.failover_warranted ? 'Yes' : 'No'}</div>
+                            <div class="verdict-field"><strong>Confidence:</strong> <span class="${confClass}">${(v.confidence || 'N/A').toUpperCase()}</span></div>
+                            <div class="verdict-field"><strong>Reasoning:</strong> ${v.reasoning || 'N/A'}</div>
+                        </div>
+                    `;
+                }
+
+                // Show timeline steps
+                if (inc.timeline) {
+                    inc.timeline.forEach(t => {
+                        html += `
+                            <div class="timeline-item">
+                                <div class="timeline-action">${t.action}</div>
+                                <div class="timeline-detail">${t.detail}</div>
+                                <div class="timeline-time">${formatTime(t.time)}</div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+            el.innerHTML = html || '<div class="no-data">No incident details available.</div>';
+        }
+
+        function renderActiveIncident(incident) {
+            // Active incident info is shown via the timeline
+        }
+
+        async function simulateFailure() {
+            const btn = document.getElementById('btnFail');
+            btn.disabled = true;
+            try {
+                await fetch(`${API_URL}/simulate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'unhealthy' })
+                });
+                showToast('Endpoint set to UNHEALTHY. Next health check will detect the failure.', 'info');
+                setTimeout(refreshStatus, 1000);
+            } catch (e) {
+                showToast('Failed to simulate failure.', 'error');
+            }
+            btn.disabled = false;
+        }
+
+        async function simulateRestore() {
+            const btn = document.getElementById('btnRestore');
+            btn.disabled = true;
+            try {
+                await fetch(`${API_URL}/simulate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'healthy' })
+                });
+                showToast('Endpoint restored to HEALTHY.', 'success');
+                setTimeout(refreshStatus, 1000);
+            } catch (e) {
+                showToast('Failed to restore endpoint.', 'error');
+            }
+            btn.disabled = false;
+        }
+
+        function showToast(msg, type) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = `toast ${type}`;
+            setTimeout(() => { el.className = 'toast'; }, 4000);
+        }
+
+        function formatTime(iso) {
+            if (!iso) return '';
+            try {
+                const d = new Date(iso);
+                return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            } catch { return iso; }
+        }
+
+        // Init
+        refreshStatus();
+        autoRefresh = setInterval(refreshStatus, 15000);
+    </script>
+</body>
+</html>

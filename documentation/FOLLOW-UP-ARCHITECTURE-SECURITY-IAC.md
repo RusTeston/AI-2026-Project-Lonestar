@@ -7,10 +7,10 @@
 
 ## Areas to Address
 
-### 1. Infrastructure as Code (IaC)
-- Currently all projects deployed via bash scripts with raw AWS CLI commands
-- Need to migrate to SAM, CloudFormation, or Terraform for reproducible, version-controlled infrastructure
-- Would enable consistent tear-down and rebuild across all projects
+### 1. Infrastructure as Code (IaC) - ✅ STARTED (March 21, 2026)
+- ~~Currently all projects deployed via bash scripts with raw AWS CLI commands~~
+- Project 06 (Cost Optimization Advisor) and Project 07 (Architecture Reviewer) deployed via SAM
+- Remaining projects still use manual deployment — migrate over time
 
 ### 2. Security Hardening
 - Lambda Function URLs use `AUTH_TYPE NONE` with `*` principal (open to internet)
@@ -54,7 +54,8 @@
 - Project 3: Language Translator
 - Project 4: Document Intelligence
 - Project 5: Text-to-Speech Reader
-- Project 6: Superhero Transformer
+- Project 6: ~~Superhero Transformer~~ Cost Optimization Advisor (replaced March 21, 2026)
+- Project 7: Architecture Reviewer (added March 21, 2026)
 - Project 8: AI Log Analyzer
 
 ---
@@ -84,7 +85,8 @@ Apply the following to each project (one at a time):
 - Project 3: Language Translator - ✅ COMPLETE
 - Project 4: Document Intelligence - ✅ COMPLETE
 - Project 5: Text-to-Speech Reader - ✅ COMPLETE
-- Project 6: Superhero Transformer - TODO
+- Project 6: Cost Optimization Advisor - ✅ COMPLETE (SAM/IaC, new project)
+- Project 7: Architecture Reviewer - ✅ COMPLETE (SAM/IaC, new project)
 - Project 8: AI Log Analyzer - ✅ COMPLETE
 
 ---

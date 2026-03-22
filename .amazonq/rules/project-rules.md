@@ -2,7 +2,7 @@
 
 ## Project Standards
 - Always follow the Deployment Discipline Agreement - require explicit "APPROVED TO PROCEED" before each phase
-- Use Texas-themed UI (Blue #002868, White, Red #BF0A30) for all Lonestar projects
+- Use dark modern theme (navy gradient, Inter font, white/light blue text) for all Lonestar projects
 - AWS region: us-east-1, Account ID: 901779867920
 - Lambda runtime: Python 3.12
 - All projects use serverless architecture (Lambda + S3, no EC2)

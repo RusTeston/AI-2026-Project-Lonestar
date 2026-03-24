@@ -18,6 +18,9 @@
 - Read existing project code for patterns before creating new projects
 - Reference the follow-up doc at `documentation/FOLLOW-UP-ARCHITECTURE-SECURITY-IAC.md` for tracked improvements
 
+## Workflow
+- After confirming changes are working, always commit and push to GitHub before moving to the next task
+
 ## Safety
 - Never deploy without explicit approval
 - Always have a rollback plan

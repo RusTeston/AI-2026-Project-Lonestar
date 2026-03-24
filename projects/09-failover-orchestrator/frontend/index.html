@@ -260,6 +260,7 @@
     <script>
         const API_URL = 'https://d6dnpz3c39.execute-api.us-east-1.amazonaws.com/Prod';
         let autoRefresh;
+        let restored = false;
 
         async function refreshStatus() {
             try {
@@ -267,7 +268,7 @@
                 const data = await res.json();
                 renderHealth(data.current);
                 renderChecks(data.recent_checks);
-                if (data.active_incident) renderActiveIncident(data.active_incident);
+                if (!restored && data.active_incident) renderActiveIncident(data.active_incident);
             } catch (e) {
                 console.error('Status fetch failed:', e);
             }
@@ -276,7 +277,7 @@
             try {
                 const res = await fetch(`${API_URL}/history`);
                 const data = await res.json();
-                renderTimeline(data.incidents);
+                if (!restored) renderTimeline(data.incidents);
             } catch (e) {
                 console.error('History fetch failed:', e);
             }
@@ -360,6 +361,7 @@
         }
 
         async function simulateFailure() {
+            restored = false;
             const btn = document.getElementById('btnFail');
             btn.disabled = true;
             try {
@@ -387,6 +389,7 @@
                 });
                 showToast('Endpoint restored to HEALTHY.', 'success');
                 // Reset verdict and timeline to default state
+                restored = true;
                 const vb = document.getElementById('verdictBox');
                 vb.className = 'verdict-box waiting';
                 vb.textContent = 'Waiting for health check failure to trigger AI analysis...';

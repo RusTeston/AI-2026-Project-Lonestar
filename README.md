@@ -2,7 +2,7 @@
 
 **AI Portfolio and Project Showcase**  
 **Project Start**: March 11, 2026  
-**Latest Updates**: March 21, 2026  
+**Latest Updates**: March 22, 2026  
 **Status**: ✅ LIVE - OPERATIONAL - CI/CD ENABLED
 
 ---
@@ -75,7 +75,10 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
    - Intelligent log analysis & troubleshooting using Bedrock Nova Lite
    - Event-driven serverless architecture (S3 + Lambda + Bedrock)
 
-9. **Project 9** - Coming Soon
+9. **Failover Orchestrator** - ✅ LIVE (March 22, 2026)
+   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/09-failover-orchestrator/index.html
+   - Intelligent multi-region failover with AI-powered decision making using Bedrock Nova Lite
+   - Step Functions orchestration with conditional branching (EventBridge + Lambda + Step Functions + DynamoDB + Bedrock Nova Lite + SAM IaC)
 
 ---
 
@@ -95,6 +98,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - **Project 6**: Cost Optimization Advisor (EventBridge Scheduler + Lambda + Cost Explorer + SES + Bedrock Nova Lite + SAM IaC)
 - **Project 7**: Architecture Reviewer (API Gateway + Lambda + SQS + S3 + DynamoDB + Bedrock Nova Lite + SAM IaC)
 - **Project 8**: AI Log Analyzer (Lambda + S3 Events + Bedrock Nova Lite)
+- **Project 9**: Failover Orchestrator (EventBridge + Lambda + Step Functions + DynamoDB + Bedrock Nova Lite + SAM IaC)
 
 **CI/CD Pipeline:**
 - **GitHub Repos**: Public repos at github.com/RusTeston
@@ -142,6 +146,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Expand project portfolio as new AI projects are completed
 
 **Recent Updates:**
+- ✅ **Project 9: Failover Orchestrator** (March 22, 2026): AI-powered multi-region failover with Step Functions, Bedrock reasoning layer, SAM/IaC
 - ✅ **Project 6: Cost Optimization Advisor** (March 21, 2026): Replaced Superhero Transformer, SAM/IaC, EventBridge + SES
 - ✅ **Project 7: Architecture Reviewer** (March 21, 2026): First SAM/IaC project, async pipeline with Bedrock
 - ✅ **Landing page redesign** (March 21, 2026): Dark modern theme, dropped Texas branding

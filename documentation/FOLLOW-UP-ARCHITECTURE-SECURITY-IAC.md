@@ -9,7 +9,7 @@
 
 ### 1. Infrastructure as Code (IaC) - ✅ STARTED (March 21, 2026)
 - ~~Currently all projects deployed via bash scripts with raw AWS CLI commands~~
-- Project 06 (Cost Optimization Advisor) and Project 07 (Architecture Reviewer) deployed via SAM
+- Project 06 (Cost Optimization Advisor), Project 07 (Architecture Reviewer), and Project 09 (Failover Orchestrator) deployed via SAM
 - Remaining projects still use manual deployment — migrate over time
 
 ### 2. Security Hardening
@@ -57,6 +57,7 @@
 - Project 6: ~~Superhero Transformer~~ Cost Optimization Advisor (replaced March 21, 2026)
 - Project 7: Architecture Reviewer (added March 21, 2026)
 - Project 8: AI Log Analyzer
+- Project 9: Failover Orchestrator (added March 22, 2026)
 
 ---
 
@@ -88,6 +89,7 @@ Apply the following to each project (one at a time):
 - Project 6: Cost Optimization Advisor - ✅ COMPLETE (SAM/IaC, new project)
 - Project 7: Architecture Reviewer - ✅ COMPLETE (SAM/IaC, new project)
 - Project 8: AI Log Analyzer - ✅ COMPLETE
+- Project 9: Failover Orchestrator - ✅ COMPLETE (SAM/IaC, Step Functions, new project)
 
 ---
 

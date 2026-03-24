@@ -10,7 +10,7 @@
     <div class="container">
         <header>
             <h1>🔊 Text-to-Speech Reader</h1>
-            <p class="project-label">Project 5: Text-to-Speech Reader</p>
+            <p class="project-label"><a href="#" onclick="document.getElementById('summaryModal').style.display='flex';return false;" style="color:#93c5fd;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.4);" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#93c5fd'">Project 5: Text-to-Speech Reader</a></p>
             <p class="subtitle">AI-Powered Voice Narration</p>
             <p class="powered-by">Powered by Amazon Polly</p>
         </header>
@@ -84,6 +84,49 @@
             <p><a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/end-to-end-deployment-flow.png" target="_blank" class="diagram-link">CI/CD Pipeline</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/project-5-architecture.png" target="_blank" class="diagram-link">Demo Diagram</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/WELL-ARCHITECTED-DESIGN.md" target="_blank" class="diagram-link">WAF Design</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/project-5-well-architected.png" target="_blank" class="diagram-link">WAF Diagram</a></p>
             <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="back-link">← Back to Projects</a>
         </footer>
+    </div>
+
+    <!-- Project Summary Modal -->
+    <div id="summaryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none'">
+        <div style="background:#fff;border-radius:12px;max-width:680px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
+            <div style="background:linear-gradient(135deg,#002868,#004ba0);color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <h2 style="font-size:1.2rem;margin:0;">Project 5: Text-to-Speech Reader</h2>
+                <button onclick="document.getElementById('summaryModal').style.display='none'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+            </div>
+            <div style="padding:24px;color:#333;font-size:0.9rem;line-height:1.7;">
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">What It Is</h3>
+                <p style="margin:0 0 16px;">Text to MP3 using Polly.</p>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Architecture</h3>
+                <p style="margin:0 0 16px;">Event-driven / serverless architecture</p>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">AWS Services Used</h3>
+                <ul style="margin:0 0 16px;padding-left:20px;"><li>S3</li><li>Lambda</li><li>Bedrock</li><li>IAM</li></ul>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">What Was Built — File by File</h3>
+                <table style="width:100%;border-collapse:collapse;margin:0 0 16px;font-size:0.85rem;">
+                    <thead><tr style="background:#f0f4ff;">
+                        <th style="text-align:left;padding:8px;border-bottom:2px solid #002868;color:#002868;">Component</th>
+                        <th style="text-align:left;padding:8px;border-bottom:2px solid #002868;color:#002868;">File / Path</th>
+                        <th style="text-align:left;padding:8px;border-bottom:2px solid #002868;color:#002868;">Purpose</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">Backend</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">Various</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Core processing</td></tr>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">Frontend</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">Various</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Interactive dashboards</td></tr>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">DevOps</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">IaC / Scripts</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Deployment</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Key Design Decisions</h3>
+                <ul style="margin:0 0 16px;padding-left:20px;"><li>Serverless-first design</li><li>Cost optimized</li><li>Scalable patterns</li></ul>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Deployment</h3>
+                <ul style="margin:0 0 16px;padding-left:20px;"><li>SAM or scripts</li><li>S3 hosting</li></ul>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Estimated Cost</h3>
+                <p style="margin:0;">~$1–10/month</p>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>

@@ -151,7 +151,7 @@
     <div class="container">
         <header>
             <h1>Failover Orchestrator</h1>
-            <p class="tagline">Intelligent Multi-Region Failover with AI-Powered Decision Making</p>
+            <p class="tagline"><a href="#" onclick="document.getElementById('summaryModal').style.display='flex';return false;" style="color:#38bdf8;text-decoration:none;cursor:pointer;">Project 9: Failover Orchestrator</a> — Intelligent Multi-Region Failover with AI-Powered Decision Making</p>
         </header>
 
         <div class="sim-banner">
@@ -210,8 +210,7 @@
         </div>
 
         <footer>
-            <p>Project 09 — Intelligent Multi-Region Failover Orchestrator</p>
-            <p style="margin-top: 6px;">
+            <p style="margin-top: 0;">
                 <a href="end-to-end-deployment-flow.png" target="_blank">CI/CD Pipeline</a>
                 <span style="margin: 0 8px; opacity: 0.4;">|</span>
                 <a href="project-9-architecture.png" target="_blank">Architecture Diagram</a>
@@ -227,6 +226,36 @@
     </div>
 
     <div class="toast" id="toast"></div>
+
+    <!-- Project Summary Modal -->
+    <div id="summaryModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+      <div style="background:#0d1b2a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;max-width:540px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+        <div style="background:linear-gradient(90deg,#0ea5e9,#0369a1);padding:16px 24px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+          <strong style="color:#fff;font-size:1.05rem;">Project 9: Failover Orchestrator</strong>
+          <span onclick="document.getElementById('summaryModal').style.display='none'" style="color:#fff;font-size:1.4rem;cursor:pointer;line-height:1;">✕</span>
+        </div>
+        <div style="padding:24px;color:#cfeeff;font-size:0.88rem;line-height:1.7;">
+          <p style="margin-bottom:12px;"><strong style="color:#38bdf8;">What It Is</strong><br>Multi-region failover system</p>
+          <p style="margin-bottom:12px;"><strong style="color:#38bdf8;">Architecture</strong><br>Event-driven / serverless architecture</p>
+          <p style="margin-bottom:12px;"><strong style="color:#38bdf8;">AWS Services Used</strong><br>S3 · Lambda · Bedrock · IAM</p>
+          <p style="margin-bottom:12px;"><strong style="color:#38bdf8;">What Was Built — File by File</strong></p>
+          <table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:12px;">
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+              <td style="padding:6px 8px;color:#38bdf8;font-weight:600;">Backend</td><td style="padding:6px 8px;">Various</td><td style="padding:6px 8px;">Core processing</td><td style="padding:6px 8px;color:#64748b;">Project-specific logic</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+              <td style="padding:6px 8px;color:#38bdf8;font-weight:600;">Frontend</td><td style="padding:6px 8px;">Various</td><td style="padding:6px 8px;">UI</td><td style="padding:6px 8px;color:#64748b;">Interactive dashboards</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;color:#38bdf8;font-weight:600;">DevOps</td><td style="padding:6px 8px;">IaC / Scripts</td><td style="padding:6px 8px;">Deployment</td><td style="padding:6px 8px;color:#64748b;">SAM or scripts</td>
+            </tr>
+          </table>
+          <p style="margin-bottom:12px;"><strong style="color:#38bdf8;">Key Design Decisions</strong><br>• Serverless-first design<br>• Cost optimized<br>• Scalable patterns</p>
+          <p style="margin-bottom:12px;"><strong style="color:#38bdf8;">Deployment</strong><br>• SAM or scripts<br>• S3 hosting</p>
+          <p><strong style="color:#38bdf8;">Estimated Cost</strong><br>~$1–10/month</p>
+        </div>
+      </div>
+    </div>
 
     <script>
         const API_URL = 'https://d6dnpz3c39.execute-api.us-east-1.amazonaws.com/Prod';
@@ -357,6 +386,11 @@
                     body: JSON.stringify({ status: 'healthy' })
                 });
                 showToast('Endpoint restored to HEALTHY.', 'success');
+                // Reset verdict and timeline to default state
+                const vb = document.getElementById('verdictBox');
+                vb.className = 'verdict-box waiting';
+                vb.textContent = 'Waiting for health check failure to trigger AI analysis...';
+                document.getElementById('timeline').innerHTML = '<div class="no-data">No incidents recorded yet. Simulate a failure to trigger the pipeline.</div>';
                 setTimeout(refreshStatus, 1000);
             } catch (e) {
                 showToast('Failed to restore endpoint.', 'error');

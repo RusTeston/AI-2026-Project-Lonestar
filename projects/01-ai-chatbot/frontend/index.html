@@ -10,7 +10,7 @@
     <div class="container">
         <header>
             <h1>☁️ Cloud Architecture Advisor</h1>
-            <p class="project-label">Project 1: AI Chatbot</p>
+            <p class="project-label"><a href="#" onclick="document.getElementById('summaryModal').style.display='flex';return false;" style="color:#93c5fd;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.4);" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#93c5fd'">Project 1: AI Chatbot</a></p>
             <p class="subtitle">AI-Powered AWS Architecture Recommendations</p>
             <p class="powered-by">Powered by Amazon Bedrock (Nova Lite)</p>
         </header>
@@ -41,6 +41,51 @@
             <p><a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/01-ai-chatbot/end-to-end-deployment-flow.png" target="_blank" class="diagram-link">CI/CD Pipeline</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/01-ai-chatbot/project-1-architecture.png" target="_blank" class="diagram-link">Demo Diagram</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/01-ai-chatbot/WELL-ARCHITECTED-DESIGN.md" target="_blank" class="diagram-link">WAF Design</a> | <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/01-ai-chatbot/project-1-well-architected.png" target="_blank" class="diagram-link">WAF Diagram</a></p>
             <a href="http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/" class="back-link">← Back to Projects</a>
         </footer>
+    </div>
+
+    <!-- Project Summary Modal -->
+    <div id="summaryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none'">
+        <div style="background:#fff;border-radius:12px;max-width:680px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
+            <div style="background:linear-gradient(135deg,#002868,#004ba0);color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+                <h2 style="font-size:1.2rem;margin:0;">Project 1: Cloud Architecture Advisor</h2>
+                <button onclick="document.getElementById('summaryModal').style.display='none'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+            </div>
+            <div style="padding:24px;color:#333;font-size:0.9rem;line-height:1.7;">
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">What It Is</h3>
+                <p style="margin:0 0 16px;">AI chatbot providing AWS architecture recommendations.</p>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Architecture</h3>
+                <p style="margin:0 0 16px;">Browser → S3 → API Gateway → Lambda → Bedrock → Response</p>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">AWS Services Used</h3>
+                <ul style="margin:0 0 16px;padding-left:20px;"><li>S3</li><li>API Gateway</li><li>Lambda</li><li>Bedrock</li><li>IAM</li><li>CloudWatch</li></ul>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">What Was Built — File by File</h3>
+                <table style="width:100%;border-collapse:collapse;margin:0 0 16px;font-size:0.85rem;">
+                    <thead><tr style="background:#f0f4ff;">
+                        <th style="text-align:left;padding:8px;border-bottom:2px solid #002868;color:#002868;">Component</th>
+                        <th style="text-align:left;padding:8px;border-bottom:2px solid #002868;color:#002868;">File / Path</th>
+                        <th style="text-align:left;padding:8px;border-bottom:2px solid #002868;color:#002868;">Purpose</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">Backend</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">backend/lambda_function.py</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Handles Bedrock requests</td></tr>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">Frontend</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">frontend/index.html</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Chat UI</td></tr>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">Frontend</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">frontend/app.js</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Handles API calls, markdown rendering</td></tr>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">Frontend</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">frontend/styles.css</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Styling</td></tr>
+                        <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">DevOps</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.8rem;">scripts/*.sh</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">Deployment scripts</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Key Design Decisions</h3>
+                <ul style="margin:0 0 16px;padding-left:20px;"><li>REST API used</li><li>Structured prompts</li><li>Balanced AI temperature</li></ul>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Deployment</h3>
+                <ul style="margin:0 0 16px;padding-left:20px;"><li>Lambda + API Gateway</li><li>S3 hosting</li><li>Manual scripts</li></ul>
+
+                <h3 style="color:#002868;font-size:1rem;margin:0 0 6px;">Estimated Cost</h3>
+                <p style="margin:0;">~$4.30/month</p>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>

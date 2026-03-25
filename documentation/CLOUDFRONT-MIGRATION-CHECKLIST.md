@@ -14,19 +14,21 @@
 - [x] Add Route 53 alias record: `ai.rus-teston.com` → CloudFront distribution
 - [x] Verify `https://ai.rus-teston.com` loads correctly — HTTP 200, SSL valid
 
-## Phase 2: CI/CD Updates
-- [ ] Check `GitHubActions-Deploy` IAM role has `cloudfront:CreateInvalidation` permission
-- [ ] Add CloudFront invalidation step to GitHub Actions workflow
-- [ ] Test: push a change, confirm auto-deploy + invalidation works
+## Phase 2: CI/CD Updates ✅ COMPLETE
+- [x] Check `GitHubActions-Deploy` IAM role has `cloudfront:CreateInvalidation` permission — added `E6LY7PZWUOBBP`
+- [x] Add CloudFront invalidation step to GitHub Actions workflow
+- [x] Test: push a change, confirm auto-deploy + invalidation works
 
-## Phase 3: URL Updates
-- [ ] Update Lonestar landing page links from S3 URLs to `https://ai.rus-teston.com`
-- [ ] Update project page links (back to projects, etc.) if needed
-- [ ] Update README.md with new live site URL
+## Phase 3: URL Updates ✅ COMPLETE
+- [x] Update Lonestar landing page links from S3 URLs to `https://ai.rus-teston.com`
+- [x] Update project page links (Projects 1, 3, 4, 5, 8 back links + diagram links)
+- [x] Update error page home button link
+- [x] Update portfolio site (rus-teston.com) AI Projects link
+- [x] Update README.md with new live site URL
 
-## Phase 4: Security Hardening (Optional, Best Practice)
-- [ ] Tighten Lambda CORS from `*` to `https://ai.rus-teston.com`
-- [ ] Add security response headers policy to CloudFront (matching portfolio site)
+## Phase 4: Security Hardening
+- [x] Add security response headers policy to CloudFront — `d409f843-33ea-453e-a8f7-2fb44e4804ef` (HSTS, CSP, X-Frame, XSS Protection, Content-Type-Options)
+- [ ] Tighten Lambda CORS from `*` to `https://ai.rus-teston.com` — DEFERRED (requires SAM redeploy of Projects 6, 7, 9 + Lambda update for Project 1; low risk item, `*` is acceptable for public demo APIs)
 
 ## Notes
 - S3 website URL remains functional as fallback throughout

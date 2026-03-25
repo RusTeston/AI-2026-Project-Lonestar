@@ -11,7 +11,7 @@
 
 AI Project: Lone Star is a portfolio website showcasing AI development projects and initiatives. The site demonstrates hands-on exploration of artificial intelligence through practical implementations and real-world applications.
 
-**Live Site**: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com
+**Live Site**: https://ai.rus-teston.com
 
 ---
 
@@ -35,7 +35,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 
 ### **Live Projects**
 1. **AI Chatbot** - ✅ LIVE (March 11, 2026)
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/01-ai-chatbot/index.html
+   - URL: https://ai.rus-teston.com/projects/01-ai-chatbot/index.html
    - Cloud Architecture Advisor powered by Amazon Bedrock Nova Lite
    - Full-stack serverless application (Lambda + API Gateway + S3)
 
@@ -44,39 +44,39 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
    - Bedrock Knowledge Base + OpenSearch Serverless
 
 3. **Language Translator** - ✅ LIVE (March 12, 2026)
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/03-language-translator/index.html
+   - URL: https://ai.rus-teston.com/projects/03-language-translator/index.html
    - Multi-language translation using AWS Translate
    - Serverless architecture (Lambda Function URL + S3)
 
 4. **Document Intelligence Pipeline** - ✅ LIVE
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/04-document-intelligence/index.html
+   - URL: https://ai.rus-teston.com/projects/04-document-intelligence/index.html
    - AI-powered document processing with Textract and Bedrock
    - Event-driven serverless architecture (S3 + Lambda + Textract + Bedrock)
 
 5. **Text-to-Speech Reader** - ✅ LIVE
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/05-text-to-speech/index.html
+   - URL: https://ai.rus-teston.com/projects/05-text-to-speech/index.html
    - AI-powered voice narration using Amazon Polly
    - Serverless architecture (Lambda Function URL + S3)
 
 6. **Cost Optimization Advisor** - ✅ LIVE (March 21, 2026)
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/06-cost-optimizer/index.html
+   - URL: https://ai.rus-teston.com/projects/06-cost-optimizer/index.html
    - AI-powered AWS cost analysis and recommendations using Bedrock Nova Lite
    - Scheduled serverless agent (EventBridge Scheduler + Lambda + Cost Explorer + SES)
    - Second project using SAM/IaC deployment
 
 7. **Architecture Reviewer** - ✅ LIVE (March 21, 2026)
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/07-architecture-reviewer/index.html
+   - URL: https://ai.rus-teston.com/projects/07-architecture-reviewer/index.html
    - AI-powered CloudFormation/SAM template review against Well-Architected Framework
    - Async serverless pipeline (API Gateway + Lambda + SQS + S3 + DynamoDB + Bedrock Nova Lite)
    - First project using SAM/IaC deployment
 
 8. **AI Log Analyzer** - ✅ LIVE
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/08-log-analyzer/index.html
+   - URL: https://ai.rus-teston.com/projects/08-log-analyzer/index.html
    - Intelligent log analysis & troubleshooting using Bedrock Nova Lite
    - Event-driven serverless architecture (S3 + Lambda + Bedrock)
 
 9. **Failover Orchestrator** - ✅ LIVE (March 22, 2026)
-   - URL: http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com/projects/09-failover-orchestrator/index.html
+   - URL: https://ai.rus-teston.com/projects/09-failover-orchestrator/index.html
    - Intelligent multi-region failover with AI-powered decision making using Bedrock Nova Lite
    - Step Functions orchestration with conditional branching (EventBridge + Lambda + Step Functions + DynamoDB + Bedrock Nova Lite + SAM IaC)
 

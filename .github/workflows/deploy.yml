@@ -35,3 +35,6 @@ jobs:
             project_name=$(echo "$project_dir" | cut -d'/' -f2)
             aws s3 sync "$project_dir" "s3://ai-2026-project-lonestar/projects/$project_name/" --exclude "*.DS_Store"
           done
+
+      - name: Invalidate CloudFront Cache
+        run: aws cloudfront create-invalidation --distribution-id E6LY7PZWUOBBP --paths "/*"

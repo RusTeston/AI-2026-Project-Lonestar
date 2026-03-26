@@ -381,7 +381,13 @@ EventBridge Scheduler, Step Functions, Lambda (Python 3.12) × 5, Bedrock Nova L
 | AWS Textract | 4, 5 |
 
 ### All Projects Live At
-http://ai-2026-project-lonestar.s3-website-us-east-1.amazonaws.com
+https://ai.rus-teston.com (CloudFront CDN + HTTPS)
+
+### Frontend Features (March 25, 2026)
+- All 8 project pages have clickable project summary modals
+- Light theme modal (Projects 1, 3, 4, 5, 8) — white background, blue headings
+- Dark theme modal (Projects 6, 7, 9) — dark background, theme-matching accents
+- Project 9: Restore Healthy button clears AI verdict and incident timeline
 
 ---
 

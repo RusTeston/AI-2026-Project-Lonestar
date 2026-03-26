@@ -105,10 +105,13 @@ Apply the following to each project (one at a time):
 - **IAM Role**: `GitHubActions-Deploy` with least-privilege permissions
   - S3: PutObject/GetObject/DeleteObject/ListBucket on both buckets
   - Lambda: UpdateFunctionCode in us-east-1
-  - CloudFront: CreateInvalidation on distribution E3IA5ZUL2HT0NT
+  - CloudFront: CreateInvalidation on distributions E3IA5ZUL2HT0NT and E6LY7PZWUOBBP
 - **GitHub Actions Workflows**: Auto-deploy on push to main
   - rus-portfolio-prod: Syncs `live-site-html/` to S3, invalidates CloudFront
-  - Lonestar: Deploys `website/` and `projects/*/frontend/` to S3
+  - Lonestar: Deploys `website/` and `projects/*/frontend/` to S3, invalidates CloudFront
+- **CloudFront for Lonestar** (March 25, 2026): Distribution `E6LY7PZWUOBBP` serving `https://ai.rus-teston.com`
+  - ACM certificate, TLS 1.2+, PriceClass_100, security response headers policy
+  - All project URLs updated from S3 HTTP to CloudFront HTTPS
 - **CI/CD Pipeline diagram**: Added to Projects 1, 3, 4, 5, 8 footers (end-to-end-deployment-flow.png)
 - **Tested**: Both pipelines verified end-to-end
 

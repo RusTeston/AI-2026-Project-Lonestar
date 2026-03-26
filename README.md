@@ -2,7 +2,7 @@
 
 **AI Portfolio and Project Showcase**  
 **Project Start**: March 11, 2026  
-**Latest Updates**: March 22, 2026  
+**Latest Updates**: March 25, 2026  
 **Status**: ✅ LIVE - OPERATIONAL - CI/CD ENABLED
 
 ---
@@ -87,8 +87,12 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 **AWS Services:**
 - **S3 Bucket**: `ai-2026-project-lonestar`
 - **Region**: `us-east-1`
-- **Configuration**: Static website hosting enabled
-- **Access**: Public read access for website content
+- **CloudFront Distribution**: `E6LY7PZWUOBBP` (`d309r1vnuulj1s.cloudfront.net`)
+- **Custom Domain**: `https://ai.rus-teston.com`
+- **ACM Certificate**: Covering `ai.rus-teston.com` (TLS 1.2+, SNI)
+- **DNS**: Route 53 alias record in `rus-teston.com` hosted zone
+- **Security Headers**: Enterprise-grade response headers policy (HSTS, CSP, X-Frame, XSS Protection)
+- **Price Class**: PriceClass_100 (cost optimized)
 
 **Projects:**
 - **Project 1**: AI Chatbot (Lambda + API Gateway + Bedrock Nova Lite)
@@ -105,11 +109,13 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - **GitHub Actions**: Auto-deploy on push to main branch
 - **OIDC Federation**: Secure AWS authentication (no stored credentials)
 - **IAM Role**: `GitHubActions-Deploy` with least-privilege permissions
+- **CloudFront Invalidation**: Automatic cache invalidation after each deploy
 
 **Website Features:**
 - Single-page portfolio design
 - Dark modern theme with Inter font
 - Professional grid layout for projects
+- Project summary modals on all 8 project pages
 - Responsive layout (desktop/tablet optimized)
 - No external dependencies
 
@@ -138,14 +144,17 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 **Design**: Professional corporate aesthetic  
 
 **Next Steps:**
-- Add custom domain (future)
-- Implement CloudFront CDN (future)
-- Configure SSL/TLS with ACM (future)
 - Add automated testing to CI/CD workflows
-- Migrate infrastructure to SAM/CloudFormation (IaC) — ✅ Started with Project 7
+- Migrate remaining projects to SAM/CloudFormation (IaC) — ✅ Started with Project 7
+- Tighten Lambda CORS from `*` to `https://ai.rus-teston.com` (deferred — requires SAM redeploys)
 - Expand project portfolio as new AI projects are completed
 
 **Recent Updates:**
+- ✅ **CloudFront + HTTPS** (March 25, 2026): `ai.rus-teston.com` served via CloudFront CDN with TLS 1.2+, security headers, PriceClass_100
+- ✅ **CI/CD CloudFront invalidation** (March 25, 2026): Auto-invalidation added to GitHub Actions workflow
+- ✅ **URL migration** (March 25, 2026): All S3 URLs replaced with `https://ai.rus-teston.com` across all projects, README, and portfolio site
+- ✅ **Project summary modals** (March 25, 2026): Clickable summary overlays added to all 8 project pages
+- ✅ **P9 restore fix** (March 25, 2026): Restore Healthy clears AI verdict and timeline
 - ✅ **Project 9: Failover Orchestrator** (March 22, 2026): AI-powered multi-region failover with Step Functions, Bedrock reasoning layer, SAM/IaC
 - ✅ **Project 6: Cost Optimization Advisor** (March 21, 2026): Replaced Superhero Transformer, SAM/IaC, EventBridge + SES
 - ✅ **Project 7: Architecture Reviewer** (March 21, 2026): First SAM/IaC project, async pipeline with Bedrock

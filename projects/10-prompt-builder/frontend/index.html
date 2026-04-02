@@ -29,6 +29,15 @@
         h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
         .tagline { font-size: 1rem; color: #cfeeff; }
 
+        .btn-info {
+            margin-top: 14px; padding: 10px 22px; border-radius: 8px; border: none;
+            background: rgba(14,165,233,0.1); color: #0ea5e9;
+            border: 1px solid rgba(14,165,233,0.25);
+            font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-info:hover { background: rgba(14,165,233,0.18); transform: translateY(-1px); }
+
         /* Form sections */
         .form-section { margin-bottom: 18px; }
         .form-section label {
@@ -181,6 +190,7 @@
         <header>
             <h1>Perfect Prompt Builder</h1>
             <p class="tagline">Build structured prompts for any foundation model — then let AI enhance them</p>
+            <button class="btn-info" onclick="showInfoModal()">Prompt Engineering & Instructions</button>
         </header>
 
         <div class="form-section">
@@ -282,6 +292,23 @@
                 <a href="../../index.html">← Back to Projects</a>
             </p>
         </footer>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="infoModal" onclick="closeModal(event)">
+        <div class="modal">
+            <button class="modal-close" onclick="document.getElementById('infoModal').classList.remove('visible')">✕</button>
+            <h2>Prompt Engineering & Instructions</h2>
+            <div class="modal-prompt">
+<span class="modal-label">WHAT IS PROMPT ENGINEERING?</span>
+Prompt engineering is the practice of writing clear, structured instructions that guide an AI model to produce better, more accurate results. Instead of asking vague or general questions, prompt engineering helps you define exactly what you want, how you want it, and who it's for. A well-crafted prompt reduces confusion, improves response quality, and saves time by minimizing the need for follow-up corrections. Think of it like giving directions: the more specific and organized your instructions are, the more likely the AI will deliver a useful and relevant answer.
+
+<span class="modal-label">INSTRUCTIONS</span>
+To create an effective prompt using the Prompt Builder page, start by filling out each section one at a time. In the Role section, define who the AI should act as (for example, a marketing expert or technical writer). In Task, clearly describe what you want the AI to do and the outcome you expect. Next, use the Context section to provide background information and describe your audience. In the Input area, paste any content the AI should work with, such as notes or data. Then, add any Constraints, including requirements or limitations (like word count or formatting rules). In Output Format, specify how the response should be structured, such as a report or bullet points. Optionally, include Examples to show what a good response looks like, and define the Tone you want (e.g., professional or casual). Finally, add Verification checks to ensure the response meets your expectations. Once complete, click "Generate Prompt," review the output, and copy it for use in your AI tool.
+
+<span class="modal-label">IN CONCLUSION</span>
+Prompt engineering is a simple but powerful way to improve how you interact with AI systems. By using a structured approach like the Prompt Builder, you can turn unclear ideas into precise instructions that produce high-quality results. The key benefits include better accuracy, more consistent outputs, and less time spent revising responses. When you clearly define role, task, context, and expectations, the AI performs more like a helpful assistant and less like a guesser. Over time, using this method will help you get faster, smarter, and more reliable results from any AI tool.</div>
+        </div>
     </div>
 
     <!-- Example Modal -->
@@ -447,6 +474,10 @@ Phase 1: Database Migration (Weeks 1-3)
 
         function showExample() {
             document.getElementById('exampleModal').classList.add('visible');
+        }
+
+        function showInfoModal() {
+            document.getElementById('infoModal').classList.add('visible');
         }
 
         function closeModal(e) {

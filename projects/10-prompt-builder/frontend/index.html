@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<!-- CI/CD: Deployed via GitHub Actions -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Prompt Builder — Project 10</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(180deg, #071029 0%, #02263f 40%, #052a4d 100%);
+            color: #e6f3ff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            padding: 40px 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .tagline { font-size: 1rem; color: #cfeeff; }
+
+        /* Form sections */
+        .form-section { margin-bottom: 18px; }
+        .form-section label {
+            display: block; font-size: 0.9rem; font-weight: 600;
+            color: #cfeeff; margin-bottom: 4px;
+        }
+        .helper { font-size: 0.75rem; color: #64748b; margin-bottom: 6px; }
+        input[type="text"], textarea, select {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e6f3ff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            padding: 10px 12px;
+            outline: none;
+        }
+        input[type="text"]:focus, textarea:focus, select:focus { border-color: rgba(255,255,255,0.25); }
+        textarea { resize: vertical; min-height: 70px; }
+        textarea::placeholder, input::placeholder { color: #5a7a8e; }
+        select { cursor: pointer; }
+        select option { background: #0f172a; color: #e6f3ff; }
+
+        /* Buttons */
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 24px 0 20px; }
+        .btn {
+            padding: 11px 22px; border-radius: 8px; border: none;
+            font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-primary { background: linear-gradient(90deg, #0ea5e9, #0369a1); color: white; flex: 2; }
+        .btn-ai { background: linear-gradient(90deg, #8b5cf6, #6d28d9); color: white; flex: 2; }
+        .btn-secondary { background: rgba(255,255,255,0.06); color: #cfeeff; border: 1px solid rgba(255,255,255,0.1); flex: 1; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+        /* Output */
+        .output-section { display: none; margin-bottom: 20px; }
+        .output-section.visible { display: block; }
+        .output-label { font-size: 0.9rem; font-weight: 600; color: #cfeeff; margin-bottom: 8px; }
+        .output-box {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 16px;
+            font-size: 0.85rem; color: #e6f3ff; line-height: 1.7;
+            white-space: pre-wrap; max-height: 400px; overflow-y: auto;
+        }
+
+        /* AI Results */
+        .ai-results { display: none; margin-bottom: 20px; }
+        .ai-results.visible { display: block; }
+
+        .score-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .score-circle {
+            width: 56px; height: 56px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; font-weight: 700; flex-shrink: 0;
+            border: 3px solid rgba(255,255,255,0.1);
+        }
+        .score-circle.high { border-color: #4ade80; color: #4ade80; background: rgba(34,197,94,0.08); }
+        .score-circle.medium { border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,0.08); }
+        .score-circle.low { border-color: #f87171; color: #f87171; background: rgba(239,68,68,0.08); }
+        .score-summary { font-size: 0.85rem; color: #95c4e6; line-height: 1.5; }
+
+        .improvements { margin-bottom: 14px; }
+        .improvement {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px; padding: 10px 12px; margin-bottom: 6px;
+            font-size: 0.82rem; color: #cfeeff; line-height: 1.5;
+            border-left: 3px solid rgba(14,165,233,0.4);
+        }
+
+        .enhanced-section { margin-top: 14px; }
+        .enhanced-box {
+            background: rgba(34,197,94,0.04); border: 1px solid rgba(34,197,94,0.15);
+            border-radius: 10px; padding: 16px;
+            font-size: 0.85rem; color: #e6f3ff; line-height: 1.7;
+            white-space: pre-wrap; max-height: 400px; overflow-y: auto;
+        }
+        .copy-enhanced {
+            margin-top: 8px; padding: 8px 16px; border-radius: 6px; border: none;
+            background: rgba(34,197,94,0.15); color: #4ade80; font-family: 'Inter', sans-serif;
+            font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .copy-enhanced:hover { background: rgba(34,197,94,0.25); }
+
+        /* Status */
+        .status { margin-bottom: 16px; padding: 14px; border-radius: 10px; display: none; text-align: center; }
+        .status.loading { display: block; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); color: #c4b5fd; }
+        .status.error { display: block; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+        .status.success { display: block; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
+        .spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.2); border-top-color: #8b5cf6;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            vertical-align: middle; margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal {
+            background: linear-gradient(180deg, #0f1d32, #071029);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 30px; max-width: 700px; width: 100%;
+            max-height: 80vh; overflow-y: auto; position: relative;
+        }
+        .modal h2 { font-size: 1.2rem; color: #fff; margin-bottom: 6px; }
+        .modal .tagline { margin-bottom: 16px; }
+        .modal-close {
+            position: absolute; top: 14px; right: 18px; background: none; border: none;
+            color: #95c4e6; font-size: 1.4rem; cursor: pointer;
+        }
+        .modal-prompt {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 18px;
+            font-size: 0.83rem; color: #cfeeff; line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        .modal-label {
+            font-size: 0.75rem; font-weight: 600; color: #0ea5e9;
+            text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 4px;
+        }
+        .modal-label:first-of-type { margin-top: 0; }
+
+        footer {
+            margin-top: 40px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center; font-size: 0.85rem; color: #95c4e6;
+        }
+        footer a { color: #0ea5e9; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 700px) {
+            .container { padding: 30px 20px; }
+            h1 { font-size: 1.5rem; }
+            .actions { flex-direction: column; }
+            .btn { flex: unset; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Perfect Prompt Builder</h1>
+            <p class="tagline">Build structured prompts for any foundation model — then let AI enhance them</p>
+        </header>
+
+        <div class="form-section">
+            <label>Role</label>
+            <div class="helper">Who should the AI act as? Sets the expertise and perspective.</div>
+            <select id="roleSelect" onchange="handleRoleSelect()">
+                <option value="">Select a role or type your own below...</option>
+                <option value="Act as a senior software engineer.">Senior Software Engineer</option>
+                <option value="Act as an AWS Solutions Architect.">AWS Solutions Architect</option>
+                <option value="Act as a technical writer.">Technical Writer</option>
+                <option value="Act as a data analyst.">Data Analyst</option>
+                <option value="Act as a cybersecurity expert.">Cybersecurity Expert</option>
+                <option value="Act as a DevOps engineer.">DevOps Engineer</option>
+                <option value="custom">Custom (type below)</option>
+            </select>
+            <input type="text" id="roleInput" placeholder="e.g., Act as a senior cloud architect with 10 years of AWS experience." style="margin-top:6px;">
+        </div>
+
+        <div class="form-section">
+            <label>Task</label>
+            <div class="helper">What should the AI do? Be specific about the deliverable.</div>
+            <textarea id="taskInput" rows="3" placeholder="e.g., Write a migration plan for moving a monolithic application to microservices on AWS."></textarea>
+        </div>
+
+        <div class="form-section">
+            <label>Context</label>
+            <div class="helper">Background information the AI needs to do the job well.</div>
+            <textarea id="contextInput" rows="3" placeholder="e.g., The application is a Java-based e-commerce platform running on a single EC2 instance with a MySQL RDS database. It handles 10,000 daily users."></textarea>
+        </div>
+
+        <div class="form-section">
+            <label>Constraints</label>
+            <div class="helper">Rules, limitations, or things to avoid. One per line.</div>
+            <textarea id="constraintsInput" rows="3" placeholder="e.g.,&#10;Do not suggest any third-party tools&#10;Keep the plan under 2000 words&#10;Use only AWS-native services"></textarea>
+        </div>
+
+        <div class="form-section">
+            <label>Output Format</label>
+            <div class="helper">How should the response be structured?</div>
+            <textarea id="formatInput" rows="2" placeholder="e.g., Return a numbered list with phase name, description, estimated timeline, and AWS services used for each phase."></textarea>
+        </div>
+
+        <div class="form-section">
+            <label>Verification</label>
+            <div class="helper">Optional — ask the AI to confirm understanding before responding.</div>
+            <input type="text" id="verificationInput" placeholder="e.g., Before responding, confirm you understand the current architecture and migration goals.">
+        </div>
+
+        <div class="form-section">
+            <label>Examples</label>
+            <div class="helper">Optional — provide a sample input/output to guide the AI's response style.</div>
+            <textarea id="examplesInput" rows="3" placeholder="e.g.,&#10;Example input: 'Migrate user authentication'&#10;Example output: 'Phase 1: Extract auth logic into a Lambda-backed API Gateway endpoint...'"></textarea>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="generatePrompt()">Generate Prompt</button>
+            <button class="btn btn-ai" id="enhanceBtn" onclick="enhancePrompt()" disabled>Enhance with AI</button>
+            <button class="btn btn-secondary" onclick="copyPrompt()">Copy</button>
+            <button class="btn btn-secondary" onclick="showExample()">View Example</button>
+            <button class="btn btn-secondary" onclick="loadDemo()">Try a Demo</button>
+            <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="output-section" id="outputSection">
+            <div class="output-label">Your Generated Prompt</div>
+            <div class="output-box" id="outputBox"></div>
+        </div>
+
+        <div class="ai-results" id="aiResults">
+            <div class="output-label">🧠 AI Enhancement Results</div>
+            <div class="score-bar">
+                <div class="score-circle" id="scoreCircle"></div>
+                <div class="score-summary" id="scoreSummary"></div>
+            </div>
+            <div class="improvements" id="improvements"></div>
+            <div class="enhanced-section">
+                <div class="output-label" style="color:#4ade80;">✨ Enhanced Prompt</div>
+                <div class="enhanced-box" id="enhancedBox"></div>
+                <button class="copy-enhanced" onclick="copyEnhanced()">Copy Enhanced Prompt</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Project 10 — Perfect Prompt Builder</p>
+            <p style="margin-top: 6px;">
+                <a href="../../index.html">← Back to Projects</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Example Modal -->
+    <div class="modal-overlay" id="exampleModal" onclick="closeModal(event)">
+        <div class="modal">
+            <button class="modal-close" onclick="document.getElementById('exampleModal').classList.remove('visible')">✕</button>
+            <h2>Example: A Well-Structured Prompt</h2>
+            <p class="tagline">This is what a completed prompt looks like when all sections are filled in.</p>
+            <div class="modal-prompt">
+<span class="modal-label">ROLE</span>
+Act as a senior AWS Solutions Architect with expertise in serverless architecture, cost optimization, and enterprise migration projects.
+
+<span class="modal-label">TASK</span>
+Design a migration plan for moving a legacy three-tier web application from on-premises infrastructure to a fully serverless architecture on AWS.
+
+<span class="modal-label">CONTEXT</span>
+The application is a .NET-based inventory management system used by 500 warehouse employees across 3 locations. It currently runs on two Windows servers with an SQL Server database. Peak usage is Monday-Friday 6 AM to 6 PM EST. The company has a $50,000 annual AWS budget and needs zero downtime during migration.
+
+<span class="modal-label">CONSTRAINTS</span>
+- Use only AWS-native services (no third-party tools)
+- Migration must complete within 90 days
+- Maintain backward compatibility with existing barcode scanners
+- Do not exceed $4,000/month in AWS costs
+- All data must remain in the us-east-1 region
+
+<span class="modal-label">OUTPUT FORMAT</span>
+Return a phased migration plan with: phase number, phase name, duration in weeks, AWS services used, estimated monthly cost, risk level (low/medium/high), and rollback procedure for each phase. End with a total cost summary and timeline.
+
+<span class="modal-label">VERIFICATION</span>
+Before responding, confirm you understand the current architecture, budget constraints, and zero-downtime requirement.
+
+<span class="modal-label">EXAMPLE</span>
+Phase 1: Database Migration (Weeks 1-3)
+- Services: DMS, Aurora Serverless v2
+- Monthly cost: $800
+- Risk: Medium
+- Rollback: Revert DMS replication, point app back to on-prem SQL Server</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://n7taftgspogdij7l4g2ercpnsi0srofk.lambda-url.us-east-1.on.aws/';
+        let generatedPrompt = '';
+
+        function handleRoleSelect() {
+            const sel = document.getElementById('roleSelect');
+            const input = document.getElementById('roleInput');
+            if (sel.value === 'custom') {
+                input.value = '';
+                input.focus();
+            } else if (sel.value) {
+                input.value = sel.value;
+            }
+        }
+
+        function generatePrompt() {
+            const role = document.getElementById('roleInput').value.trim();
+            const task = document.getElementById('taskInput').value.trim();
+            const context = document.getElementById('contextInput').value.trim();
+            const constraints = document.getElementById('constraintsInput').value.trim();
+            const format = document.getElementById('formatInput').value.trim();
+            const verification = document.getElementById('verificationInput').value.trim();
+            const examples = document.getElementById('examplesInput').value.trim();
+
+            if (!task) {
+                showError('Please fill in at least the Task field.');
+                return;
+            }
+
+            let prompt = '';
+            if (role) prompt += `ROLE:\n${role}\n\n`;
+            if (task) prompt += `TASK:\n${task}\n\n`;
+            if (context) prompt += `CONTEXT:\n${context}\n\n`;
+            if (constraints) {
+                const lines = constraints.split('\n').filter(l => l.trim());
+                prompt += `CONSTRAINTS:\n${lines.map(l => l.trim().startsWith('-') ? l.trim() : `- ${l.trim()}`).join('\n')}\n\n`;
+            }
+            if (format) prompt += `OUTPUT FORMAT:\n${format}\n\n`;
+            if (verification) prompt += `VERIFICATION:\n${verification}\n\n`;
+            if (examples) prompt += `EXAMPLES:\n${examples}\n\n`;
+
+            generatedPrompt = prompt.trim();
+            document.getElementById('outputBox').textContent = generatedPrompt;
+            document.getElementById('outputSection').classList.add('visible');
+            document.getElementById('enhanceBtn').disabled = false;
+            document.getElementById('aiResults').classList.remove('visible');
+            hideStatus();
+        }
+
+        async function enhancePrompt() {
+            if (!generatedPrompt) return;
+
+            const btn = document.getElementById('enhanceBtn');
+            btn.disabled = true;
+            showLoading('Analyzing prompt with Bedrock Nova Lite...');
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: generatedPrompt })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Enhancement failed');
+                hideStatus();
+                renderAIResults(data);
+            } catch (e) {
+                showError(e.message);
+            }
+            btn.disabled = false;
+        }
+
+        function renderAIResults(data) {
+            const score = data.score || 0;
+            const tier = score >= 75 ? 'high' : score >= 50 ? 'medium' : 'low';
+
+            const circle = document.getElementById('scoreCircle');
+            circle.className = `score-circle ${tier}`;
+            circle.textContent = score;
+
+            document.getElementById('scoreSummary').textContent = data.summary || '';
+
+            const impEl = document.getElementById('improvements');
+            if (data.improvements && data.improvements.length) {
+                impEl.innerHTML = data.improvements.map(i => `<div class="improvement">💡 ${i}</div>`).join('');
+            } else {
+                impEl.innerHTML = '';
+            }
+
+            document.getElementById('enhancedBox').textContent = data.enhanced_prompt || '';
+            document.getElementById('aiResults').classList.add('visible');
+        }
+
+        function copyPrompt() {
+            if (!generatedPrompt) {
+                showError('Generate a prompt first.');
+                return;
+            }
+            navigator.clipboard.writeText(generatedPrompt);
+            showSuccess('Prompt copied to clipboard!');
+        }
+
+        function copyEnhanced() {
+            const text = document.getElementById('enhancedBox').textContent;
+            if (text) {
+                navigator.clipboard.writeText(text);
+                showSuccess('Enhanced prompt copied to clipboard!');
+            }
+        }
+
+        function showExample() {
+            document.getElementById('exampleModal').classList.add('visible');
+        }
+
+        function closeModal(e) {
+            if (e.target === e.currentTarget) {
+                e.currentTarget.classList.remove('visible');
+            }
+        }
+
+        function loadDemo() {
+            document.getElementById('roleSelect').value = 'Act as an AWS Solutions Architect.';
+            document.getElementById('roleInput').value = 'Act as an AWS Solutions Architect with deep expertise in serverless and event-driven architectures.';
+            document.getElementById('taskInput').value = 'Design a real-time order processing system for an e-commerce platform that handles flash sales with 10x normal traffic spikes.';
+            document.getElementById('contextInput').value = 'The platform currently processes 5,000 orders per hour during normal operations. During flash sales (2-3 times per month), traffic spikes to 50,000 orders per hour for 2-4 hour windows. Current architecture uses a single EC2 instance with an RDS MySQL database that crashes under flash sale load.';
+            document.getElementById('constraintsInput').value = 'Must use serverless services only (no EC2)\nTotal monthly cost must stay under $2,000\nOrder processing latency must be under 3 seconds\nMust handle duplicate order submissions gracefully\nAll data must be encrypted at rest and in transit';
+            document.getElementById('formatInput').value = 'Return an architecture overview with: service name, purpose, how it handles the traffic spike, estimated cost, and a brief justification for choosing it over alternatives.';
+            document.getElementById('verificationInput').value = 'Before responding, confirm you understand the traffic pattern and the requirement for sub-3-second processing during 10x spikes.';
+            document.getElementById('examplesInput').value = '';
+
+            document.getElementById('outputSection').classList.remove('visible');
+            document.getElementById('aiResults').classList.remove('visible');
+            document.getElementById('enhanceBtn').disabled = true;
+            hideStatus();
+        }
+
+        function clearAll() {
+            document.getElementById('roleSelect').value = '';
+            document.getElementById('roleInput').value = '';
+            document.getElementById('taskInput').value = '';
+            document.getElementById('contextInput').value = '';
+            document.getElementById('constraintsInput').value = '';
+            document.getElementById('formatInput').value = '';
+            document.getElementById('verificationInput').value = '';
+            document.getElementById('examplesInput').value = '';
+            document.getElementById('outputSection').classList.remove('visible');
+            document.getElementById('aiResults').classList.remove('visible');
+            document.getElementById('enhanceBtn').disabled = true;
+            generatedPrompt = '';
+            hideStatus();
+        }
+
+        function showLoading(msg) {
+            const el = document.getElementById('status');
+            el.className = 'status loading';
+            el.innerHTML = `<span class="spinner"></span>${msg}`;
+        }
+        function showError(msg) {
+            const el = document.getElementById('status');
+            el.className = 'status error';
+            el.textContent = msg;
+            setTimeout(hideStatus, 4000);
+        }
+        function showSuccess(msg) {
+            const el = document.getElementById('status');
+            el.className = 'status success';
+            el.textContent = msg;
+            setTimeout(hideStatus, 2000);
+        }
+        function hideStatus() { document.getElementById('status').className = 'status'; }
+    </script>
+</body>
+</html>

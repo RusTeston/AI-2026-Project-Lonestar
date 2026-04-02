@@ -160,19 +160,6 @@
         }
         .modal-label:first-of-type { margin-top: 0; }
 
-        .enhanced-score {
-            display: flex; align-items: center; gap: 10px;
-            margin-top: 10px; padding: 10px 14px; border-radius: 8px;
-            background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15);
-        }
-        .enhanced-score-circle {
-            width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.95rem; font-weight: 700; flex-shrink: 0;
-            border: 3px solid #4ade80; color: #4ade80; background: rgba(34,197,94,0.08);
-        }
-        .enhanced-score-label { font-size: 0.82rem; color: #95c4e6; }
-
         footer {
             margin-top: 40px; padding-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.06);
@@ -273,8 +260,11 @@
             <div class="improvements" id="improvements"></div>
             <div class="enhanced-section">
                 <div class="output-label" style="color:#4ade80;">✨ Enhanced Prompt</div>
+                <div class="score-bar" id="enhancedScoreBar" style="display:none;">
+                    <div class="score-circle" id="enhancedScoreCircle"></div>
+                    <div class="score-summary" id="enhancedScoreLabel"></div>
+                </div>
                 <div class="enhanced-box" id="enhancedBox"></div>
-                <div class="enhanced-score" id="enhancedScore"></div>
                 <button class="copy-enhanced" onclick="copyEnhanced()">Copy Enhanced Prompt</button>
             </div>
         </div>
@@ -423,14 +413,16 @@ Phase 1: Database Migration (Weeks 1-3)
 
             document.getElementById('enhancedBox').textContent = data.enhanced_prompt || '';
 
-            const enhScoreEl = document.getElementById('enhancedScore');
+            const enhScoreBar = document.getElementById('enhancedScoreBar');
             if (data.enhanced_score) {
-                enhScoreEl.innerHTML = `
-                    <div class="enhanced-score-circle">${data.enhanced_score}</div>
-                    <div class="enhanced-score-label">Enhanced prompt score — up from ${score}</div>
-                `;
+                const enhTier = data.enhanced_score >= 75 ? 'high' : data.enhanced_score >= 50 ? 'medium' : 'low';
+                const enhCircle = document.getElementById('enhancedScoreCircle');
+                enhCircle.className = `score-circle ${enhTier}`;
+                enhCircle.textContent = data.enhanced_score;
+                document.getElementById('enhancedScoreLabel').textContent = `Enhanced prompt score — up from ${score}`;
+                enhScoreBar.style.display = 'flex';
             } else {
-                enhScoreEl.innerHTML = '';
+                enhScoreBar.style.display = 'none';
             }
 
             document.getElementById('aiResults').classList.add('visible');

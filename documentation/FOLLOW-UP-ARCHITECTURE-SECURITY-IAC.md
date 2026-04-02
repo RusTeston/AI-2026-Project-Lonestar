@@ -58,6 +58,7 @@
 - Project 7: Architecture Reviewer (added March 21, 2026)
 - Project 8: AI Log Analyzer
 - Project 9: Failover Orchestrator (added March 22, 2026)
+- Project 10: Perfect Prompt Builder (added April 2, 2026)
 
 ---
 
@@ -90,6 +91,7 @@ Apply the following to each project (one at a time):
 - Project 7: Architecture Reviewer - ✅ COMPLETE (SAM/IaC, new project)
 - Project 8: AI Log Analyzer - ✅ COMPLETE
 - Project 9: Failover Orchestrator - ✅ COMPLETE (SAM/IaC, Step Functions, new project)
+- Project 10: Perfect Prompt Builder - ✅ COMPLETE (Lambda Function URL, Bedrock)
 
 ---
 

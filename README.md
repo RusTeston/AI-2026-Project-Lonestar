@@ -2,7 +2,7 @@
 
 **AI Portfolio and Project Showcase**  
 **Project Start**: March 11, 2026  
-**Latest Updates**: March 25, 2026  
+**Latest Updates**: April 2, 2026  
 **Status**: ✅ LIVE - OPERATIONAL - CI/CD ENABLED
 
 ---
@@ -80,6 +80,11 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
    - Intelligent multi-region failover with AI-powered decision making using Bedrock Nova Lite
    - Step Functions orchestration with conditional branching (EventBridge + Lambda + Step Functions + DynamoDB + Bedrock Nova Lite + SAM IaC)
 
+10. **Perfect Prompt Builder** - ✅ LIVE (April 2, 2026)
+    - URL: https://ai.rus-teston.com/projects/10-prompt-builder/index.html
+    - Structured prompt builder with AI-powered enhancement using Bedrock Nova Lite
+    - Serverless architecture (Lambda Function URL + Bedrock Nova Lite + S3)
+
 ---
 
 ## 🏗️ Infrastructure
@@ -103,6 +108,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - **Project 7**: Architecture Reviewer (API Gateway + Lambda + SQS + S3 + DynamoDB + Bedrock Nova Lite + SAM IaC)
 - **Project 8**: AI Log Analyzer (Lambda + S3 Events + Bedrock Nova Lite)
 - **Project 9**: Failover Orchestrator (EventBridge + Lambda + Step Functions + DynamoDB + Bedrock Nova Lite + SAM IaC)
+- **Project 10**: Perfect Prompt Builder (Lambda Function URL + Bedrock Nova Lite)
 
 **CI/CD Pipeline:**
 - **GitHub Repos**: Public repos at github.com/RusTeston
@@ -115,8 +121,9 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Single-page portfolio design
 - Dark modern theme with Inter font
 - Professional grid layout for projects
-- Project summary modals on all 8 project pages
+- Project summary modals on all project pages
 - Responsive layout (desktop/tablet optimized)
+- 10 AI projects live
 - No external dependencies
 
 ---
@@ -150,6 +157,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Expand project portfolio as new AI projects are completed
 
 **Recent Updates:**
+- ✅ **Project 10: Perfect Prompt Builder** (April 2, 2026): Structured prompt builder with AI enhancement via Bedrock Nova Lite
 - ✅ **CloudFront + HTTPS** (March 25, 2026): `ai.rus-teston.com` served via CloudFront CDN with TLS 1.2+, security headers, PriceClass_100
 - ✅ **CI/CD CloudFront invalidation** (March 25, 2026): Auto-invalidation added to GitHub Actions workflow
 - ✅ **URL migration** (March 25, 2026): All S3 URLs replaced with `https://ai.rus-teston.com` across all projects, README, and portfolio site

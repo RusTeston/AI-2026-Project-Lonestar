@@ -18,10 +18,16 @@
 - Read existing project code for patterns before creating new projects
 - Reference the follow-up doc at `documentation/FOLLOW-UP-ARCHITECTURE-SECURITY-IAC.md` for tracked improvements
 
-## Workflow
+## Deployment Discipline
+<!-- See rus-portfolio-prod/documentation/migration-reports/DEPLOYMENT-DISCIPLINE-AGREEMENT.md -->
+- Minor changes (comments, text edits, doc updates, small fixes): proceed efficiently with approval
+- Major changes (new pages, rewrites, new infrastructure, new projects): follow full Deployment Discipline Agreement
+  - Propose → Review → Test Plan → Rollback Plan → "APPROVED TO PROCEED" → Execute → Validate → Document
+  - Create mockup/preview before deploying to production
 - After confirming changes are working, always commit and push to GitHub before moving to the next task
 
 ## Safety
+- Preview HTML changes locally (open in browser) before deploying to S3
 - Never deploy without explicit approval
 - Always have a rollback plan
 - Clean up test data from S3 after testing

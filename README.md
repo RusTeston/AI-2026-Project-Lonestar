@@ -26,8 +26,6 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 ### **website/** - Live Website Files
 - `index.html` - Main portfolio page
 
-### **backups/** - File Backups
-- Timestamped backups of previous versions
 
 ---
 

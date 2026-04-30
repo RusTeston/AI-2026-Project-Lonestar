@@ -19,6 +19,12 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 
 ### **documentation/** - Project Documentation
 - `PROJECT-LONESTAR-AGREEMENT.md` - Deployment and project agreements
+- `CLOUDFRONT-MIGRATION-CHECKLIST.md` - CloudFront setup checklist
+- `DEPLOYMENT-MANIFEST.md` - Deployment tracking
+- `FOLLOW-UP-ARCHITECTURE-SECURITY-IAC.md` - Tracked improvements
+- `PROJECT-1-DEPLOYMENT-RECORD.md` - AI Chatbot deployment record
+- `PROJECT-3-PLAN.md` - Language Translator planning
+- `PROJECT-SUMMARIES.md` - All project summaries
 
 ### **scripts/** - Automation Scripts
 - `create-lonestar-bucket.sh` - S3 bucket creation and configuration script

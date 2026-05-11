@@ -136,7 +136,10 @@ def get_result(event):
         try:
             response = s3.get_object(Bucket=BUCKET_NAME, Key=error_key)
             error = json.loads(response['Body'].read())
-            
+
+            if 'UnsupportedDocumentException' in error.get('error', ''):
+                error['error'] = 'This file could not be processed. The PDF may be encrypted, password-protected, or in an unsupported format. Please try a plain, unprotected PDF or a TXT file.'
+
             return {
                 'statusCode': 500,
                 'body': json.dumps(error)

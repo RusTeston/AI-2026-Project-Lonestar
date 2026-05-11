@@ -159,7 +159,9 @@ S3 (uploads + results), Lambda Function URL (Python 3.12) × 2, Amazon Polly, AW
 - Voice settings encoded in filename (`timestamp_engine_voiceId_originalname`) — no database needed
 - Polly 3,000 character limit enforced with truncation warning shown to user
 - Neural vs Standard engine choice exposed to user
-- Audio served via direct S3 URL with HTML5 audio player + download button
+- Audio player uses pre-signed S3 URL (`audio_url`) for in-browser streaming
+- Download button uses a separate pre-signed S3 URL (`download_url`) with `Content-Disposition: attachment` to force file save
+- CloudFront CSP includes `media-src https://ai-text-to-speech-p5.s3.amazonaws.com` to allow audio player to load cross-origin S3 URLs
 - Same two-Lambda async pattern as Project 4
 
 ### Deployment

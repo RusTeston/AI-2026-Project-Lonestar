@@ -149,31 +149,24 @@ async function pollForResults() {
 }
 
 function displayResults(result) {
-    // Show results section
     resultsSection.style.display = 'flex';
-    
-    // Set audio source
-    audioSource.src = result.audio_url;
+
+    // Audio player - streams via pre-signed URL
+    audioPlayer.src = result.audio_url;
     audioPlayer.load();
-    
-    // Set download link
-    downloadBtn.href = result.audio_url;
-    downloadBtn.download = result.audio_file;
-    
-    // Display info
-    document.getElementById('voiceInfo').textContent = 
+
+    // Download button - separate pre-signed URL with content-disposition: attachment
+    downloadBtn.href = result.download_url;
+    downloadBtn.removeAttribute('onclick');
+
+    document.getElementById('voiceInfo').textContent =
         `${result.voice_id} (${result.voice_engine === 'neural' ? 'Neural' : 'Standard'})`;
-    document.getElementById('textLength').textContent = 
+    document.getElementById('textLength').textContent =
         `${result.text_length} characters`;
-    
-    // Show truncation warning if needed
-    if (result.truncated) {
-        document.getElementById('truncatedWarning').style.display = 'block';
-    } else {
-        document.getElementById('truncatedWarning').style.display = 'none';
-    }
-    
-    // Scroll to results
+
+    document.getElementById('truncatedWarning').style.display =
+        result.truncated ? 'block' : 'none';
+
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -236,6 +229,6 @@ function clearResults() {
     fileInput.value = '';
     currentFilename = null;
     audioPlayer.pause();
-    audioSource.src = '';
+    audioPlayer.src = '';
     hideStatus();
 }

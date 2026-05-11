@@ -106,7 +106,27 @@ def get_result(event):
         # Try successful result
         response = s3.get_object(Bucket=BUCKET_NAME, Key=result_key)
         result = json.loads(response['Body'].read())
-        
+
+        audio_key = f"results/{result['audio_file']}"
+
+        # Pre-signed URL for the audio player (stream in browser)
+        result['audio_url'] = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': BUCKET_NAME, 'Key': audio_key},
+            ExpiresIn=3600
+        )
+
+        # Separate pre-signed URL for download (forces file save)
+        result['download_url'] = s3.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': BUCKET_NAME,
+                'Key': audio_key,
+                'ResponseContentDisposition': f'attachment; filename="{result["audio_file"]}"'
+            },
+            ExpiresIn=3600
+        )
+
         return {
             'statusCode': 200,
             'body': json.dumps(result)

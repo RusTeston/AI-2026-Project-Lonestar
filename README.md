@@ -61,6 +61,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
    - URL: https://ai.rus-teston.com/projects/05-text-to-speech/index.html
    - AI-powered voice narration using Amazon Polly
    - Serverless architecture (Lambda Function URL + S3)
+   - Audio player streams via pre-signed URL; Download MP3 uses separate pre-signed URL with forced attachment
 
 6. **Cost Optimization Advisor** - ✅ LIVE (March 21, 2026)
    - URL: https://ai.rus-teston.com/projects/06-cost-optimizer/index.html
@@ -161,6 +162,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Expand project portfolio as new AI projects are completed
 
 **Recent Updates:**
+- ✅ **Project 5: Audio Player Fix** (May 11, 2026): Fixed audio player not loading — added `media-src` to CloudFront CSP, switched to pre-signed URLs for streaming (audio player) and forced download (Download MP3 button)
 - ✅ **Project 10: Perfect Prompt Builder** (April 2, 2026): Structured prompt builder with AI enhancement via Bedrock Nova Lite
 - ✅ **CloudFront + HTTPS** (March 25, 2026): `ai.rus-teston.com` served via CloudFront CDN with TLS 1.2+, security headers, PriceClass_100
 - ✅ **CI/CD CloudFront invalidation** (March 25, 2026): Auto-invalidation added to GitHub Actions workflow

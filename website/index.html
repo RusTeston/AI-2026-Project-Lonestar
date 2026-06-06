@@ -223,6 +223,18 @@
                     <h3 class="project-title">Perfect Prompt Builder</h3>
                     <p class="project-status">Live — Click to view</p>
                 </a>
+
+                <a href="#" onclick="document.getElementById('modal11').style.display='flex';return false;" class="project-card active">
+                    <div class="project-number" style="color:#fbbf24;">New</div>
+                    <h3 class="project-title">The Architecture Studio</h3>
+                    <p class="project-status">Live — Click to view</p>
+                </a>
+
+                <a href="#" onclick="document.getElementById('modal12').style.display='flex';return false;" class="project-card active">
+                    <div class="project-number" style="color:#fbbf24;">New</div>
+                    <h3 class="project-title">On-Prem to AWS Translator</h3>
+                    <p class="project-status">Live — Click to view</p>
+                </a>
             </div>
         </section>
 
@@ -231,6 +243,62 @@
             <p style="margin-top: 8px;"><a href="https://rus-teston.com" style="color: #0ea5e9; text-decoration: none;">← Back to Portfolio</a></p>
         </footer>
     </div>
+<!-- Project 11 Modal -->
+<div id="modal11" style="display:none;position:fixed;inset:0;background:rgba(4,8,20,0.88);backdrop-filter:blur(10px);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this){this.style.display='none';}">
+  <div style="background:#10224A;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:36px 40px;max-width:600px;width:92%;max-height:85vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <button onclick="document.getElementById('modal11').style.display='none';" style="position:absolute;top:14px;right:16px;background:#162C52;border:1px solid #1E3A5C;border-radius:8px;color:#B0CFEA;font-size:1.1rem;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;">✕</button>
+    <h2 style="font-size:1.3rem;font-weight:700;color:#E0FF4F;margin-bottom:4px;">The Architecture Studio</h2>
+    <p style="font-size:0.8rem;color:#5A8AAE;margin-bottom:20px;">Project 11</p>
+    <p style="font-size:0.95rem;color:#B0CFEA;line-height:1.7;margin-bottom:20px;"><span style="color:#E0FF4F;font-weight:600;">The following is:</span> A dual-panel AI-powered diagramming tool that generates professional infrastructure diagrams from plain-language descriptions. Describe your on-premises data center in the left panel and your AWS architecture in the right panel. Each panel generates a detailed SVG diagram independently. Once both diagrams are ready, click Generate Migration Analysis for a side-by-side component mapping, key business benefits, and a phased migration roadmap — all generated automatically by Amazon Bedrock.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:#162C52;border:1px solid #1E3A5C;border-radius:8px;padding:12px;">
+        <div style="font-size:0.7rem;color:#5A8AAE;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Left Panel</div>
+        <div style="font-size:0.85rem;color:#B0CFEA;">Describe your on-premises infrastructure to generate a data center diagram</div>
+      </div>
+      <div style="background:#162C52;border:1px solid #1E3A5C;border-radius:8px;padding:12px;">
+        <div style="font-size:0.7rem;color:#5A8AAE;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Right Panel</div>
+        <div style="font-size:0.85rem;color:#B0CFEA;">Describe your AWS architecture to generate a cloud diagram</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+      <span style="background:rgba(224,255,79,0.1);color:#E0FF4F;border:1px solid rgba(224,255,79,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">On-Prem Diagrams</span>
+      <span style="background:rgba(0,200,83,0.1);color:#00C853;border:1px solid rgba(0,200,83,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">AWS Diagrams</span>
+      <span style="background:rgba(255,107,53,0.1);color:#FF6B35;border:1px solid rgba(255,107,53,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">Migration Analysis</span>
+      <span style="background:rgba(224,255,79,0.1);color:#E0FF4F;border:1px solid rgba(224,255,79,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">SVG + PNG Export</span>
+      <span style="background:rgba(0,200,83,0.1);color:#00C853;border:1px solid rgba(0,200,83,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">Powered by Bedrock</span>
+    </div>
+    <a href="projects/11-architecture-studio/index.html" style="display:block;text-align:center;background:linear-gradient(135deg,#E0FF4F,#c8e640);color:#0C1A3A;font-weight:700;padding:12px 24px;border-radius:10px;text-decoration:none;font-size:0.95rem;">Continue...</a>
+  </div>
+</div>
+
+<!-- Project 12 Modal -->
+<div id="modal12" style="display:none;position:fixed;inset:0;background:rgba(4,8,20,0.88);backdrop-filter:blur(10px);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this){this.style.display='none';}">
+  <div style="background:#10224A;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:36px 40px;max-width:600px;width:92%;max-height:85vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <button onclick="document.getElementById('modal12').style.display='none';" style="position:absolute;top:14px;right:16px;background:#162C52;border:1px solid #1E3A5C;border-radius:8px;color:#B0CFEA;font-size:1.1rem;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;">✕</button>
+    <h2 style="font-size:1.3rem;font-weight:700;color:#E0FF4F;margin-bottom:4px;">On-Prem to AWS Translator</h2>
+    <p style="font-size:0.8rem;color:#5A8AAE;margin-bottom:20px;">Project 12</p>
+    <p style="font-size:0.95rem;color:#B0CFEA;line-height:1.7;margin-bottom:20px;"><span style="color:#E0FF4F;font-weight:600;">The following is:</span> An AI-powered translation tool that reads your on-premises infrastructure description and instantly generates a detailed AWS architecture recommendation. It maps every on-premises component to its AWS equivalent, produces a ready-to-use AWS architecture description you can copy directly into a diagramming tool, and delivers a full migration analysis with component mapping, business benefits, and a phased migration roadmap. Includes a one-click button to open The Architecture Studio with your description already copied to clipboard.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:#162C52;border:1px solid #1E3A5C;border-radius:8px;padding:12px;">
+        <div style="font-size:0.7rem;color:#5A8AAE;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Input</div>
+        <div style="font-size:0.85rem;color:#B0CFEA;">Plain-language description of your on-premises infrastructure</div>
+      </div>
+      <div style="background:#162C52;border:1px solid #1E3A5C;border-radius:8px;padding:12px;">
+        <div style="font-size:0.7rem;color:#5A8AAE;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Output</div>
+        <div style="font-size:0.85rem;color:#B0CFEA;">AWS description, component mapping, benefits, and migration roadmap</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+      <span style="background:rgba(224,255,79,0.1);color:#E0FF4F;border:1px solid rgba(224,255,79,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">Auto-Translation</span>
+      <span style="background:rgba(0,200,83,0.1);color:#00C853;border:1px solid rgba(0,200,83,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">Migration Analysis</span>
+      <span style="background:rgba(255,107,53,0.1);color:#FF6B35;border:1px solid rgba(255,107,53,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">Copy to Clipboard</span>
+      <span style="background:rgba(224,255,79,0.1);color:#E0FF4F;border:1px solid rgba(224,255,79,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">Links to Studio</span>
+      <span style="background:rgba(0,200,83,0.1);color:#00C853;border:1px solid rgba(0,200,83,0.2);padding:4px 10px;border-radius:999px;font-size:0.75rem;">Powered by Bedrock</span>
+    </div>
+    <a href="projects/12-aws-translator/index.html" style="display:block;text-align:center;background:linear-gradient(135deg,#E0FF4F,#c8e640);color:#0C1A3A;font-weight:700;padding:12px 24px;border-radius:10px;text-decoration:none;font-size:0.95rem;">Continue...</a>
+  </div>
+</div>
+
 </body>
 </html>
 

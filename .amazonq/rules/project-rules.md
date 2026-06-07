@@ -34,3 +34,36 @@
 - Back up current files before making UI changes
 - Before any CI/CD workflow that syncs or deletes from S3, compare S3 contents against local files and download any S3-only files first
 - Never use `--delete` flag on S3 sync without first verifying all S3 assets exist locally
+
+## Architecture Catalog — Project 13 Quality Standards
+
+### MANDATORY process for EVERY architecture (all 24 diagrams):
+
+**STEP 1 — RESEARCH FIRST**
+- Use the `search_documentation` tool to search AWS documentation for the specific architecture pattern
+- Cross-reference AWS Well-Architected Framework guidance where applicable
+- Identify the current recommended services, patterns, and approaches per AWS documentation
+- Do NOT skip this step under any circumstances
+
+**STEP 2 — VERIFY & UPDATE HTML**
+- Compare the existing description, service list, and flow steps against what AWS documentation says
+- Update anything that is outdated, missing, imprecise, or not reflective of current AWS best practice
+- Present ALL changes to Rus for review and explicit approval before proceeding
+- Do NOT proceed to diagram until Rus says "Approved"
+
+**STEP 3 — DIAGRAM ONLY AFTER APPROVAL**
+- Generate the PNG only after Rus has explicitly approved the updated description
+- Diagram must exactly match the approved description — every service in the description must appear as a node
+- Use proper clusters, left-to-right flow, and complete end-to-end path
+- High fidelity standard: no sparse diagrams, no missing services, no generic labels
+
+**STEP 4 — DEPLOY AFTER EACH**
+- Copy PNG to `website/projects/13-architecture-catalog/images/{slug}.png`
+- S3 sync → CloudFront invalidation → git commit and push
+- One architecture fully complete before moving to the next
+
+### Quality reminder phrase
+If Rus says **"High fidelity standard"** — stop, re-research, re-verify, re-draw to full quality.
+
+### Interview context
+Rus is demoing Project 13 to an AWS SA Manager. Every description and diagram must reflect the latest AWS recommended architecture and best practices. There is no room for outdated, generic, or incomplete content.

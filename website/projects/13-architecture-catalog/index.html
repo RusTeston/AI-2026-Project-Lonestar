@@ -531,6 +531,46 @@
       .sidebar-section { padding: 20px; }
     }
 
+
+    /* ─────────────── Summary Panel ─────────────── */
+    .summary-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 12px 20px;
+      background: rgba(224,255,79,0.08);
+      border: 1px solid rgba(224,255,79,0.25);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--yellow);
+      cursor: pointer;
+      width: 100%;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .summary-toggle:hover { background: rgba(224,255,79,0.14); border-color: rgba(224,255,79,0.5); }
+    .summary-toggle.open { border-radius: var(--radius-md) var(--radius-md) 0 0; }
+    .summary-toggle-icon { transition: transform 300ms ease; flex-shrink: 0; }
+    .summary-toggle.open .summary-toggle-icon { transform: rotate(180deg); }
+    .summary-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid rgba(224,255,79,0.25);
+      border-top: none;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      padding: 24px 28px;
+    }
+    .summary-panel.open { display: block; }
+    .summary-panel p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.85;
+      margin-bottom: 14px;
+    }
+    .summary-panel p:last-child { margin-bottom: 0; }
+
     /* ─────────────── Scrollbar ─────────────── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -662,6 +702,7 @@ const CATEGORIES = [
           'Amazon S3', 'Amazon API Gateway', 'Amazon Cognito', 'Amazon CloudWatch'
         ],
         description: 'RAG augments a foundation model\'s responses with context retrieved from a private vector knowledge base, grounding outputs in verified enterprise data and eliminating the cost and risk of fine-tuning. The ingestion pipeline chunks, embeds, and indexes source documents from S3 into an OpenSearch k-NN vector index, while the query path retrieves the most semantically relevant chunks at inference time and injects them into the Bedrock prompt before generation. This is the AWS-recommended pattern for internal knowledge bases, customer support copilots, and document Q&A where answers must be traceable to source material.',
+        summary: 'In a RAG architecture on AWS, source documents are typically stored in S3, parsed, and split into smaller text chunks. Each chunk is converted into a vector embedding using an embedding model through Amazon Bedrock, and then stored in Amazon OpenSearch along with the original text and metadata.\n\nAt runtime, the user authenticates through Cognito and sends a question to an API exposed through API Gateway. API Gateway validates the Cognito token and invokes Lambda. Lambda checks the user context, embeds the user\'s question, and uses that embedding to perform a vector similarity search against OpenSearch. OpenSearch returns the most relevant text chunks, usually filtered by tenant, role, or document permissions.\n\nLambda then builds a prompt containing the user\'s question and the retrieved context, sends that prompt to a Bedrock foundation model, and receives a grounded natural-language answer. The answer is returned through API Gateway back to the client. CloudWatch monitors application health, logs, latency, and alarms, while CloudTrail (optional) provides audit visibility into AWS API activity and configuration changes.',
         flow: [
           'The client authenticates with Amazon Cognito and receives a signed JWT, then submits a natural language query to Amazon API Gateway with the JWT in the Authorization header.',
           'API Gateway validates the token against the Cognito User Pool authorizer and invokes the Lambda Orchestrator function with the full request payload.',
@@ -1400,8 +1441,32 @@ function renderDetail(cat, arch) {
     </li>
   `).join('');
 
+        // Summary toggle (only if summary exists)
+        if (arch.summary) {
+          const summaryId = `summary-${arch.id}`;
+          const toggleId = `summary-toggle-${arch.id}`;
+          const paragraphs = arch.summary.split(/\n\n/).map(p => `<p>${p}</p>`).join('');
+          const summaryHtml = `
+            <button id="${toggleId}" class="summary-toggle" onclick="toggleSummary('${arch.id}')">
+              <span>📖 &nbsp;Plain-English Summary</span>
+              <svg class="summary-toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div id="${summaryId}" class="summary-panel">${paragraphs}</div>
+          `;
+          document.getElementById('detail-diagram-body').closest('.diagram-wrap').insertAdjacentHTML('afterend', summaryHtml);
+        }
+
   // Services sidebar
   document.getElementById('detail-pills').innerHTML = buildPills(arch.services);
+}
+
+function toggleSummary(archId) {
+  const panel = document.getElementById(`summary-${archId}`);
+  const toggle = document.getElementById(`summary-toggle-${archId}`);
+  panel.classList.toggle('open');
+  toggle.classList.toggle('open');
 }
 
 /* ═══════════════════════════════════════════════════════════════════

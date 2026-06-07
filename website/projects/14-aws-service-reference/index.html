@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS Service Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-start:    #0C1A3A;
+      --bg-mid:      #0A3050;
+      --bg-end:      #0E3558;
+      --text:        #E8F4FD;
+      --text-muted:  #8AAEC8;
+      --accent:      #E0FF4F;
+      --accent-dim:  rgba(224,255,79,.12);
+      --border:      #1E3A5C;
+      --card-bg:     rgba(14,53,88,.55);
+      --card-hover:  rgba(20,65,105,.75);
+      --topbar-h:    60px;
+      --radius:      10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-mid) 50%, var(--bg-end) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--topbar-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(10,24,58,.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    #topbar .brand {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #topbar .brand svg { flex-shrink: 0; }
+    #topbar .back-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    #topbar .back-link:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    #hero {
+      text-align: center;
+      padding: 64px 24px 40px;
+    }
+    #hero .kicker {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(224,255,79,.25);
+      border-radius: 40px;
+      padding: 4px 14px;
+      margin-bottom: 20px;
+    }
+    #hero h1 {
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    #hero h1 span { color: var(--accent); }
+    #hero p {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── SEARCH ── */
+    #search-wrap {
+      max-width: 680px;
+      margin: 0 auto 16px;
+      padding: 0 20px;
+      position: relative;
+    }
+    #search-wrap svg.icon-search {
+      position: absolute;
+      left: 38px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    #search {
+      width: 100%;
+      padding: 14px 18px 14px 48px;
+      background: rgba(14,53,88,.7);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    #search::placeholder { color: var(--text-muted); }
+    #search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(224,255,79,.12);
+    }
+    #result-count {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      min-height: 18px;
+      letter-spacing: .03em;
+    }
+    #result-count strong { color: var(--accent); }
+
+    /* ── MAIN CONTENT ── */
+    #content {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── TIER ── */
+    .tier-section { margin-bottom: 56px; }
+    .tier-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tier-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--bg-start);
+      background: var(--accent);
+      border-radius: 4px;
+      padding: 3px 9px;
+      white-space: nowrap;
+    }
+    .tier-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .tier-count {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2px 10px;
+    }
+
+    /* ── GRID ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px)  { .cards-grid { grid-template-columns: 1fr; } }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
+      position: relative;
+    }
+    .card:hover {
+      background: var(--card-hover);
+      border-color: rgba(224,255,79,.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    }
+    .card-icon-wrap {
+      flex-shrink: 0;
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .card-icon-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 6px;
+    }
+    .icon-fallback {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      display: none;
+    }
+    .card-body { flex: 1; min-width: 0; }
+    .card-badge {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+    .card-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .card-def {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* highlight match */
+    mark {
+      background: rgba(224,255,79,.28);
+      color: var(--accent);
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* ── EMPTY STATE ── */
+    #empty-state {
+      display: none;
+      text-align: center;
+      padding: 80px 20px;
+    }
+    #empty-state .big-icon { font-size: 48px; margin-bottom: 16px; }
+    #empty-state h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    #empty-state p { color: var(--text-muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header id="topbar">
+  <div class="brand">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 17L12 22L22 17" stroke="#E0FF4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M2 12L12 17L22 12" stroke="#E0FF4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#E0FF4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".35"/>
+    </svg>
+    AWS Service Reference
+  </div>
+  <a href="../../index.html" class="back-link">
+    ← Back to AI Projects
+  </a>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="kicker">75 Core Services · 8 Tiers</div>
+  <h1>AWS <span>Service</span> Reference</h1>
+  <p>A searchable guide to the most commonly used AWS services in architecture diagrams — with plain-English definitions.</p>
+</section>
+
+<!-- SEARCH -->
+<div id="search-wrap">
+  <svg class="icon-search" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+  <input id="search" type="search" placeholder="Search services by name or description…" autocomplete="off" spellcheck="false" />
+</div>
+<div id="result-count"></div>
+
+<!-- CONTENT -->
+<main id="content"></main>
+
+<!-- EMPTY STATE -->
+<div id="empty-state">
+  <div class="big-icon">🔍</div>
+  <h3>No services found</h3>
+  <p>Try a different keyword — e.g. "storage", "database", "Lambda"</p>
+</div>
+
+<footer>
+  <p>AWS Service Reference &mdash; Portfolio Project &nbsp;|&nbsp; <a href="../../index.html">← Back to AI Projects</a></p>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA — All 75 AWS Services
+═══════════════════════════════════════════════ */
+const SERVICES = [
+  /* ── Tier 1 ── */
+  { id:1,  name:"Amazon S3",          tier:1, tierLabel:"Appears in virtually every architecture", slug:"amazon-s3",          definition:"Amazon S3 is AWS's object storage service. It stores and retrieves any amount of data — files, images, logs, backups, and static website assets — with 99.999999999% durability. It is the most widely used storage service in AWS architectures." },
+  { id:2,  name:"Amazon CloudWatch",  tier:1, tierLabel:"Appears in virtually every architecture", slug:"amazon-cloudwatch",  definition:"Amazon CloudWatch is AWS's observability service. It collects metrics, logs, and traces from AWS resources and applications, enabling teams to monitor health, set alarms, and troubleshoot operational issues across their entire AWS environment." },
+  { id:3,  name:"AWS IAM",            tier:1, tierLabel:"Appears in virtually every architecture", slug:"aws-iam",            definition:"AWS IAM is the identity and access management service for AWS. It controls who can authenticate to AWS and what actions they are authorized to perform, using users, roles, policies, and permissions to enforce least-privilege access across every AWS service." },
+  { id:4,  name:"AWS Lambda",         tier:1, tierLabel:"Appears in virtually every architecture", slug:"aws-lambda",         definition:"AWS Lambda is AWS's serverless compute service. It runs application code in response to events without requiring servers to be provisioned or managed, automatically scaling from zero to millions of executions and charging only for the compute time consumed." },
+  { id:5,  name:"Amazon VPC",         tier:1, tierLabel:"Appears in virtually every architecture", slug:"amazon-vpc",         definition:"Amazon VPC is AWS's virtual networking service. It lets teams define isolated private networks within AWS, control IP address ranges, configure subnets, route tables, and security groups, and connect to on-premises environments or other AWS services securely." },
+  { id:6,  name:"Amazon CloudFront",  tier:1, tierLabel:"Appears in virtually every architecture", slug:"amazon-cloudfront",  definition:"Amazon CloudFront is AWS's global content delivery network. It caches and serves content from edge locations close to users worldwide, reducing latency for websites, APIs, and media while integrating with WAF, Shield, and S3 for security and origin protection." },
+  { id:7,  name:"Amazon Route 53",    tier:1, tierLabel:"Appears in virtually every architecture", slug:"amazon-route-53",    definition:"Amazon Route 53 is AWS's scalable DNS and traffic management service. It resolves domain names to AWS resources, supports routing policies like latency-based, geolocation, and failover routing, and provides health checks to enable automated DNS-level failover." },
+  { id:8,  name:"Amazon API Gateway", tier:1, tierLabel:"Appears in virtually every architecture", slug:"amazon-api-gateway", definition:"Amazon API Gateway is AWS's managed API service. It creates, publishes, secures, and monitors REST, HTTP, and WebSocket APIs at any scale, handling authentication, throttling, request validation, and routing to backend services like Lambda or ECS." },
+  { id:9,  name:"Application Load Balancer", tier:1, tierLabel:"Appears in virtually every architecture", slug:"application-load-balancer", definition:"The Application Load Balancer is AWS's Layer 7 load balancer. It distributes HTTP and HTTPS traffic to targets based on host, path, headers, or query strings, supports TLS termination with ACM certificates, and integrates with WAF for web application security." },
+  { id:10, name:"AWS CloudTrail",     tier:1, tierLabel:"Appears in virtually every architecture", slug:"aws-cloudtrail",     definition:"AWS CloudTrail is AWS's API audit logging service. It records every AWS API call made in an account — who made it, when, from where, and what changed — providing an immutable audit trail for security investigation, compliance, and governance." },
+
+  /* ── Tier 2 ── */
+  { id:11, name:"Amazon EC2",          tier:2, tierLabel:"Core compute and data", slug:"amazon-ec2",          definition:"Amazon EC2 is AWS's virtual machine service. It provides resizable compute capacity in the cloud, offering hundreds of instance types optimized for compute, memory, storage, or GPU workloads, with Auto Scaling to match capacity to demand automatically." },
+  { id:12, name:"Amazon RDS",          tier:2, tierLabel:"Core compute and data", slug:"amazon-rds",          definition:"Amazon RDS is AWS's managed relational database service. It automates provisioning, patching, backups, and Multi-AZ failover for MySQL, PostgreSQL, MariaDB, Oracle, and SQL Server, so teams can focus on their applications rather than database operations." },
+  { id:13, name:"Amazon Aurora",       tier:2, tierLabel:"Core compute and data", slug:"amazon-aurora",       definition:"Amazon Aurora is AWS's cloud-native relational database. It is compatible with MySQL and PostgreSQL but delivers up to five times the performance, with automated replication across three Availability Zones, serverless scaling options, and a Global Database feature for multi-region deployments." },
+  { id:14, name:"Amazon DynamoDB",     tier:2, tierLabel:"Core compute and data", slug:"amazon-dynamodb",     definition:"Amazon DynamoDB is AWS's fully managed NoSQL database. It delivers single-digit millisecond performance at any scale, supports key-value and document data models, and automatically replicates data across multiple Availability Zones with no infrastructure to manage." },
+  { id:15, name:"Amazon ECS",          tier:2, tierLabel:"Core compute and data", slug:"amazon-ecs",          definition:"Amazon ECS is AWS's container orchestration service. It runs Docker containers on AWS without requiring teams to manage a control plane, integrates natively with Fargate for serverless containers, ALB for load balancing, and IAM for fine-grained task permissions." },
+  { id:16, name:"AWS Fargate",         tier:2, tierLabel:"Core compute and data", slug:"aws-fargate",         definition:"AWS Fargate is the serverless compute engine for containers on ECS and EKS. It removes the need to provision or manage EC2 instances for container workloads, automatically allocating the right amount of compute and charging only for the vCPU and memory consumed per task." },
+  { id:17, name:"Amazon EKS",          tier:2, tierLabel:"Core compute and data", slug:"amazon-eks",          definition:"Amazon EKS is AWS's managed Kubernetes service. It runs and scales Kubernetes control planes across multiple Availability Zones without requiring teams to install or operate Kubernetes, and integrates with AWS networking, storage, security, and observability services natively." },
+  { id:18, name:"Amazon Cognito",      tier:2, tierLabel:"Core compute and data", slug:"amazon-cognito",      definition:"Amazon Cognito is AWS's user authentication and authorization service. It provides user sign-up, sign-in, and access control for web and mobile applications, supporting social identity providers, SAML federation, and JWT-based authorization for API Gateway and AppSync." },
+  { id:19, name:"AWS Certificate Manager", tier:2, tierLabel:"Core compute and data", slug:"aws-certificate-manager", definition:"AWS Certificate Manager provisions, manages, and renews TLS/SSL certificates for AWS services. It eliminates manual certificate renewal by automatically rotating certificates attached to CloudFront, ALB, and API Gateway, and issues public certificates at no charge." },
+  { id:20, name:"AWS CodePipeline",    tier:2, tierLabel:"Core compute and data", slug:"aws-codepipeline",    definition:"AWS CodePipeline is AWS's fully managed CI/CD pipeline service. It automates the build, test, and deploy phases of application release, integrating with CodeBuild, CodeDeploy, GitHub, and other tools to deliver code changes rapidly and reliably." },
+
+  /* ── Tier 3 ── */
+  { id:21, name:"Amazon Bedrock",      tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-bedrock",      definition:"Amazon Bedrock is AWS's fully managed generative AI service. It provides secure access to foundation models from Amazon and other AI providers, and lets companies build AI applications using their own data while AWS handles the model hosting, scaling, and infrastructure." },
+  { id:22, name:"Amazon SageMaker",    tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-sagemaker",    definition:"Amazon SageMaker is AWS's end-to-end machine learning platform. It provides tools for data preparation, model training, evaluation, deployment, and monitoring in a single managed service, supporting the full ML lifecycle from experimentation through production." },
+  { id:23, name:"Amazon OpenSearch Service", tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-opensearch-service", definition:"Amazon OpenSearch Service is AWS's managed search and analytics engine. It lets teams deploy and scale OpenSearch for full-text search, log analytics, observability, security analytics, and vector search for AI-powered retrieval applications." },
+  { id:24, name:"Amazon Lex",          tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-lex",          definition:"Amazon Lex is AWS's managed conversational AI service. It builds chatbots and voice assistants using the same technology that powers Alexa, providing automatic speech recognition, natural language understanding, and integration with Lambda for fulfillment logic." },
+  { id:25, name:"Amazon Rekognition",  tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-rekognition",  definition:"Amazon Rekognition is AWS's computer vision service. It analyzes images and video to detect objects, scenes, faces, text, and unsafe content, and can identify individuals in video streams for use cases like media analysis, security monitoring, and identity verification." },
+  { id:26, name:"Amazon Textract",     tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-textract",     definition:"Amazon Textract is AWS's document intelligence service. It automatically extracts text, handwriting, tables, and structured data from scanned documents and forms, going beyond simple OCR to understand the context and structure of the extracted content." },
+  { id:27, name:"Amazon Comprehend",   tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-comprehend",   definition:"Amazon Comprehend is AWS's natural language processing service. It analyzes text to extract entities, key phrases, sentiment, language, and custom categories, enabling teams to build intelligent text analysis pipelines without building NLP models from scratch." },
+  { id:28, name:"Amazon Transcribe",   tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-transcribe",   definition:"Amazon Transcribe is AWS's automatic speech recognition service. It converts audio and video recordings into accurate text transcripts, supporting real-time and batch transcription with speaker identification, custom vocabulary, and content redaction for PII." },
+  { id:29, name:"Amazon Polly",        tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-polly",        definition:"Amazon Polly is AWS's text-to-speech service. It converts text into lifelike speech using deep learning, supporting dozens of voices and languages, and is commonly used for voice-enabled applications, accessibility features, and audio content generation." },
+  { id:30, name:"Amazon Kendra",       tier:3, tierLabel:"AI and ML (rapidly rising)", slug:"amazon-kendra",       definition:"Amazon Kendra is AWS's intelligent enterprise search service. It uses machine learning to index content from multiple sources and deliver accurate, natural language search results, making it easier to find information across documents, wikis, and databases." },
+
+  /* ── Tier 4 ── */
+  { id:31, name:"AWS KMS",             tier:4, tierLabel:"Security and governance", slug:"aws-kms",             definition:"AWS KMS is AWS's key management service. It creates and controls the cryptographic keys used to encrypt data across AWS services, provides centralized key policy management, and logs all key usage to CloudTrail for audit and compliance purposes." },
+  { id:32, name:"AWS Secrets Manager", tier:4, tierLabel:"Security and governance", slug:"aws-secrets-manager", definition:"AWS Secrets Manager stores, rotates, and retrieves database credentials, API keys, and other secrets automatically. It eliminates hardcoded secrets in application code and integrates with RDS, Redshift, and Lambda for automatic credential rotation without application changes." },
+  { id:33, name:"AWS WAF",             tier:4, tierLabel:"Security and governance", slug:"aws-waf",             definition:"AWS WAF is AWS's web application firewall. It protects web applications and APIs against common exploits like SQL injection, cross-site scripting, and bot traffic by applying managed or custom rules at CloudFront, ALB, API Gateway, and AppSync." },
+  { id:34, name:"AWS Shield",          tier:4, tierLabel:"Security and governance", slug:"aws-shield",          definition:"AWS Shield is AWS's managed DDoS protection service. Shield Standard is automatically included for all AWS customers at no cost, while Shield Advanced provides enhanced detection, mitigation, cost protection, and access to the AWS DDoS Response Team for critical applications." },
+  { id:35, name:"Amazon GuardDuty",    tier:4, tierLabel:"Security and governance", slug:"amazon-guardduty",    definition:"Amazon GuardDuty is AWS's intelligent threat detection service. It continuously monitors AWS accounts, workloads, and data for malicious activity using machine learning and threat intelligence, generating actionable security findings without requiring agents or additional infrastructure." },
+  { id:36, name:"AWS Security Hub",    tier:4, tierLabel:"Security and governance", slug:"aws-security-hub",    definition:"AWS Security Hub is AWS's centralized security findings aggregator. It collects and normalizes security findings from GuardDuty, Macie, Inspector, Config, and third-party tools into a single dashboard, providing a unified view of security posture across accounts and regions." },
+  { id:37, name:"Amazon Inspector",    tier:4, tierLabel:"Security and governance", slug:"amazon-inspector",    definition:"Amazon Inspector is AWS's automated vulnerability assessment service. It continuously scans EC2 instances, container images in ECR, and Lambda functions for software vulnerabilities and unintended network exposure, prioritizing findings by severity." },
+  { id:38, name:"Amazon Macie",        tier:4, tierLabel:"Security and governance", slug:"amazon-macie",        definition:"Amazon Macie is AWS's data security and privacy service. It uses machine learning to automatically discover, classify, and protect sensitive data in S3, identifying personally identifiable information, financial data, and credentials that may be at risk." },
+  { id:39, name:"AWS Config",          tier:4, tierLabel:"Security and governance", slug:"aws-config",          definition:"AWS Config is AWS's resource configuration tracking service. It continuously records the configuration of AWS resources, evaluates them against desired-state rules, and provides a detailed history of configuration changes for compliance auditing and troubleshooting." },
+  { id:40, name:"AWS Control Tower",   tier:4, tierLabel:"Security and governance", slug:"aws-control-tower",   definition:"AWS Control Tower is AWS's managed service for setting up and governing a multi-account AWS environment. It provisions accounts with pre-configured guardrails, centralized logging, and SSO, providing a secure and compliant landing zone foundation for enterprise AWS adoption." },
+  { id:41, name:"AWS Organizations",   tier:4, tierLabel:"Security and governance", slug:"aws-organizations",   definition:"AWS Organizations is AWS's multi-account management service. It groups AWS accounts into organizational units, applies Service Control Policies to enforce permission boundaries across accounts, and consolidates billing for simplified cost management at scale." },
+  { id:42, name:"AWS IAM Identity Center", tier:4, tierLabel:"Security and governance", slug:"aws-iam-identity-center", definition:"AWS IAM Identity Center is AWS's centralized workforce identity service. It provides single sign-on access to multiple AWS accounts and business applications from one place, integrating with corporate identity providers like Okta, Azure AD, and Active Directory." },
+  { id:43, name:"AWS Verified Access", tier:4, tierLabel:"Security and governance", slug:"aws-verified-access", definition:"AWS Verified Access is AWS's zero trust network access service. It grants access to internal applications based on verified identity and device posture rather than network location, replacing VPN with per-application access policies without requiring application code changes." },
+
+  /* ── Tier 5 ── */
+  { id:44, name:"Amazon SQS",          tier:5, tierLabel:"Messaging and integration", slug:"amazon-sqs",          definition:"Amazon SQS is AWS's fully managed message queuing service. It decouples application components by buffering messages between producers and consumers, supporting standard queues for maximum throughput and FIFO queues for ordered, exactly-once processing." },
+  { id:45, name:"Amazon SNS",          tier:5, tierLabel:"Messaging and integration", slug:"amazon-sns",          definition:"Amazon SNS is AWS's fully managed pub/sub messaging service. It delivers messages from publishers to multiple subscribers simultaneously — including SQS queues, Lambda functions, HTTP endpoints, and mobile devices — enabling fan-out messaging patterns at scale." },
+  { id:46, name:"Amazon EventBridge",  tier:5, tierLabel:"Messaging and integration", slug:"amazon-eventbridge",  definition:"Amazon EventBridge is AWS's serverless event bus service. It routes events between AWS services, SaaS applications, and custom sources using rules and event patterns, enabling loosely coupled, event-driven architectures without managing message infrastructure." },
+  { id:47, name:"AWS Step Functions",  tier:5, tierLabel:"Messaging and integration", slug:"aws-step-functions",  definition:"AWS Step Functions is AWS's serverless workflow orchestration service. It coordinates multi-step application workflows using visual state machines, with built-in error handling, retry logic, and conditional branching, supporting both standard and high-throughput Express Workflows." },
+  { id:48, name:"Amazon MQ",           tier:5, tierLabel:"Messaging and integration", slug:"amazon-mq",           definition:"Amazon MQ is AWS's managed message broker service for Apache ActiveMQ and RabbitMQ. It enables teams to migrate existing messaging workloads to AWS without rewriting applications that use industry-standard messaging protocols like AMQP, MQTT, and STOMP." },
+
+  /* ── Tier 6 ── */
+  { id:49, name:"Amazon Kinesis Data Streams",  tier:6, tierLabel:"Analytics and data", slug:"amazon-kinesis-data-streams",  definition:"Amazon Kinesis Data Streams is AWS's real-time data streaming service. It ingests and stores high-throughput event streams from applications, IoT devices, and logs, enabling multiple consumers to process the same stream independently for analytics, monitoring, and machine learning." },
+  { id:50, name:"Amazon Kinesis Data Firehose", tier:6, tierLabel:"Analytics and data", slug:"amazon-kinesis-data-firehose", definition:"Amazon Kinesis Data Firehose is AWS's managed data delivery service. It captures, transforms, and delivers streaming data to destinations like S3, Redshift, and OpenSearch automatically, buffering and batching records without requiring custom consumer code." },
+  { id:51, name:"AWS Glue",            tier:6, tierLabel:"Analytics and data", slug:"aws-glue",            definition:"AWS Glue is AWS's serverless data integration service. It discovers data schemas with crawlers, catalogs metadata in the Glue Data Catalog, and runs distributed PySpark ETL jobs to transform and move data between storage systems without managing Spark clusters." },
+  { id:52, name:"Amazon Athena",       tier:6, tierLabel:"Analytics and data", slug:"amazon-athena",       definition:"Amazon Athena is AWS's serverless interactive query service. It runs standard SQL queries directly against data stored in S3 using the Glue Data Catalog for schema resolution, charging only for the data scanned, with no infrastructure to set up or manage." },
+  { id:53, name:"AWS Lake Formation",  tier:6, tierLabel:"Analytics and data", slug:"aws-lake-formation",  definition:"AWS Lake Formation is AWS's data lake governance service. It centralizes access control for S3 data lakes, enforcing column-level, row-level, and cell-level permissions across Athena, Glue, and Redshift Spectrum using a simple grant and revoke model." },
+  { id:54, name:"Amazon Redshift",     tier:6, tierLabel:"Analytics and data", slug:"amazon-redshift",     definition:"Amazon Redshift is AWS's fully managed cloud data warehouse. It analyzes exabytes of structured and semi-structured data using SQL, with columnar storage, automatic workload management, and Redshift Serverless for on-demand capacity that scales with query volume." },
+  { id:55, name:"Amazon QuickSight",   tier:6, tierLabel:"Analytics and data", slug:"amazon-quicksight",   definition:"Amazon QuickSight is AWS's cloud-native business intelligence service. It creates interactive dashboards and visualizations from data in S3, Athena, Redshift, and other sources, with ML-powered insights, natural language querying, and pay-per-session pricing." },
+  { id:56, name:"Amazon Managed Service for Apache Flink", tier:6, tierLabel:"Analytics and data", slug:"amazon-managed-service-for-apache-flink", definition:"Amazon Managed Service for Apache Flink is AWS's managed stream processing service. It runs Apache Flink applications for stateful real-time analytics — including windowed aggregations, pattern detection, and stream enrichment — without managing Flink clusters or infrastructure." },
+  { id:57, name:"Amazon EMR",          tier:6, tierLabel:"Analytics and data", slug:"amazon-emr",          definition:"Amazon EMR is AWS's managed big data platform. It runs Apache Spark, Hadoop, Hive, and other big data frameworks on dynamically scalable EC2 clusters or serverless compute, processing petabytes of data for analytics, machine learning, and data transformation workloads." },
+
+  /* ── Tier 7 ── */
+  { id:58, name:"AWS Transit Gateway",    tier:7, tierLabel:"Networking", slug:"aws-transit-gateway",    definition:"AWS Transit Gateway is AWS's cloud network hub. It connects VPCs, VPNs, and Direct Connect connections through a central gateway, enabling transitive routing between thousands of networks without complex VPC peering meshes or custom routing configurations." },
+  { id:59, name:"AWS Global Accelerator", tier:7, tierLabel:"Networking", slug:"aws-global-accelerator", definition:"AWS Global Accelerator is AWS's global network performance service. It routes user traffic over the AWS global backbone to the nearest healthy application endpoint, improving availability and reducing latency compared to routing over the public internet." },
+  { id:60, name:"AWS Direct Connect",    tier:7, tierLabel:"Networking", slug:"aws-direct-connect",    definition:"AWS Direct Connect is AWS's dedicated private network connection service. It establishes a physical connection between on-premises data centers and AWS, providing consistent bandwidth, predictable latency, and reduced data transfer costs compared to internet-based connectivity." },
+  { id:61, name:"AWS PrivateLink",       tier:7, tierLabel:"Networking", slug:"aws-privatelink",       definition:"AWS PrivateLink is AWS's private connectivity service. It enables secure access to AWS services, third-party services, and custom applications through private endpoints within a VPC, keeping traffic off the public internet without requiring NAT gateways or internet gateways." },
+  { id:62, name:"Amazon Route 53 Resolver", tier:7, tierLabel:"Networking", slug:"amazon-route-53-resolver", definition:"Amazon Route 53 Resolver enables DNS resolution between AWS VPCs and on-premises networks. It uses inbound and outbound endpoints with forwarding rules to resolve private hosted zone records from on-premises resolvers and forward on-premises DNS queries to AWS." },
+  { id:63, name:"AWS Network Firewall",  tier:7, tierLabel:"Networking", slug:"aws-network-firewall",  definition:"AWS Network Firewall is AWS's managed network security service. It deploys stateful and stateless firewall rules at the VPC level, supporting domain filtering, intrusion prevention, and TLS inspection for centralized egress control across Transit Gateway topologies." },
+  { id:64, name:"NAT Gateway",           tier:7, tierLabel:"Networking", slug:"nat-gateway",           definition:"NAT Gateway is AWS's managed network address translation service. It allows EC2 instances and containers in private subnets to initiate outbound internet connections for software updates and API calls, while preventing inbound connections from the internet." },
+  { id:65, name:"AWS Site-to-Site VPN",  tier:7, tierLabel:"Networking", slug:"aws-site-to-site-vpn",  definition:"AWS Site-to-Site VPN creates encrypted tunnels between on-premises networks and AWS VPCs over the public internet. It provides a quick and cost-effective hybrid connectivity option, commonly used as a backup path alongside AWS Direct Connect." },
+  { id:66, name:"Network Load Balancer", tier:7, tierLabel:"Networking", slug:"network-load-balancer", definition:"The Network Load Balancer is AWS's Layer 4 load balancer. It handles TCP, UDP, and TLS traffic with ultra-low latency and static IP addresses, making it the right choice for high-performance workloads, non-HTTP protocols, and applications requiring client IP preservation." },
+
+  /* ── Tier 8 ── */
+  { id:67, name:"Amazon ElastiCache",       tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-elasticache",       definition:"Amazon ElastiCache is AWS's managed in-memory caching service. It supports Redis and Memcached to accelerate application performance by storing frequently accessed data in memory, reducing database load and delivering sub-millisecond response times for sessions, leaderboards, and caching layers." },
+  { id:68, name:"Amazon MemoryDB for Redis",tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-memorydb-for-redis",definition:"Amazon MemoryDB for Redis is AWS's durable, Redis-compatible in-memory database. Unlike ElastiCache, it provides Multi-AZ durability with a transactional log, making it suitable as a primary database for applications requiring ultra-fast reads and writes with data persistence." },
+  { id:69, name:"Amazon DocumentDB",        tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-documentdb",        definition:"Amazon DocumentDB is AWS's managed document database service compatible with MongoDB. It stores, queries, and indexes JSON data with automatic replication across three Availability Zones, designed for teams migrating MongoDB workloads to AWS without changing application code." },
+  { id:70, name:"Amazon EBS",               tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-ebs",               definition:"Amazon EBS is AWS's block storage service for EC2. It provides persistent, high-performance storage volumes that attach to EC2 instances like a hard drive, supporting general-purpose SSD, provisioned IOPS SSD, and throughput-optimized HDD volume types for different workload needs." },
+  { id:71, name:"Amazon EFS",               tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-efs",               definition:"Amazon EFS is AWS's managed elastic file system for Linux workloads. It provides shared NFS file storage that multiple EC2 instances, containers, and Lambda functions can access simultaneously, automatically scaling capacity up and down as files are added or removed." },
+  { id:72, name:"Amazon S3 Glacier",        tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-s3-glacier",        definition:"Amazon S3 Glacier is AWS's low-cost archival storage service. It provides three retrieval tiers — Instant, Flexible, and Deep Archive — for long-term retention of compliance data, backups, and media assets that are accessed infrequently but must be stored durably for years or decades." },
+  { id:73, name:"Amazon DynamoDB Global Tables", tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-dynamodb-global-tables", definition:"Amazon DynamoDB Global Tables is DynamoDB's multi-region, multi-master replication feature. It automatically replicates table data across selected AWS Regions, enabling globally distributed applications to read and write from the nearest region with sub-second replication lag." },
+  { id:74, name:"Amazon Aurora Global Database", tier:8, tierLabel:"Storage and database (specialized)", slug:"amazon-aurora-global-database", definition:"Amazon Aurora Global Database replicates an Aurora cluster across multiple AWS Regions with typically under one second lag. It supports cross-region read scaling and enables regional failover with a recovery time objective of under one minute for disaster recovery." },
+
+  /* ── DevOps (Tier 9 label) ── */
+  { id:75, name:"Amazon ECR",            tier:9, tierLabel:"DevOps", slug:"amazon-ecr",            definition:"Amazon ECR is AWS's fully managed container registry. It stores, manages, and deploys Docker and OCI container images securely within AWS, integrating with ECS, EKS, and CodePipeline, with built-in image scanning for vulnerabilities and lifecycle policies to manage image retention." },
+];
+
+/* ═══════════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════════ */
+const content    = document.getElementById('content');
+const searchEl   = document.getElementById('search');
+const countEl    = document.getElementById('result-count');
+const emptyEl    = document.getElementById('empty-state');
+
+/* Group by tier */
+const tiers = [...new Set(SERVICES.map(s => s.tier))].sort((a,b)=>a-b);
+const byTier = {};
+tiers.forEach(t => byTier[t] = SERVICES.filter(s => s.tier === t));
+
+/* Build DOM once */
+const tierEls   = {}; // tier number → section element
+const cardEls   = {}; // service id  → card element
+
+tiers.forEach(t => {
+  const services   = byTier[t];
+  const tierLabel  = services[0].tierLabel;
+  const tierNum    = t <= 8 ? `Tier ${t}` : 'DevOps';
+
+  const section = document.createElement('section');
+  section.className = 'tier-section';
+  section.dataset.tier = t;
+
+  section.innerHTML = `
+    <div class="tier-header">
+      <span class="tier-badge">${tierNum}</span>
+      <span class="tier-label">${tierLabel}</span>
+      <span class="tier-count" data-count="${services.length}">${services.length} service${services.length !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="cards-grid" data-tier-grid="${t}"></div>
+  `;
+
+  const grid = section.querySelector('.cards-grid');
+
+  services.forEach(s => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.id = `service-${s.id}`;
+    card.dataset.id = s.id;
+
+    const initial = s.name.replace(/^(Amazon|AWS)\s+/i,'').charAt(0).toUpperCase();
+
+    card.innerHTML = `
+      <div class="card-icon-wrap">
+        <img
+          src="images/${s.slug}.png"
+          alt="${s.name} icon"
+          loading="lazy"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+        />
+        <span class="icon-fallback" style="display:none;align-items:center;justify-content:center;width:100%;height:100%;">${initial}</span>
+      </div>
+      <div class="card-body">
+        <span class="card-badge">#${s.id}</span>
+        <div class="card-name">${s.name}</div>
+        <div class="card-def">${s.definition}</div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+    cardEls[s.id] = card;
+  });
+
+  content.appendChild(section);
+  tierEls[t] = section;
+});
+
+/* ═══════════════════════════════════════════════
+   SEARCH
+═══════════════════════════════════════════════ */
+function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function highlight(text, query) {
+  if (!query) return text;
+  const re = new RegExp(`(${escapeRe(query)})`, 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function updateSearch() {
+  const q = searchEl.value.trim();
+  const ql = q.toLowerCase();
+  let totalVisible = 0;
+
+  tiers.forEach(t => {
+    const services = byTier[t];
+    let tierVisible = 0;
+
+    services.forEach(s => {
+      const matches = !ql
+        || s.name.toLowerCase().includes(ql)
+        || s.definition.toLowerCase().includes(ql);
+
+      const card = cardEls[s.id];
+      if (matches) {
+        card.style.display = '';
+        /* Highlight */
+        card.querySelector('.card-name').innerHTML = highlight(s.name, q);
+        card.querySelector('.card-def').innerHTML  = highlight(s.definition, q);
+        tierVisible++;
+        totalVisible++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    /* Hide tier if nothing matches */
+    tierEls[t].style.display = tierVisible === 0 ? 'none' : '';
+    /* Update count badge */
+    const badge = tierEls[t].querySelector('.tier-count');
+    badge.textContent = `${tierVisible} service${tierVisible !== 1 ? 's' : ''}`;
+  });
+
+  /* Result count message */
+  if (!ql) {
+    countEl.innerHTML = `Showing <strong>all 75</strong> services across 8 tiers`;
+  } else if (totalVisible === 0) {
+    countEl.innerHTML = `No results for <strong>"${q}"</strong>`;
+  } else {
+    countEl.innerHTML = `<strong>${totalVisible}</strong> result${totalVisible !== 1 ? 's' : ''} for <strong>"${q}"</strong>`;
+  }
+
+  /* Empty state */
+  emptyEl.style.display   = totalVisible === 0 && ql ? 'block' : 'none';
+  content.style.display   = totalVisible === 0 && ql ? 'none'  : '';
+}
+
+searchEl.addEventListener('input', updateSearch);
+updateSearch(); // initial
+</script>
+</body>
+</html>

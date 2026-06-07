@@ -724,10 +724,11 @@ const CATEGORIES = [
         id: 'multi-tier-web',
         name: 'Multi-Tier Web Application',
         services: [
-          'Amazon CloudFront', 'AWS WAF', 'Application Load Balancer',
-          'Amazon EC2', 'Amazon RDS', 'Amazon ElastiCache', 'Amazon S3'
+          'Amazon Route 53', 'Amazon CloudFront', 'AWS WAF', 'Application Load Balancer',
+          'Amazon EC2', 'Amazon RDS', 'Amazon ElastiCache', 'Amazon S3',
+          'AWS Certificate Manager', 'Amazon CloudWatch'
         ],
-        description: 'The canonical three-tier architecture separating static assets, application logic, and data storage across independently scalable layers within a multi-AZ VPC. It remains the most widely deployed pattern for traditional web applications requiring full server-side rendering, complex session management, or legacy middleware compatibility.',
+        description: 'The canonical three-tier architecture separating presentation, application, and data tiers across independently scalable layers within a multi-AZ VPC. Route 53 handles DNS, CloudFront serves static assets from S3 with WAF protection at the edge, an Application Load Balancer with ACM-managed TLS distributes traffic across Auto Scaling EC2 instances, ElastiCache reduces database load, and RDS Multi-AZ provides durable relational storage. It remains the most widely deployed pattern for traditional web applications requiring server-side rendering, complex session management, or legacy middleware compatibility.',
         flow: [
           'The user\'s browser resolves the domain via Amazon Route 53 and connects to the nearest Amazon CloudFront edge location, which serves cached static assets directly from Amazon S3.',
           'CloudFront passes dynamic requests through AWS WAF for OWASP rule evaluation and rate limiting before forwarding to an Application Load Balancer in the public subnet.',
@@ -735,7 +736,8 @@ const CATEGORIES = [
           'The application layer checks Amazon ElastiCache (Redis) for a cached response before querying the relational database.',
           'On a cache miss, the EC2 application tier queries the Amazon RDS Multi-AZ primary instance in the isolated data subnet.',
           'RDS synchronously replicates writes to a standby instance in a second AZ; read replicas absorb reporting queries to reduce primary load.',
-          'The response flows back through the ALB and CloudFront, with cache-control headers set for subsequent edge caching.'
+          'The response flows back through the ALB and CloudFront, with cache-control headers set for subsequent edge caching.',
+          'Amazon CloudWatch collects ALB access logs, EC2 metrics, RDS performance insights, and ElastiCache hit/miss rates for operational monitoring and alerting.'
         ]
       },
       {

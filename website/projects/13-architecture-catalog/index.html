@@ -745,17 +745,18 @@ const CATEGORIES = [
         name: 'Serverless REST API',
         services: [
           'Amazon API Gateway', 'AWS Lambda', 'Amazon DynamoDB',
-          'Amazon Cognito', 'AWS X-Ray', 'Amazon CloudWatch'
+          'Amazon Cognito', 'AWS X-Ray', 'Amazon CloudWatch', 'AWS WAF'
         ],
-        description: 'A pay-per-invocation API backend that scales automatically from zero to millions of requests without provisioning or managing EC2 instances, making it the default pattern for microservices, mobile backends, and variable-traffic APIs. API Gateway handles routing, throttling, and authorization while Lambda executes stateless business logic.',
+        description: 'A pay-per-invocation REST API backend that scales automatically from zero to millions of requests without provisioning servers, making it the default pattern for microservices, mobile backends, and variable-traffic APIs. API Gateway handles routing, throttling, request validation, and Cognito-based authorization, while AWS WAF protects against malicious traffic at the API layer and Lambda executes stateless business logic with X-Ray active tracing for full request observability.',
         flow: [
-          'The client sends an HTTP request to Amazon API Gateway\'s regional or edge-optimized endpoint with a Cognito-issued JWT in the Authorization header.',
-          'API Gateway validates the token against the Amazon Cognito User Pool authorizer, rejecting unauthenticated requests with a 401 without invoking Lambda.',
-          'API Gateway applies request throttling and usage plan limits, then invokes the mapped AWS Lambda function with the full request event payload.',
-          'Lambda executes business logic with AWS X-Ray active tracing enabled, which records subsegment latency for all downstream service calls.',
-          'Lambda reads from or writes to Amazon DynamoDB using single-table design patterns; GetItem and Query calls for reads, PutItem and UpdateItem for writes.',
-          'The DynamoDB response is marshalled into an HTTP response object returned through Lambda to API Gateway.',
-          'API Gateway applies any configured response transformations and returns the HTTP response with appropriate CORS and cache-control headers.'
+          'The client sends an HTTP request to Amazon API Gateway\'s regional endpoint with a Cognito-issued JWT in the Authorization header.',
+          'AWS WAF evaluates the request against configured rules — blocking malicious IPs, SQL injection, and rate-limit violations before the request reaches API Gateway routing.',
+          'API Gateway validates the JWT token against the Amazon Cognito User Pool authorizer, rejecting unauthenticated requests with a 401 without invoking Lambda.',
+          'API Gateway applies request throttling, usage plan limits, and optional request validation, then invokes the mapped AWS Lambda function with the full request event payload.',
+          'Lambda executes business logic with AWS X-Ray active tracing enabled, recording subsegment latency for all downstream service calls.',
+          'Lambda reads from or writes to Amazon DynamoDB using single-table design patterns — GetItem and Query for reads, PutItem and UpdateItem for writes.',
+          'The DynamoDB response is marshalled into an HTTP response returned through Lambda to API Gateway.',
+          'API Gateway applies response transformations and returns the HTTP response with CORS and cache-control headers; CloudWatch captures API latency, error rates, and Lambda execution metrics.'
         ]
       },
       {

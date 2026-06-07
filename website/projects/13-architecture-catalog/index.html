@@ -764,16 +764,18 @@ const CATEGORIES = [
         name: 'GraphQL API with AppSync',
         services: [
           'AWS AppSync', 'AWS Lambda', 'Amazon DynamoDB',
-          'Amazon Cognito', 'Amazon ElastiCache', 'Amazon RDS'
+          'Amazon Cognito', 'AWS WAF', 'AWS X-Ray', 'Amazon CloudWatch'
         ],
-        description: 'AWS AppSync provides a managed GraphQL endpoint with built-in real-time subscription support over WebSocket, conflict detection for offline sync, and per-field authorization — making it the standard choice for React, Vue, and React Native applications that need flexible data fetching and live updates without a custom WebSocket server.',
+        description: 'AWS AppSync provides a managed GraphQL endpoint with built-in real-time subscription support over WebSocket, per-field authorization using Cognito User Pools or Lambda authorizers, and enterprise security with WAF integration — making it the standard choice for React, Vue, and React Native applications that need flexible data fetching and live updates. Resolvers are written in JavaScript/TypeScript and connect directly to DynamoDB, Lambda, or other data sources. AppSync\'s built-in server-side caching reduces backend load without requiring a separate cache cluster.',
         flow: [
-          'The client authenticates with Amazon Cognito and presents a JWT to the AWS AppSync endpoint with every GraphQL request or subscription registration.',
-          'AppSync evaluates field-level authorization rules defined in the GraphQL schema using Cognito group claims and custom IAM conditions.',
-          'For query and mutation operations, AppSync invokes the mapped resolver—either a direct DynamoDB resolver or a Lambda pipeline resolver for multi-step business logic.',
-          'Lambda resolvers check Amazon ElastiCache (Redis) for hot-path data before falling back to Amazon DynamoDB or Amazon RDS reads.',
-          'Mutation operations write to DynamoDB and trigger AppSync subscriptions, which push delta updates to all connected WebSocket clients in real time.',
-          'Batching resolvers aggregate multiple field-level invocations into a single Lambda call using AppSync\'s BatchInvoke feature to reduce cold-start overhead.'
+          'The client authenticates with Amazon Cognito and presents a JWT to the AWS AppSync GraphQL endpoint with every query, mutation, or subscription registration.',
+          'AWS WAF evaluates the request against configured rules before it reaches AppSync, blocking malicious traffic at the API layer.',
+          'AppSync evaluates field-level authorization rules defined in the GraphQL schema using Cognito User Pool group claims or a Lambda authorizer for custom logic.',
+          'For query and mutation operations, AppSync invokes the mapped JavaScript/TypeScript resolver — either a direct DynamoDB resolver for simple CRUD or a Lambda pipeline resolver for multi-step business logic.',
+          'Lambda resolvers execute custom business logic and read from or write to Amazon DynamoDB; AppSync\'s built-in server-side caching serves repeated reads without invoking resolvers.',
+          'Mutation operations write to DynamoDB and automatically trigger AppSync subscriptions, which push delta updates to all connected WebSocket clients in real time.',
+          'AWS X-Ray traces resolver execution and downstream service calls for latency analysis and debugging.',
+          'Amazon CloudWatch captures AppSync request metrics, error rates, and resolver latency for operational monitoring and alerting.'
         ]
       }
     ]

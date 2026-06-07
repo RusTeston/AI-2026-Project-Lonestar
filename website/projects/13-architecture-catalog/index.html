@@ -677,18 +677,19 @@ const CATEGORIES = [
         id: 'mlops-pipeline',
         name: 'MLOps Training Pipeline',
         services: [
-          'Amazon SageMaker', 'Amazon S3', 'AWS CodePipeline',
-          'AWS CodeBuild', 'Amazon ECR', 'AWS Step Functions', 'Amazon EventBridge'
+          'Amazon SageMaker', 'Amazon S3', 'Amazon ECR',
+          'Amazon EventBridge', 'Amazon CloudWatch'
         ],
-        description: 'Automates the full ML lifecycle—from data preparation through model training, evaluation, and deployment—using SageMaker Pipelines and CI/CD tooling to enforce reproducibility and quality gates. This is the standard approach for teams that need to retrain models on fresh data, gate promotion on accuracy metrics, and maintain an auditable model registry.',
+        description: 'Automates the full ML lifecycle using Amazon SageMaker Pipelines — AWS\'s purpose-built ML workflow orchestrator — to enforce reproducibility, quality gates, and an auditable model registry without managing orchestration infrastructure. A SageMaker Pipeline defines the workflow as a DAG of steps: data processing, model training, evaluation against a quality threshold, and conditional registration into the SageMaker Model Registry. Amazon EventBridge triggers pipeline runs on a schedule or in response to new data arriving in S3, making this the AWS-recommended standard for teams that need repeatable ML delivery with built-in lineage tracking via SageMaker Experiments.',
         flow: [
-          'A data scientist merges a pull request, which triggers AWS CodePipeline via an Amazon EventBridge rule on the source repository.',
-          'AWS CodeBuild runs unit tests on training code and packages it as a Docker container image pushed to Amazon ECR.',
-          'CodePipeline invokes an AWS Step Functions state machine that orchestrates the SageMaker Pipeline execution.',
-          'The SageMaker Pipeline runs a Processing step using SageMaker Processing jobs, reading raw data from Amazon S3 and writing transformed features back to S3.',
-          'A SageMaker Training job pulls the ECR container and training data from S3, writes model artifacts to a versioned S3 prefix, and logs metrics to SageMaker Experiments.',
-          'A Model Evaluation step compares accuracy against a defined threshold; failing models are rejected and the pipeline halts before registry registration.',
-          'Approved models are registered in the SageMaker Model Registry and promoted to a SageMaker real-time Endpoint via a blue/green deployment.'
+          'New training data lands in Amazon S3 or a scheduled Amazon EventBridge rule fires, triggering the SageMaker Pipeline execution via the EventBridge-to-SageMaker Pipelines integration.',
+          'The pipeline runs a SageMaker Processing step that reads raw data from S3, applies feature engineering and preprocessing logic, and writes train, validation, and test datasets back to S3.',
+          'A SageMaker Training step pulls the training container image from Amazon ECR, reads the prepared training dataset from S3, trains the model, and logs metrics to SageMaker Experiments for lineage tracking.',
+          'A second SageMaker Processing step evaluates the trained model against the test dataset and writes evaluation metrics to S3 as a JSON report.',
+          'A SageMaker Condition step evaluates the accuracy metric against a defined threshold — pipelines that fail the quality gate are halted and an Amazon CloudWatch alarm notifies the team.',
+          'Approved models are registered as a versioned model package in the SageMaker Model Registry with metadata, evaluation metrics, and approval status.',
+          'A downstream deployment pipeline or EventBridge rule detects the approved model version and promotes it to a SageMaker real-time endpoint or batch transform job.',
+          'Amazon CloudWatch monitors pipeline execution status, step durations, and training job metrics throughout the workflow.'
         ]
       },
       {

@@ -601,19 +601,6 @@
       <h1 id="detail-heading"></h1>
     </div>
 
-    <!-- Diagram -->
-    <div class="diagram-wrap">
-      <div class="diagram-header">
-        <div class="diagram-header-dot" style="background:#E63757"></div>
-        <div class="diagram-header-dot" style="background:#F4A43A; margin-left:6px"></div>
-        <div class="diagram-header-dot" style="background:#2CCE6A; margin-left:6px"></div>
-        <span id="detail-diagram-label">architecture-diagram.png</span>
-      </div>
-      <div class="diagram-body" id="detail-diagram-body">
-        <!-- populated by JS -->
-      </div>
-    </div>
-
     <div class="detail-layout">
       <!-- Main column -->
       <div>
@@ -625,6 +612,19 @@
         <div class="detail-section">
           <p class="detail-section-title">Traffic Flow</p>
           <ol class="flow-list" id="detail-flow"></ol>
+        </div>
+
+        <!-- Diagram below traffic flow -->
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="diagram-header-dot" style="background:#E63757"></div>
+            <div class="diagram-header-dot" style="background:#F4A43A; margin-left:6px"></div>
+            <div class="diagram-header-dot" style="background:#2CCE6A; margin-left:6px"></div>
+            <span id="detail-diagram-label">architecture-diagram.png</span>
+          </div>
+          <div class="diagram-body" id="detail-diagram-body">
+            <!-- populated by JS -->
+          </div>
         </div>
       </div>
 

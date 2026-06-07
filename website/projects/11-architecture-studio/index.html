@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture Diagram Studio</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #0A1628;
+  --navy2: #142035;
+  --blue: #2563EB;
+  --blue-l: #DBEAFE;
+  --aws: #FF9900;
+  --bg: #ECF0F7;
+  --card: #FFFFFF;
+  --border: #D1D8E8;
+  --border2: #E8EDF6;
+  --txt: #1A2640;
+  --txt2: #4B5A72;
+  --txt3: #8A97B0;
+  --red: #DC2626;
+  --green: #059669;
+  --sh1: 0 1px 3px rgba(10,22,40,.08), 0 4px 12px rgba(10,22,40,.06);
+  --sh2: 0 4px 16px rgba(10,22,40,.12), 0 8px 32px rgba(10,22,40,.08);
+  --sh3: 0 12px 40px rgba(10,22,40,.18), 0 4px 16px rgba(10,22,40,.1);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── TOP BAR ─────────────────────────────────────── */
+.topbar {
+  background: var(--navy);
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 12px rgba(0,0,0,.4);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--aws) 100%);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.topbar-title { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -.2px; line-height: 1; }
+.topbar-sub { font-size: 10.5px; color: rgba(255,255,255,.4); letter-spacing: .6px; text-transform: uppercase; margin-top: 3px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.powered-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 20px; padding: 4px 12px; font-size: 11.5px; color: rgba(255,255,255,.7); font-weight: 500;
+}
+.powered-pill strong { color: #FF9900; }
+
+/* ─── MAIN ─────────────────────────────────────────── */
+.main {
+  flex: 1; padding: 20px;
+  display: flex; flex-direction: column; gap: 20px;
+  max-width: 1700px; width: 100%; margin: 0 auto;
+}
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+
+/* ─── PANEL ─────────────────────────────────────────── */
+.panel { background: var(--card); border-radius: 14px; box-shadow: var(--sh1); overflow: hidden; }
+.panel-head { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.panel-head.onprem { background: linear-gradient(118deg, #1040C8 0%, #2563EB 60%, #3B82F6 100%); }
+.panel-head.aws    { background: linear-gradient(118deg, #C17500 0%, #E08800 40%, #FF9900 100%); }
+.phead-tag { font-size: 9.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); margin-bottom: 3px; }
+.phead-title { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
+.phead-badge { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.9); }
+
+.panel-body { padding: 18px 20px; }
+.flabel { display: block; font-size: 11px; font-weight: 700; color: var(--txt3); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 7px; }
+textarea {
+  width: 100%; min-height: 150px; padding: 12px 14px;
+  border: 1.5px solid var(--border); border-radius: 9px;
+  font-size: 13px; line-height: 1.65; color: var(--txt);
+  background: #FAFBFD; resize: vertical; font-family: inherit;
+  outline: none; transition: border-color .2s, box-shadow .2s, background .2s;
+}
+textarea:focus { background: #fff; }
+textarea.onprem:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+textarea.aws:focus { border-color: var(--aws); box-shadow: 0 0 0 3px rgba(255,153,0,.12); }
+.ccount { font-size: 11px; color: var(--txt3); text-align: right; margin-top: 5px; }
+.btn-gen {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 11px 20px; border: none; border-radius: 9px;
+  font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 13px;
+  transition: all .2s; letter-spacing: .1px; position: relative; overflow: hidden;
+}
+.btn-gen::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background .15s; }
+.btn-gen:hover::after { background: rgba(255,255,255,.08); }
+.btn-gen:active::after { background: rgba(0,0,0,.06); }
+.btn-gen.onprem { background: var(--blue); color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,.3); }
+.btn-gen.onprem:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,99,235,.35); }
+.btn-gen.aws { background: var(--aws); color: #fff; box-shadow: 0 2px 8px rgba(255,153,0,.3); }
+.btn-gen.aws:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,153,0,.35); }
+.btn-gen:disabled { opacity: .55; cursor: not-allowed; transform: none !important; }
+
+/* ─── LOADING ───────────────────────────────────────── */
+.loading-area { display: none; padding: 36px 20px; text-align: center; border-top: 1px solid var(--border2); }
+.loading-area.on { display: block; }
+.spinner-wrap { position: relative; width: 44px; height: 44px; margin: 0 auto 14px; }
+.spinner { width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--border2); position: absolute; top: 0; left: 0; }
+.spinner-track { animation: spin 1.1s linear infinite; }
+.spinner.onprem { border-top-color: var(--blue); }
+.spinner.aws { border-top-color: var(--aws); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title { font-size: 14px; font-weight: 600; color: var(--txt2); margin-bottom: 4px; }
+.loading-sub { font-size: 12px; color: var(--txt3); }
+.loading-dots::after { content: ''; animation: dotdot 1.6s steps(3, end) infinite; }
+@keyframes dotdot { 0%,100%{content:''} 33%{content:'.'} 66%{content:'..'} 99%{content:'...'} }
+
+/* ─── ERROR ─────────────────────────────────────────── */
+.err-area { display: none; margin: 0 20px 16px; padding: 12px 16px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 8px; color: var(--red); font-size: 13px; line-height: 1.5; }
+.err-area.on { display: block; }
+.err-title { font-weight: 700; margin-bottom: 3px; }
+
+/* ─── DIAGRAM AREA ──────────────────────────────────── */
+.diagram-area { display: none; border-top: 1px solid var(--border2); }
+.diagram-area.on { display: block; }
+.diag-toolbar { padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; background: #F8FAFD; border-bottom: 1px solid var(--border2); gap: 8px; flex-wrap: wrap; }
+.diag-info { display: flex; align-items: center; gap: 8px; }
+.ready-pill { display: inline-flex; align-items: center; gap: 5px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 20px; padding: 3px 9px; font-size: 11px; font-weight: 700; color: #065F46; }
+.ready-dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981; }
+.diag-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-act { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; background: #fff; color: var(--txt2); transition: all .15s; white-space: nowrap; }
+.btn-act:hover { background: #F1F5FB; border-color: #B0BCDC; color: var(--txt); }
+.btn-act.dl-svg { color: var(--green); border-color: #A7F3D0; }
+.btn-act.dl-svg:hover { background: #ECFDF5; }
+.btn-act.dl-png { color: var(--green); border-color: #A7F3D0; }
+.btn-act.dl-png:hover { background: #ECFDF5; }
+.btn-act.expand { color: var(--blue); border-color: #BFDBFE; }
+.btn-act.expand:hover { background: var(--blue-l); }
+.btn-act.danger { color: var(--red); border-color: #FCA5A5; }
+.btn-act.danger:hover { background: #FEF2F2; }
+.diag-box { padding: 16px; background: #fff; overflow: auto; max-height: 680px; }
+.diag-box svg { max-width: 100%; height: auto; display: block; }
+
+/* ─── FULLSCREEN MODAL ──────────────────────────────── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(5,14,30,.65); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.overlay.on { display: flex; }
+.fs-modal { background: #fff; border-radius: 12px; width: 100%; max-width: 1400px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: var(--sh3); animation: modalIn .22s ease; }
+@keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.fs-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border2); flex-shrink: 0; }
+.fs-title { font-size: 15px; font-weight: 700; color: var(--txt); }
+.fs-actions { display: flex; gap: 6px; align-items: center; }
+.btn-close { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--border); background: #fff; color: var(--txt2); font-size: 16px; cursor: pointer; transition: all .15s; }
+.btn-close:hover { background: #F3F6FB; color: var(--txt); }
+.fs-body { flex: 1; overflow: auto; padding: 20px; }
+.fs-body svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+/* ─── TOAST ─────────────────────────────────────────── */
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 3000; background: var(--navy); color: #fff; padding: 11px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; box-shadow: var(--sh2); opacity: 0; transform: translateY(8px); transition: all .25s; pointer-events: none; max-width: 320px; }
+.toast.on { opacity: 1; transform: translateY(0); }
+.toast.ok { background: #065F46; border-left: 3px solid #10B981; }
+.toast.err { background: #7F1D1D; border-left: 3px solid var(--red); }
+/* ─── MIGRATION TRIGGER ─────────────────────────────── */
+.migration-trigger {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, var(--navy) 0%, #1E3050 100%);
+  border: none; border-radius: 12px; padding: 16px 24px;
+  width: 100%; cursor: pointer; box-shadow: 0 4px 16px rgba(10,22,40,.2);
+  transition: all .2s;
+}
+.migration-trigger:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(10,22,40,.28); }
+.migration-trigger:disabled { opacity: .55; cursor: not-allowed; }
+.mt-icon { width: 38px; height: 38px; border-radius: 9px; background: linear-gradient(135deg, var(--blue), var(--aws)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mt-text { text-align: left; }
+.mt-title { font-size: 15px; font-weight: 700; color: #fff; }
+.mt-sub { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 2px; }
+.mt-badge { margin-left: auto; background: rgba(255,153,0,.15); border: 1px solid rgba(255,153,0,.3); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: var(--aws); white-space: nowrap; }
+
+/* ─── MIGRATION OUTPUT ───────────────────────────────── */
+.migration-header { background: linear-gradient(118deg, var(--navy) 0%, #1E3050 60%, #162840 100%); padding: 20px 24px; display: flex; align-items: center; gap: 12px; }
+.mh-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+.mh-icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--blue), var(--aws)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mh-tag { font-size: 9.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 3px; }
+.mh-title { font-size: 18px; font-weight: 700; color: #fff; }
+.migration-body { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+.summary-bar { background: linear-gradient(135deg, #EFF6FF, #FFF3DC); border: 1px solid #BFDBFE; border-radius: 10px; padding: 16px 20px; display: flex; gap: 32px; flex-wrap: wrap; }
+.sb-item { display: flex; flex-direction: column; gap: 3px; }
+.sb-label { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--txt3); }
+.sb-value { font-size: 14px; font-weight: 700; color: var(--txt); }
+.sb-value.green { color: var(--green); }
+.sb-value.blue { color: var(--blue); }
+.sb-value.aws { color: var(--aws); }
+.section-heading { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--txt2); padding-bottom: 12px; border-bottom: 2px solid var(--border2); margin-bottom: 4px; }
+.sh-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mapping-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.mapping-table th { text-align: left; padding: 9px 14px; font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--txt3); background: #F8FAFD; border-bottom: 1px solid var(--border2); }
+.mapping-table td { padding: 12px 14px; border-bottom: 1px solid var(--border2); vertical-align: top; }
+.mapping-table tr:last-child td { border-bottom: none; }
+.mapping-table tr:hover td { background: #FAFBFE; }
+.onprem-tag { display: inline-flex; align-items: center; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 6px; padding: 3px 9px; font-size: 12px; font-weight: 600; color: #1D4ED8; }
+.aws-tag { display: inline-flex; align-items: center; background: #FFF3DC; border: 1px solid #FCD34D; border-radius: 6px; padding: 3px 9px; font-size: 12px; font-weight: 600; color: #92400E; }
+.arrow-cell { color: var(--txt3); font-size: 16px; text-align: center; padding: 12px 8px; }
+.reason-cell { font-size: 12.5px; color: var(--txt2); line-height: 1.55; }
+.benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.benefit-card { background: #F8FAFD; border: 1px solid var(--border2); border-radius: 10px; padding: 16px; }
+.bc-icon { font-size: 22px; margin-bottom: 8px; }
+.bc-title { font-size: 13px; font-weight: 700; color: var(--txt); margin-bottom: 5px; }
+.bc-desc { font-size: 12px; color: var(--txt2); line-height: 1.55; }
+.phases { display: flex; flex-direction: column; gap: 10px; }
+.phase-row { display: flex; align-items: flex-start; gap: 14px; background: #F8FAFD; border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; }
+.phase-num { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
+.phase-num.p1 { background: var(--blue); }
+.phase-num.p2 { background: var(--aws); color: var(--navy); }
+.phase-num.p3 { background: var(--green); }
+.phase-num.p4 { background: #8B5CF6; }
+.phase-title { font-size: 13px; font-weight: 700; color: var(--txt); margin-bottom: 3px; }
+.phase-desc { font-size: 12px; color: var(--txt2); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="3" width="9" height="7" rx="1.5" fill="white" opacity=".9"/>
+        <rect x="13" y="3" width="9" height="7" rx="1.5" fill="white" opacity=".9"/>
+        <rect x="2" y="14" width="9" height="7" rx="1.5" fill="white" opacity=".9"/>
+        <rect x="13" y="14" width="9" height="7" rx="1.5" fill="white" opacity=".9"/>
+      </svg>
+    </div>
+    <div>
+      <div class="topbar-title">Architecture Diagram Studio</div>
+      <div class="topbar-sub">AWS Solutions Architect · Discovery Tool</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="powered-pill">Powered by <strong>Amazon Bedrock</strong></div>
+    <a href="../../index.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.8);border-radius:7px;padding:6px 12px;font-size:12.5px;font-weight:600;text-decoration:none;transition:all .18s;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15,18 9,12 15,6"/></svg>
+      AI Projects
+    </a>
+  </div>
+</header>
+
+<main class="main">
+  <div class="grid">
+
+    <!-- ON-PREM PANEL -->
+    <div class="panel" id="panel-onprem">
+      <div class="panel-head onprem">
+        <div class="phead-left">
+          <div class="phead-tag">Panel 1</div>
+          <div class="phead-title">On-Prem Drawing</div>
+        </div>
+        <div class="phead-badge">Data Center</div>
+      </div>
+      <div class="panel-body">
+        <label class="flabel" for="ta-onprem">Describe on-premises infrastructure</label>
+        <textarea id="ta-onprem" class="onprem" rows="8"
+          placeholder="Describe your on-premises infrastructure in detail...&#10;&#10;Include:&#10;• Physical servers and their roles (web, app, database, mail)&#10;• Firewalls — type, vendor, placement (edge, internal)&#10;• DMZ zones and what lives in them&#10;• Network switches, VLANs, and segmentation&#10;• Load balancers (hardware or software)&#10;• Storage arrays (SAN, NAS, iSCSI, FC)&#10;• WAN links, MPLS, SD-WAN, or DR site connections&#10;• Backup, monitoring, or management systems&#10;&#10;Example: 3-tier setup with 2 Cisco ASA firewalls in HA, 2 web servers in DMZ on VLAN 100, 4 app servers on VLAN 200, clustered SQL Server on VLAN 300, NetApp AFF SAN, F5 LTM load balancer, MPLS to DR site in Chicago."
+          oninput="onInput('onprem')" onkeydown="handleKey(event,'onprem')"></textarea>
+        <div class="ccount"><span id="cc-onprem">0</span> chars &nbsp;·&nbsp; Ctrl+↵ to generate</div>
+        <button class="btn-gen onprem" id="btn-onprem" onclick="generate('onprem')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polygon points="5,3 19,12 5,21"/></svg>
+          Generate On-Prem Diagram
+        </button>
+      </div>
+      <div class="loading-area" id="load-onprem">
+        <div class="spinner-wrap"><div class="spinner onprem spinner-track"></div></div>
+        <div class="loading-title">Generating architecture diagram<span class="loading-dots"></span></div>
+        <div class="loading-sub">Crafting detailed SVG — typically 20–45 seconds</div>
+      </div>
+      <div class="err-area" id="err-onprem"></div>
+      <div class="diagram-area" id="diag-onprem">
+        <div class="diag-toolbar">
+          <div class="diag-info"><div class="ready-pill"><div class="ready-dot"></div> Diagram Ready</div></div>
+          <div class="diag-btns">
+            <button class="btn-act dl-svg" onclick="dlSVG('onprem')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12z"/><path d="M2 13h12v1.5H2z"/></svg>SVG
+            </button>
+            <button class="btn-act dl-png" onclick="dlPNG('onprem')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12z"/><path d="M2 13h12v1.5H2z"/></svg>PNG
+            </button>
+            <button class="btn-act expand" onclick="expand('onprem')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Expand
+            </button>
+            <button class="btn-act" onclick="generate('onprem')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Regen
+            </button>
+            <button class="btn-act danger" onclick="clearPanel('onprem')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear
+            </button>
+          </div>
+        </div>
+        <div class="diag-box" id="dbox-onprem"></div>
+      </div>
+    </div>
+
+    <!-- AWS PANEL -->
+    <div class="panel" id="panel-aws">
+      <div class="panel-head aws">
+        <div class="phead-left">
+          <div class="phead-tag">Panel 2</div>
+          <div class="phead-title">AWS Drawing</div>
+        </div>
+        <div class="phead-badge">Cloud</div>
+      </div>
+      <div class="panel-body">
+        <label class="flabel" for="ta-aws">Describe AWS architecture needs</label>
+        <textarea id="ta-aws" class="aws" rows="8"
+          placeholder="Describe your AWS architecture in detail...&#10;&#10;Include:&#10;• VPC layout and CIDR blocks (e.g., 10.0.0.0/16)&#10;• Number of Availability Zones needed&#10;• AWS services: EC2, RDS, S3, Lambda, ECS/EKS, SQS, SNS&#10;• Public vs. private subnet structure&#10;• Load balancers (ALB / NLB / CLB)&#10;• Data flow between services&#10;• Security requirements (WAF, GuardDuty)&#10;• Migration context from on-premises&#10;• Any managed services or serverless components&#10;&#10;Example: Multi-AZ web app — CloudFront + WAF → ALB → ECS Fargate (2 AZs, private subnets) → Aurora MySQL (Multi-AZ) + ElastiCache Redis. S3 for static assets. SQS queue to Lambda for async jobs. Route 53 + ACM."
+          oninput="onInput('aws')" onkeydown="handleKey(event,'aws')"></textarea>
+        <div class="ccount"><span id="cc-aws">0</span> chars &nbsp;·&nbsp; Ctrl+↵ to generate</div>
+        <button class="btn-gen aws" id="btn-aws" onclick="generate('aws')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polygon points="5,3 19,12 5,21"/></svg>
+          Generate AWS Diagram
+        </button>
+      </div>
+      <div class="loading-area" id="load-aws">
+        <div class="spinner-wrap"><div class="spinner aws spinner-track"></div></div>
+        <div class="loading-title">Generating AWS architecture diagram<span class="loading-dots"></span></div>
+        <div class="loading-sub">Crafting detailed SVG — typically 20–45 seconds</div>
+      </div>
+      <div class="err-area" id="err-aws"></div>
+      <div class="diagram-area" id="diag-aws">
+        <div class="diag-toolbar">
+          <div class="diag-info"><div class="ready-pill"><div class="ready-dot"></div> Diagram Ready</div></div>
+          <div class="diag-btns">
+            <button class="btn-act dl-svg" onclick="dlSVG('aws')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12z"/><path d="M2 13h12v1.5H2z"/></svg>SVG
+            </button>
+            <button class="btn-act dl-png" onclick="dlPNG('aws')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12z"/><path d="M2 13h12v1.5H2z"/></svg>PNG
+            </button>
+            <button class="btn-act expand" onclick="expand('aws')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Expand
+            </button>
+            <button class="btn-act" onclick="generate('aws')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Regen
+            </button>
+            <button class="btn-act danger" onclick="clearPanel('aws')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear
+            </button>
+          </div>
+        </div>
+        <div class="diag-box" id="dbox-aws"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MIGRATION TRIGGER -->
+  <div id="migration-trigger-wrap" style="display:none;margin-top:4px;">
+    <button class="migration-trigger" onclick="generateMigration()" id="btn-migration">
+      <div class="mt-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="mt-text">
+        <div class="mt-title">Generate Migration Analysis</div>
+        <div class="mt-sub">Compare on-premises to AWS recommended architecture</div>
+      </div>
+      <div class="mt-badge">✦ Powered by Bedrock</div>
+    </button>
+  </div>
+
+  <!-- MIGRATION LOADING -->
+  <div class="loading-area" id="load-migration" style="background:#fff;border-radius:14px;box-shadow:var(--sh1);">
+    <div class="spinner-wrap"><div class="spinner aws spinner-track"></div></div>
+    <div class="loading-title">Generating migration analysis<span class="loading-dots"></span></div>
+    <div class="loading-sub">Analyzing both architectures — typically 20–40 seconds</div>
+  </div>
+
+  <!-- MIGRATION ERROR -->
+  <div class="err-area" id="err-migration"></div>
+
+  <!-- MIGRATION OUTPUT -->
+  <div id="migration-output" style="display:none;background:var(--card);border-radius:14px;box-shadow:var(--sh1);overflow:hidden;">
+    <div class="migration-header">
+      <div class="mh-left">
+        <div class="mh-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div>
+          <div class="mh-tag">AWS Migration Analysis</div>
+          <div class="mh-title">On-Premises → AWS Recommendation</div>
+        </div>
+      </div>
+      <button class="btn-act danger" onclick="clearMigration()" style="margin-left:auto;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Clear
+      </button>
+    </div>
+    <div class="migration-body" id="migration-body"></div>
+  </div>
+
+</main>
+
+<!-- FULLSCREEN MODAL -->
+<div class="overlay" id="overlay-expand">
+  <div class="fs-modal">
+    <div class="fs-header">
+      <div class="fs-title" id="fs-title">Architecture Diagram</div>
+      <div class="fs-actions">
+        <button class="btn-act dl-svg" id="fs-dl-svg">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12z"/><path d="M2 13h12v1.5H2z"/></svg>SVG
+        </button>
+        <button class="btn-act dl-png" id="fs-dl-png">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12z"/><path d="M2 13h12v1.5H2z"/></svg>PNG
+        </button>
+        <button class="btn-close" onclick="closeExpand()">×</button>
+      </div>
+    </div>
+    <div class="fs-body" id="fs-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LAMBDA_URL = 'https://6mcb5tctfchpldojluzolhh6gu0ajpqj.lambda-url.us-east-1.on.aws/';
+
+const S = {
+  onprem: { svg: null, busy: false },
+  aws:    { svg: null, busy: false },
+};
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeExpand();
+});
+
+function onInput(t) {
+  document.getElementById('cc-' + t).textContent = document.getElementById('ta-' + t).value.length;
+}
+
+function handleKey(e, t) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); generate(t); }
+}
+
+async function generate(t) {
+  const desc = document.getElementById('ta-' + t).value.trim();
+  if (!desc) { toast('Please describe your infrastructure first.', 'err'); return; }
+  if (S[t].busy) return;
+
+  setLoading(t, true);
+  hideErr(t);
+  hideDiag(t);
+
+  try {
+    const res = await fetch(LAMBDA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: t, description: desc })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || `HTTP ${res.status}`);
+    }
+
+    const svg = data.svg;
+    if (!svg) throw new Error('No SVG returned. Please try again.');
+
+    S[t].svg = svg;
+    renderDiag(t, svg);
+
+  } catch (err) {
+    showErr(t, err.message);
+  } finally {
+    setLoading(t, false);
+  }
+}
+
+function setLoading(t, on) {
+  S[t].busy = on;
+  document.getElementById('load-' + t).classList.toggle('on', on);
+  document.getElementById('btn-' + t).disabled = on;
+}
+function showErr(t, msg) {
+  const el = document.getElementById('err-' + t);
+  el.innerHTML = `<div class="err-title">Generation failed</div>${escHtml(msg)}`;
+  el.classList.add('on');
+}
+function hideErr(t)  { document.getElementById('err-' + t).classList.remove('on'); }
+function hideDiag(t) { document.getElementById('diag-' + t).classList.remove('on'); }
+function renderDiag(t, svg) {
+  document.getElementById('dbox-' + t).innerHTML = svg;
+  document.getElementById('diag-' + t).classList.add('on');
+  document.getElementById('diag-' + t).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  checkMigrationTrigger();
+}
+
+function clearPanel(t) {
+  document.getElementById('ta-' + t).value = '';
+  document.getElementById('cc-' + t).textContent = '0';
+  document.getElementById('dbox-' + t).innerHTML = '';
+  hideDiag(t);
+  hideErr(t);
+  S[t].svg = null;
+}
+
+function expand(t) {
+  if (!S[t].svg) return;
+  document.getElementById('fs-title').textContent = (t === 'onprem' ? 'On-Premises' : 'AWS') + ' Architecture Diagram';
+  document.getElementById('fs-body').innerHTML = S[t].svg;
+  const svgEl = document.getElementById('fs-body').querySelector('svg');
+  if (svgEl) { svgEl.style.maxWidth = '100%'; svgEl.style.height = 'auto'; }
+  document.getElementById('fs-dl-svg').onclick = () => dlSVG(t);
+  document.getElementById('fs-dl-png').onclick = () => dlPNG(t);
+  document.getElementById('overlay-expand').classList.add('on');
+}
+function closeExpand() { document.getElementById('overlay-expand').classList.remove('on'); }
+
+function dlSVG(t) {
+  if (!S[t].svg) return;
+  const blob = new Blob([S[t].svg], { type: 'image/svg+xml;charset=utf-8' });
+  triggerDL(URL.createObjectURL(blob), `${t}-architecture-diagram.svg`);
+  toast('SVG downloaded!', 'ok');
+}
+
+async function dlPNG(t) {
+  if (!S[t].svg) return;
+  toast('Converting to PNG…');
+  try {
+    const dataUrl = await svgToPng(S[t].svg);
+    triggerDL(dataUrl, `${t}-architecture-diagram.png`);
+    toast('PNG downloaded!', 'ok');
+  } catch(e) {
+    toast('PNG conversion failed — try SVG instead.', 'err');
+  }
+}
+
+function triggerDL(href, name) {
+  const a = document.createElement('a');
+  a.href = href; a.download = name;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(href), 1000);
+}
+
+function svgToPng(svgStr) {
+  return new Promise((resolve, reject) => {
+    const doc  = new DOMParser().parseFromString(svgStr, 'image/svg+xml');
+    const root = doc.documentElement;
+    let w = parseInt(root.getAttribute('width'))  || 1400;
+    let h = parseInt(root.getAttribute('height')) || 950;
+    const vb = root.getAttribute('viewBox');
+    if (vb && (isNaN(w) || w < 100)) {
+      const p = vb.split(/[\s,]+/);
+      if (p.length === 4) { w = parseFloat(p[2]); h = parseFloat(p[3]); }
+    }
+    w = w || 1400; h = h || 950;
+    const scale = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = w * scale; canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const img  = new Image();
+    img.onload  = () => { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h); ctx.drawImage(img,0,0,w,h); URL.revokeObjectURL(url); resolve(canvas.toDataURL('image/png')); };
+    img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+    img.src = url;
+  });
+}
+
+let toastTimer;
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast on' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('on'), 3200);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Show migration button when both diagrams are ready
+function checkMigrationTrigger() {
+  if (S.onprem.svg && S.aws.svg) {
+    document.getElementById('migration-trigger-wrap').style.display = 'block';
+  }
+}
+
+async function generateMigration() {
+  const onpremDesc = document.getElementById('ta-onprem').value.trim();
+  const awsDesc    = document.getElementById('ta-aws').value.trim();
+  if (!onpremDesc || !awsDesc) { toast('Both panels must have descriptions to generate migration analysis.', 'err'); return; }
+
+  document.getElementById('btn-migration').disabled = true;
+  document.getElementById('load-migration').classList.add('on');
+  document.getElementById('err-migration').classList.remove('on');
+  document.getElementById('migration-output').style.display = 'none';
+
+  try {
+    const res = await fetch(LAMBDA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'migration', description: { onprem: onpremDesc, aws: awsDesc } })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    if (!data.html) throw new Error('No analysis returned. Please try again.');
+
+    document.getElementById('migration-body').innerHTML = data.html;
+    document.getElementById('migration-output').style.display = 'block';
+    document.getElementById('migration-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast('Migration analysis ready!', 'ok');
+
+  } catch (err) {
+    const el = document.getElementById('err-migration');
+    el.innerHTML = `<div class="err-title">Analysis failed</div>${escHtml(err.message)}`;
+    el.classList.add('on');
+  } finally {
+    document.getElementById('load-migration').classList.remove('on');
+    document.getElementById('btn-migration').disabled = false;
+  }
+}
+
+function clearMigration() {
+  document.getElementById('migration-output').style.display = 'none';
+  document.getElementById('migration-body').innerHTML = '';
+  document.getElementById('err-migration').classList.remove('on');
+}
+</script>
+</body>
+</html>

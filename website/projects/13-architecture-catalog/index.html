@@ -659,16 +659,18 @@ const CATEGORIES = [
         name: 'Retrieval-Augmented Generation (RAG)',
         services: [
           'Amazon Bedrock', 'Amazon OpenSearch Service', 'AWS Lambda',
-          'Amazon S3', 'Amazon API Gateway', 'Amazon Cognito'
+          'Amazon S3', 'Amazon API Gateway', 'Amazon Cognito', 'Amazon CloudWatch'
         ],
-        description: 'RAG augments foundation model responses with context retrieved from a private vector knowledge base, reducing hallucinations and enabling enterprise-specific Q&A without costly fine-tuning. Commonly deployed for internal knowledge bases, customer support, and document search where LLM outputs must be grounded in verified source material.',
+        description: 'RAG augments a foundation model\'s responses with context retrieved from a private vector knowledge base, grounding outputs in verified enterprise data and eliminating the cost and risk of fine-tuning. The ingestion pipeline chunks, embeds, and indexes source documents from S3 into an OpenSearch k-NN vector index, while the query path retrieves the most semantically relevant chunks at inference time and injects them into the Bedrock prompt before generation. This is the AWS-recommended pattern for internal knowledge bases, customer support copilots, and document Q&A where answers must be traceable to source material.',
         flow: [
-          'The client submits a natural language query to Amazon API Gateway, which validates the request against an Amazon Cognito User Pool authorizer.',
-          'API Gateway invokes an AWS Lambda function that calls Amazon Bedrock\'s Titan Embeddings model to convert the query text into a dense vector representation.',
-          'Lambda queries Amazon OpenSearch Service\'s k-NN vector index to retrieve the top-k semantically similar document chunks.',
-          'The retrieved chunks are injected into a prompt template alongside the original query and submitted to a Bedrock foundation model (e.g., Claude or Titan) for generation.',
-          'Bedrock streams the generated response back through Lambda and API Gateway to the client.',
-          'A separate ingestion Lambda—triggered by S3 object uploads—chunks, embeds, and indexes new documents into OpenSearch Service to keep the knowledge base current.'
+          'The client authenticates with Amazon Cognito and receives a signed JWT, then submits a natural language query to Amazon API Gateway with the JWT in the Authorization header.',
+          'API Gateway validates the token against the Cognito User Pool authorizer and invokes the Lambda Orchestrator function with the full request payload.',
+          'Lambda calls Amazon Bedrock Titan Embeddings to convert the query text into a dense vector representation.',
+          'Lambda queries the Amazon OpenSearch Service k-NN vector index with the query embedding to retrieve the top-k most semantically similar document chunks.',
+          'Lambda constructs a prompt by injecting the retrieved chunks as context alongside the original query, then calls the Amazon Bedrock foundation model (e.g., Claude or Amazon Nova) for response generation.',
+          'Bedrock generates a grounded response using the supplied context and returns it to Lambda, which passes it back through API Gateway to the client.',
+          'A separate ingestion Lambda — triggered by S3 object upload events — chunks new documents, generates embeddings via Bedrock Titan Embeddings, and upserts vectors into the OpenSearch index to keep the knowledge base current.',
+          'Lambda emits invocation metrics, latency, and error counts to Amazon CloudWatch for operational monitoring and alerting.'
         ]
       },
       {
@@ -693,17 +695,17 @@ const CATEGORIES = [
         id: 'serverless-chatbot',
         name: 'Serverless AI Chatbot',
         services: [
-          'Amazon Lex', 'AWS Lambda', 'Amazon DynamoDB',
-          'Amazon Bedrock', 'Amazon API Gateway', 'Amazon Cognito'
+          'Amazon Bedrock', 'AWS Lambda', 'Amazon DynamoDB',
+          'Amazon API Gateway', 'Amazon Cognito', 'Amazon CloudFront', 'Amazon S3'
         ],
-        description: 'Combines Amazon Lex\'s intent classification and slot filling with Amazon Bedrock\'s generative capabilities to handle structured tasks (booking, lookup) and open-ended conversation in a single serverless interface. The pattern eliminates server management while providing built-in session management, SSML voice support, and automatic scaling to zero between conversations.',
+        description: 'A fully serverless conversational AI application backed by Amazon Bedrock foundation models, where Lambda orchestrates conversation context stored in DynamoDB and API Gateway handles authentication via Cognito — the most widely deployed pattern for teams who want generative AI chat without managing infrastructure or paying for idle compute. CloudFront delivers the static chat interface globally from S3 with low latency.',
         flow: [
-          'The end user sends a message through a web or mobile client that calls Amazon API Gateway with a Cognito JWT for authentication.',
-          'API Gateway routes the request to an AWS Lambda function, which forwards the utterance to Amazon Lex for intent recognition and entity extraction.',
-          'Lex identifies the intent and, if all required slots are filled, invokes a fulfillment Lambda function via its code hook mechanism.',
-          'The fulfillment Lambda retrieves the user\'s conversation history and session context from Amazon DynamoDB using the session ID as the partition key.',
-          'Lambda constructs a prompt with the conversation history and passes it to Amazon Bedrock for generative response synthesis with the chosen foundation model.',
-          'The Bedrock response is written back to DynamoDB as the latest conversation turn and returned through API Gateway to the client.'
+          'The user opens the chat application delivered via Amazon CloudFront from static assets stored in Amazon S3, and authenticates using Amazon Cognito to receive a signed JWT.',
+          'The user submits a message; the browser calls Amazon API Gateway with the Cognito JWT, which validates the token before invoking an AWS Lambda function.',
+          'Lambda retrieves the conversation history for the session from Amazon DynamoDB using the Cognito sub as the partition key, maintaining multi-turn context.',
+          'Lambda constructs a prompt with the full conversation history and the new user message, then calls Amazon Bedrock InvokeModel API with the chosen foundation model (e.g., Claude or Amazon Nova).',
+          'Bedrock generates a response and returns it to Lambda, which writes the new turn — user message and model reply — back to DynamoDB and returns the reply through API Gateway.',
+          'The browser renders the response in the chat UI; subsequent messages repeat the cycle, with DynamoDB maintaining the full conversation context across turns.'
         ]
       }
     ]
@@ -860,7 +862,7 @@ const CATEGORIES = [
         name: 'Zero Trust Network Access',
         services: [
           'AWS Verified Access', 'AWS IAM Identity Center', 'AWS WAF',
-          'Amazon VPC', 'AWS Certificate Manager', 'Amazon CloudWatch'
+          'Amazon VPC', 'AWS Certificate Manager', 'Amazon Cognito', 'Amazon CloudWatch'
         ],
         description: 'Grants application-level access based on continuous identity and device posture verification rather than network perimeter membership, replacing VPN for workforce-facing internal applications. AWS Verified Access integrates with corporate identity providers and device management platforms to enforce least-privilege access per application without modifying application code or deploying agents on servers.',
         flow: [
@@ -941,7 +943,7 @@ const CATEGORIES = [
           'Amazon DynamoDB Global Tables', 'Amazon Aurora Global Database',
           'Application Load Balancer'
         ],
-        description: 'Distributes active workloads across multiple AWS Regions simultaneously to minimize latency for geographically dispersed users, satisfy data residency requirements, and survive a complete Regional outage with near-zero RTO. Managed replication services handle cross-region consistency and failover promotion, removing the need for custom synchronization code.',
+        description: 'Distributes active workloads across multiple AWS Regions simultaneously to minimize latency for geographically dispersed users, satisfy data residency requirements, and survive a complete Regional outage with near-zero RTO. Application Load Balancers in each Region serve active traffic, while managed replication services handle cross-region data consistency and failover promotion, removing the need for custom synchronization code.',
         flow: [
           'A global user\'s DNS query is resolved by Amazon Route 53 using a latency-based or geolocation routing policy, returning an AWS Global Accelerator anycast IP address.',
           'Global Accelerator routes the connection over the AWS global backbone to the nearest healthy Regional Application Load Balancer, bypassing the public internet for most of the path.',
@@ -1089,7 +1091,7 @@ const CATEGORIES = [
           'Amazon Route 53', 'Amazon RDS', 'Amazon EC2',
           'AWS CloudFormation', 'Amazon S3', 'Amazon CloudWatch', 'AWS Backup'
         ],
-        description: 'Maintains a minimal running footprint in a secondary Region — typically only the database with active replication running — while all remaining infrastructure is pre-templated and ready to launch in minutes during a declared disaster. Pilot light achieves lower standby cost than warm standby at the trade-off of a longer RTO (typically 30–60 minutes) for compute provisioning.',
+        description: 'Maintains a minimal running footprint in a secondary Region — typically only the database with active replication running — while all remaining infrastructure is pre-templated in AWS CloudFormation and ready to launch in minutes during a declared disaster. AWS Backup protects both EC2 volumes and RDS snapshots with cross-region copy, providing an additional recovery layer beyond live replication. Pilot light achieves lower standby cost than warm standby at the trade-off of a longer RTO (typically 30–60 minutes) for compute provisioning.',
         flow: [
           'The primary Region handles all production traffic; Amazon RDS continuously replicates to a cross-region read replica in the DR Region using asynchronous binary log replication.',
           'AWS Backup runs scheduled backups of EC2 instance volumes and RDS snapshots, copying them to the DR Region\'s backup vault for additional data protection.',

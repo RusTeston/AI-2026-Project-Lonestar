@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS Architecture Catalog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ─────────────── Reset & Base ─────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-start:    #0C1A3A;
+      --bg-mid:      #0A3050;
+      --bg-end:      #0E3558;
+      --surface:     #112347;
+      --surface-2:   #16294E;
+      --border:      #1E3A5C;
+      --border-bright: #2A4F7A;
+      --text:        #E8F4FD;
+      --text-muted:  #7FA8C9;
+      --text-dim:    #4A7299;
+      --yellow:      #E0FF4F;
+      --yellow-dim:  #B8D420;
+      --white:       #FFFFFF;
+      --radius-sm:   6px;
+      --radius-md:   10px;
+      --radius-lg:   16px;
+      --transition:  200ms ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-mid) 50%, var(--bg-end) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─────────────── Topbar ─────────────── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12, 26, 58, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .topbar-badge {
+      background: var(--yellow);
+      color: #0C1A3A;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-back {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color var(--transition);
+      flex-shrink: 0;
+    }
+    .topbar-back:hover { color: var(--yellow); }
+
+    /* ─────────────── Main wrapper ─────────────── */
+    #app {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ─────────────── Views ─────────────── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ─────────────── Page Headers ─────────────── */
+    .page-header {
+      margin-bottom: 40px;
+    }
+
+    .page-header-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 20px;
+      transition: color var(--transition);
+    }
+    .page-header-nav:hover { color: var(--yellow); }
+    .page-header-nav svg { flex-shrink: 0; }
+
+    .page-header h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800;
+      color: var(--yellow);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .page-header p {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 600px;
+    }
+
+    .category-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px 14px 4px 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .category-tag .icon { font-size: 16px; }
+
+    /* ─────────────── Category Grid (View 1) ─────────────── */
+    .hero {
+      margin-bottom: 56px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      color: var(--yellow);
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 28px;
+    }
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 1024px) { .categories-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px)  { .categories-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px)  { .categories-grid { grid-template-columns: 1fr; } }
+
+    .category-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px 20px;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition), transform 150ms ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .category-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(224,255,79,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .category-card:hover {
+      border-color: var(--yellow);
+      background: var(--surface-2);
+      transform: translateY(-2px);
+    }
+    .category-card:active { transform: translateY(0); }
+
+    .category-card-icon {
+      font-size: 32px;
+      margin-bottom: 14px;
+      display: block;
+      line-height: 1;
+    }
+    .category-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .category-card-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+    .category-card-count span {
+      color: var(--yellow);
+      font-weight: 700;
+    }
+    .category-card-arrow {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: var(--border-bright);
+      transition: color var(--transition), transform var(--transition);
+    }
+    .category-card:hover .category-card-arrow {
+      color: var(--yellow);
+      transform: translate(2px, -2px);
+    }
+
+    /* ─────────────── Architecture List (View 2) ─────────────── */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 900px)  { .arch-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px)  { .arch-grid { grid-template-columns: 1fr; } }
+
+    .arch-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition), transform 150ms ease;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .arch-card:hover {
+      border-color: var(--border-bright);
+      background: var(--surface-2);
+      transform: translateY(-2px);
+    }
+
+    .arch-card-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .arch-card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .service-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .arch-card-footer {
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-view {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--yellow);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: gap var(--transition);
+    }
+    .btn-view:hover { gap: 10px; }
+
+    /* ─────────────── Architecture Detail (View 3) ─────────────── */
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 960px) { .detail-layout { grid-template-columns: 1fr; } }
+
+    .diagram-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .diagram-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .diagram-header-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .diagram-header span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-dim);
+      margin-left: 4px;
+    }
+
+    .diagram-body {
+      min-height: 400px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .diagram-body img {
+      display: none;
+      width: 100%;
+      height: auto;
+    }
+    .diagram-body img.loaded {
+      display: block;
+    }
+
+    .diagram-placeholder-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 60px 40px;
+      text-align: center;
+    }
+    .diagram-placeholder-inner svg {
+      opacity: 0.2;
+    }
+    .diagram-placeholder-inner p {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+    .diagram-placeholder-inner span {
+      font-size: 12px;
+      color: var(--text-dim);
+      opacity: 0.7;
+    }
+
+    .detail-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .detail-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    .detail-section p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    .flow-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .flow-step {
+      display: flex;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .flow-step:last-child { border-bottom: none; }
+
+    .flow-step-num {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--bg-start);
+      border: 1px solid var(--border-bright);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--yellow);
+      margin-top: 1px;
+    }
+
+    .flow-step-text {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      padding-top: 3px;
+    }
+
+    .sidebar-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .sidebar-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    /* ─────────────── Pill color palette ─────────────── */
+    /* Each service gets a deterministic color class via JS */
+    .pill-compute  { background: rgba(217,119,6,0.15);  color: #FBB034; border: 1px solid rgba(217,119,6,0.3);  }
+    .pill-storage  { background: rgba(37,99,235,0.15);  color: #60A5FA; border: 1px solid rgba(37,99,235,0.3);  }
+    .pill-database { background: rgba(8,145,178,0.15);  color: #22D3EE; border: 1px solid rgba(8,145,178,0.3);  }
+    .pill-network  { background: rgba(5,150,105,0.15);  color: #34D399; border: 1px solid rgba(5,150,105,0.3);  }
+    .pill-security { background: rgba(220,38,38,0.15);  color: #F87171; border: 1px solid rgba(220,38,38,0.3);  }
+    .pill-aiml    { background: rgba(124,58,237,0.15);  color: #A78BFA; border: 1px solid rgba(124,58,237,0.3); }
+    .pill-analytics{ background: rgba(234,88,12,0.15);  color: #FB923C; border: 1px solid rgba(234,88,12,0.3);  }
+    .pill-messaging{ background: rgba(14,116,144,0.15); color: #67E8F9; border: 1px solid rgba(14,116,144,0.3); }
+    .pill-devops   { background: rgba(79,70,229,0.15);  color: #818CF8; border: 1px solid rgba(79,70,229,0.3);  }
+    .pill-mgmt     { background: rgba(71,85,105,0.15);  color: #94A3B8; border: 1px solid rgba(71,85,105,0.3);  }
+
+    /* ─────────────── Responsive tweaks ─────────────── */
+    @media (max-width: 600px) {
+      #app { padding: 32px 16px 60px; }
+      .topbar { padding: 0 16px; }
+      .hero-stats { gap: 20px; }
+      .detail-section { padding: 20px; }
+      .sidebar-section { padding: 20px; }
+    }
+
+    /* ─────────────── Scrollbar ─────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ STICKY TOP BAR ══════════════ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">AWS</span>
+    <span class="topbar-title">Architecture Catalog</span>
+  </div>
+  <a href="../../index.html" class="topbar-back">← Back to AI Projects</a>
+</header>
+
+<!-- ══════════════ APP ROOT ══════════════ -->
+<main id="app">
+
+  <!-- ── View 1: Category Grid ── -->
+  <div id="view-categories" class="view active">
+    <div class="hero">
+      <h1>AWS Architecture<br>Reference Catalog</h1>
+      <p>Production-ready patterns for the most common AWS workloads — organized by category with service breakdowns and detailed traffic flows.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-value">8</span>
+          <span class="stat-label">Categories</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">24</span>
+          <span class="stat-label">Architectures</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">2024–25</span>
+          <span class="stat-label">Best Practices</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-label">Browse by category</p>
+    <div class="categories-grid" id="categories-grid"></div>
+  </div>
+
+  <!-- ── View 2: Architecture List ── -->
+  <div id="view-list" class="view">
+    <div class="page-header">
+      <button class="page-header-nav" onclick="navigate('categories')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to Categories
+      </button>
+      <div id="list-category-tag" class="category-tag"></div>
+      <h1 id="list-heading"></h1>
+      <p id="list-subheading" class="page-header p"></p>
+    </div>
+    <div class="arch-grid" id="arch-grid"></div>
+  </div>
+
+  <!-- ── View 3: Architecture Detail ── -->
+  <div id="view-detail" class="view">
+    <div class="page-header">
+      <button class="page-header-nav" id="detail-back-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="detail-back-label">Back</span>
+      </button>
+      <h1 id="detail-heading"></h1>
+    </div>
+
+    <!-- Diagram -->
+    <div class="diagram-wrap">
+      <div class="diagram-header">
+        <div class="diagram-header-dot" style="background:#E63757"></div>
+        <div class="diagram-header-dot" style="background:#F4A43A; margin-left:6px"></div>
+        <div class="diagram-header-dot" style="background:#2CCE6A; margin-left:6px"></div>
+        <span id="detail-diagram-label">architecture-diagram.png</span>
+      </div>
+      <div class="diagram-body" id="detail-diagram-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <div class="detail-layout">
+      <!-- Main column -->
+      <div>
+        <div class="detail-section">
+          <p class="detail-section-title">About this Architecture</p>
+          <p id="detail-description"></p>
+        </div>
+
+        <div class="detail-section">
+          <p class="detail-section-title">Traffic Flow</p>
+          <ol class="flow-list" id="detail-flow"></ol>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="sidebar-section">
+          <p class="sidebar-section-title">AWS Services</p>
+          <div class="service-pills" id="detail-pills"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════ JAVASCRIPT ══════════════ -->
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   ARCHITECTURE DATA
+   To add a new architecture: append an object to a category's
+   `architectures` array following the exact same shape.
+   ═══════════════════════════════════════════════════════════════════ */
+const CATEGORIES = [
+  /* ── 1. AI & Machine Learning ─────────────────────────────── */
+  {
+    id: 'ai-ml',
+    name: 'AI & Machine Learning',
+    icon: '🤖',
+    architectures: [
+      {
+        id: 'rag',
+        name: 'Retrieval-Augmented Generation (RAG)',
+        services: [
+          'Amazon Bedrock', 'Amazon OpenSearch Service', 'AWS Lambda',
+          'Amazon S3', 'Amazon API Gateway', 'Amazon Cognito'
+        ],
+        description: 'RAG augments foundation model responses with context retrieved from a private vector knowledge base, reducing hallucinations and enabling enterprise-specific Q&A without costly fine-tuning. Commonly deployed for internal knowledge bases, customer support, and document search where LLM outputs must be grounded in verified source material.',
+        flow: [
+          'The client submits a natural language query to Amazon API Gateway, which validates the request against an Amazon Cognito User Pool authorizer.',
+          'API Gateway invokes an AWS Lambda function that calls Amazon Bedrock\'s Titan Embeddings model to convert the query text into a dense vector representation.',
+          'Lambda queries Amazon OpenSearch Service\'s k-NN vector index to retrieve the top-k semantically similar document chunks.',
+          'The retrieved chunks are injected into a prompt template alongside the original query and submitted to a Bedrock foundation model (e.g., Claude or Titan) for generation.',
+          'Bedrock streams the generated response back through Lambda and API Gateway to the client.',
+          'A separate ingestion Lambda—triggered by S3 object uploads—chunks, embeds, and indexes new documents into OpenSearch Service to keep the knowledge base current.'
+        ]
+      },
+      {
+        id: 'mlops-pipeline',
+        name: 'MLOps Training Pipeline',
+        services: [
+          'Amazon SageMaker', 'Amazon S3', 'AWS CodePipeline',
+          'AWS CodeBuild', 'Amazon ECR', 'AWS Step Functions', 'Amazon EventBridge'
+        ],
+        description: 'Automates the full ML lifecycle—from data preparation through model training, evaluation, and deployment—using SageMaker Pipelines and CI/CD tooling to enforce reproducibility and quality gates. This is the standard approach for teams that need to retrain models on fresh data, gate promotion on accuracy metrics, and maintain an auditable model registry.',
+        flow: [
+          'A data scientist merges a pull request, which triggers AWS CodePipeline via an Amazon EventBridge rule on the source repository.',
+          'AWS CodeBuild runs unit tests on training code and packages it as a Docker container image pushed to Amazon ECR.',
+          'CodePipeline invokes an AWS Step Functions state machine that orchestrates the SageMaker Pipeline execution.',
+          'The SageMaker Pipeline runs a Processing step using SageMaker Processing jobs, reading raw data from Amazon S3 and writing transformed features back to S3.',
+          'A SageMaker Training job pulls the ECR container and training data from S3, writes model artifacts to a versioned S3 prefix, and logs metrics to SageMaker Experiments.',
+          'A Model Evaluation step compares accuracy against a defined threshold; failing models are rejected and the pipeline halts before registry registration.',
+          'Approved models are registered in the SageMaker Model Registry and promoted to a SageMaker real-time Endpoint via a blue/green deployment.'
+        ]
+      },
+      {
+        id: 'serverless-chatbot',
+        name: 'Serverless AI Chatbot',
+        services: [
+          'Amazon Lex', 'AWS Lambda', 'Amazon DynamoDB',
+          'Amazon Bedrock', 'Amazon API Gateway', 'Amazon Cognito'
+        ],
+        description: 'Combines Amazon Lex\'s intent classification and slot filling with Amazon Bedrock\'s generative capabilities to handle structured tasks (booking, lookup) and open-ended conversation in a single serverless interface. The pattern eliminates server management while providing built-in session management, SSML voice support, and automatic scaling to zero between conversations.',
+        flow: [
+          'The end user sends a message through a web or mobile client that calls Amazon API Gateway with a Cognito JWT for authentication.',
+          'API Gateway routes the request to an AWS Lambda function, which forwards the utterance to Amazon Lex for intent recognition and entity extraction.',
+          'Lex identifies the intent and, if all required slots are filled, invokes a fulfillment Lambda function via its code hook mechanism.',
+          'The fulfillment Lambda retrieves the user\'s conversation history and session context from Amazon DynamoDB using the session ID as the partition key.',
+          'Lambda constructs a prompt with the conversation history and passes it to Amazon Bedrock for generative response synthesis with the chosen foundation model.',
+          'The Bedrock response is written back to DynamoDB as the latest conversation turn and returned through API Gateway to the client.'
+        ]
+      }
+    ]
+  },
+
+  /* ── 2. Web & API ────────────────────────────────────────── */
+  {
+    id: 'web-api',
+    name: 'Web & API',
+    icon: '🌐',
+    architectures: [
+      {
+        id: 'multi-tier-web',
+        name: 'Multi-Tier Web Application',
+        services: [
+          'Amazon CloudFront', 'AWS WAF', 'Application Load Balancer',
+          'Amazon EC2', 'Amazon RDS', 'Amazon ElastiCache', 'Amazon S3'
+        ],
+        description: 'The canonical three-tier architecture separating static assets, application logic, and data storage across independently scalable layers within a multi-AZ VPC. It remains the most widely deployed pattern for traditional web applications requiring full server-side rendering, complex session management, or legacy middleware compatibility.',
+        flow: [
+          'The user\'s browser resolves the domain via Amazon Route 53 and connects to the nearest Amazon CloudFront edge location, which serves cached static assets directly from Amazon S3.',
+          'CloudFront passes dynamic requests through AWS WAF for OWASP rule evaluation and rate limiting before forwarding to an Application Load Balancer in the public subnet.',
+          'The ALB terminates TLS using an AWS Certificate Manager certificate and distributes requests across EC2 instances in an Auto Scaling group spread across multiple Availability Zones in private subnets.',
+          'The application layer checks Amazon ElastiCache (Redis) for a cached response before querying the relational database.',
+          'On a cache miss, the EC2 application tier queries the Amazon RDS Multi-AZ primary instance in the isolated data subnet.',
+          'RDS synchronously replicates writes to a standby instance in a second AZ; read replicas absorb reporting queries to reduce primary load.',
+          'The response flows back through the ALB and CloudFront, with cache-control headers set for subsequent edge caching.'
+        ]
+      },
+      {
+        id: 'serverless-rest-api',
+        name: 'Serverless REST API',
+        services: [
+          'Amazon API Gateway', 'AWS Lambda', 'Amazon DynamoDB',
+          'Amazon Cognito', 'AWS X-Ray', 'Amazon CloudWatch'
+        ],
+        description: 'A pay-per-invocation API backend that scales automatically from zero to millions of requests without provisioning or managing EC2 instances, making it the default pattern for microservices, mobile backends, and variable-traffic APIs. API Gateway handles routing, throttling, and authorization while Lambda executes stateless business logic.',
+        flow: [
+          'The client sends an HTTP request to Amazon API Gateway\'s regional or edge-optimized endpoint with a Cognito-issued JWT in the Authorization header.',
+          'API Gateway validates the token against the Amazon Cognito User Pool authorizer, rejecting unauthenticated requests with a 401 without invoking Lambda.',
+          'API Gateway applies request throttling and usage plan limits, then invokes the mapped AWS Lambda function with the full request event payload.',
+          'Lambda executes business logic with AWS X-Ray active tracing enabled, which records subsegment latency for all downstream service calls.',
+          'Lambda reads from or writes to Amazon DynamoDB using single-table design patterns; GetItem and Query calls for reads, PutItem and UpdateItem for writes.',
+          'The DynamoDB response is marshalled into an HTTP response object returned through Lambda to API Gateway.',
+          'API Gateway applies any configured response transformations and returns the HTTP response with appropriate CORS and cache-control headers.'
+        ]
+      },
+      {
+        id: 'graphql-appsync',
+        name: 'GraphQL API with AppSync',
+        services: [
+          'AWS AppSync', 'AWS Lambda', 'Amazon DynamoDB',
+          'Amazon Cognito', 'Amazon ElastiCache', 'Amazon RDS'
+        ],
+        description: 'AWS AppSync provides a managed GraphQL endpoint with built-in real-time subscription support over WebSocket, conflict detection for offline sync, and per-field authorization — making it the standard choice for React, Vue, and React Native applications that need flexible data fetching and live updates without a custom WebSocket server.',
+        flow: [
+          'The client authenticates with Amazon Cognito and presents a JWT to the AWS AppSync endpoint with every GraphQL request or subscription registration.',
+          'AppSync evaluates field-level authorization rules defined in the GraphQL schema using Cognito group claims and custom IAM conditions.',
+          'For query and mutation operations, AppSync invokes the mapped resolver—either a direct DynamoDB resolver or a Lambda pipeline resolver for multi-step business logic.',
+          'Lambda resolvers check Amazon ElastiCache (Redis) for hot-path data before falling back to Amazon DynamoDB or Amazon RDS reads.',
+          'Mutation operations write to DynamoDB and trigger AppSync subscriptions, which push delta updates to all connected WebSocket clients in real time.',
+          'Batching resolvers aggregate multiple field-level invocations into a single Lambda call using AppSync\'s BatchInvoke feature to reduce cold-start overhead.'
+        ]
+      }
+    ]
+  },
+
+  /* ── 3. Data & Analytics ─────────────────────────────────── */
+  {
+    id: 'data-analytics',
+    name: 'Data & Analytics',
+    icon: '📊',
+    architectures: [
+      {
+        id: 'data-lake-s3',
+        name: 'Data Lake on S3',
+        services: [
+          'Amazon S3', 'AWS Glue', 'Amazon Athena',
+          'AWS Lake Formation', 'Amazon Kinesis Data Firehose', 'Amazon QuickSight'
+        ],
+        description: 'A governed, schema-on-read data lake that consolidates structured, semi-structured, and unstructured data from disparate sources into tiered S3 prefixes, enabling ad-hoc SQL analytics without loading data into a warehouse first. AWS Lake Formation provides centralized column- and row-level access controls across all consumers without modifying each table definition.',
+        flow: [
+          'Operational systems and streaming sources deliver events to Amazon Kinesis Data Firehose, which buffers and writes records to the S3 raw zone in Parquet or JSON format.',
+          'AWS Glue crawlers run on a schedule, inferring schema from new S3 objects and registering table definitions and partition metadata in the AWS Glue Data Catalog.',
+          'AWS Glue ETL jobs read from the raw zone, apply transformations and deduplication logic, and write optimized Parquet files to the S3 curated zone partitioned by date.',
+          'AWS Lake Formation governs access to all Data Catalog tables, enforcing column masking and row-level filters based on the requester\'s IAM principal.',
+          'Analysts run SQL queries against curated zone tables via Amazon Athena, which resolves schema from the Glue Data Catalog and reads S3 data in parallel using distributed Presto.',
+          'Athena query results are connected to Amazon QuickSight SPICE for cached visualizations and ML-powered insights shared across the organization.'
+        ]
+      },
+      {
+        id: 'real-time-streaming',
+        name: 'Real-Time Streaming Analytics',
+        services: [
+          'Amazon Kinesis Data Streams', 'Amazon Managed Service for Apache Flink',
+          'Amazon Kinesis Data Firehose', 'AWS Lambda',
+          'Amazon DynamoDB', 'Amazon OpenSearch Service'
+        ],
+        description: 'A low-latency event processing architecture that ingests high-throughput streams and applies stateful computations—windowed aggregations, anomaly detection, pattern matching—with results written to operational stores for immediate action. Typical use cases include real-time fraud detection, clickstream analysis, and IoT telemetry at millions of events per second.',
+        flow: [
+          'Producers (web applications, IoT devices, clickstream trackers) publish events to Amazon Kinesis Data Streams shards via the PutRecords API with partition key-based routing.',
+          'Amazon Managed Service for Apache Flink reads from the Kinesis stream as a source, applying stateful operations such as tumbling windows, session windows, and CEP pattern detection.',
+          'Apache Flink enriches events by joining the stream against a reference dataset in Amazon DynamoDB using async I/O lookups to avoid blocking the stream-processing pipeline.',
+          'Enriched or anomalous records that breach configured thresholds are sent to an AWS Lambda function via Kinesis stream destination for real-time alerting and downstream actions.',
+          'Processed results are written to Amazon DynamoDB for sub-millisecond operational reads by the application tier, and to Amazon OpenSearch Service for near-real-time search and dashboards.',
+          'All raw and processed events are simultaneously delivered to Amazon Kinesis Data Firehose, which batches them to the S3 data lake for long-term retention and historical analysis.'
+        ]
+      },
+      {
+        id: 'serverless-etl',
+        name: 'Serverless ETL Pipeline',
+        services: [
+          'AWS Glue', 'Amazon S3', 'AWS Step Functions',
+          'Amazon EventBridge', 'Amazon Athena', 'AWS Lambda'
+        ],
+        description: 'An event-driven pipeline that transforms and loads data between storage systems on a trigger or schedule using AWS Glue for distributed PySpark execution without managing Spark clusters. AWS Step Functions orchestrates multi-step workflows with built-in error handling, exponential retry logic, and conditional branching that would otherwise require custom coordination code.',
+        flow: [
+          'A new file landing in an Amazon S3 source bucket fires an Amazon EventBridge rule, or a scheduled EventBridge cron expression fires at a configured interval.',
+          'EventBridge invokes an AWS Step Functions Express Workflow that defines the multi-step ETL orchestration with named states.',
+          'A first Step Functions state invokes an AWS Lambda function that validates the source file schema and records the pipeline run metadata to Amazon DynamoDB.',
+          'Step Functions starts an AWS Glue job execution, passing source and destination S3 paths as job parameters; Glue spawns a distributed PySpark cluster to read, transform, and join the data.',
+          'The Glue job writes transformed Parquet files to the S3 processed zone and updates the AWS Glue Data Catalog with the new partition metadata using the Catalog write API.',
+          'Step Functions invokes a final Lambda that runs a validation query via Amazon Athena to verify row counts and data quality before marking the pipeline run as successful in DynamoDB.'
+        ]
+      }
+    ]
+  },
+
+  /* ── 4. Security & Compliance ────────────────────────────── */
+  {
+    id: 'security-compliance',
+    name: 'Security & Compliance',
+    icon: '🔐',
+    architectures: [
+      {
+        id: 'landing-zone',
+        name: 'Multi-Account Landing Zone',
+        services: [
+          'AWS Control Tower', 'AWS Organizations', 'AWS IAM Identity Center',
+          'AWS Config', 'AWS CloudTrail', 'Amazon Security Hub'
+        ],
+        description: 'A governed multi-account environment that enforces organizational policies, centralizes security findings, and provides federated access across hundreds of AWS accounts without per-account manual configuration. Control Tower\'s Account Vending Machine provisions new accounts with guardrails, centralized logging, and SSO pre-configured — the standard foundation for enterprise AWS adoption at scale.',
+        flow: [
+          'An administrator requests a new AWS account through the AWS Control Tower Account Factory, specifying the account name, email, and target organizational unit.',
+          'Control Tower invokes AWS Service Catalog to provision the account using a pre-approved CloudFormation template and enroll it in the correct OU within AWS Organizations.',
+          'Organizations applies Service Control Policies (SCPs) from the parent OU, restricting disallowed actions such as leaving the organization or disabling AWS CloudTrail.',
+          'Control Tower automatically deploys the AWSControlTowerExecution IAM role, AWS Config rules, and an organization CloudTrail trail to the new account.',
+          'AWS IAM Identity Center propagates configured permission sets to the new account, enabling federated SSO access for users mapped to the account in the identity directory.',
+          'AWS Config continuously evaluates resources in the new account against conformance packs; all findings are aggregated into a central Amazon Security Hub delegated administrator account.'
+        ]
+      },
+      {
+        id: 'zero-trust-network',
+        name: 'Zero Trust Network Access',
+        services: [
+          'AWS Verified Access', 'AWS IAM Identity Center', 'AWS WAF',
+          'Amazon VPC', 'AWS Certificate Manager', 'Amazon CloudWatch'
+        ],
+        description: 'Grants application-level access based on continuous identity and device posture verification rather than network perimeter membership, replacing VPN for workforce-facing internal applications. AWS Verified Access integrates with corporate identity providers and device management platforms to enforce least-privilege access per application without modifying application code or deploying agents on servers.',
+        flow: [
+          'A remote employee navigates to an internal application URL; their browser is redirected to the AWS Verified Access endpoint rather than a VPN gateway.',
+          'Verified Access redirects the user to the configured identity provider (AWS IAM Identity Center or a SAML/OIDC IdP) for multi-factor authentication.',
+          'After authentication, Verified Access evaluates the device trust policy by querying posture signals from the integrated endpoint management platform.',
+          'Verified Access applies an access policy written in Cedar that combines identity group membership, device compliance status, and resource trust level to make an allow or deny decision.',
+          'Allowed requests are forwarded to the application target in a private VPC subnet with an x-amzn-ava-user-context header injected so the application can apply app-layer authorization.',
+          'All access decisions and request metadata are logged to Amazon CloudWatch Logs and streamed to Amazon S3 for SIEM ingestion and compliance audit trails.'
+        ]
+      },
+      {
+        id: 'hipaa-workload',
+        name: 'HIPAA-Ready Workload',
+        services: [
+          'Amazon VPC', 'AWS KMS', 'Amazon RDS',
+          'AWS CloudTrail', 'Amazon Macie', 'AWS Config',
+          'Amazon Security Hub', 'Application Load Balancer'
+        ],
+        description: 'A regulated healthcare architecture that implements the encryption, audit logging, access control, and data classification controls required by HIPAA\'s Technical Safeguard rules for systems processing Protected Health Information. AWS enables customers to operate HIPAA-eligible workloads under a signed Business Associate Agreement covering a specific set of managed services.',
+        flow: [
+          'Clinical applications connect to an Application Load Balancer over TLS 1.2+; the ALB uses an AWS Certificate Manager certificate and terminates SSL before forwarding to private subnets.',
+          'The ALB forwards requests to application tier instances or AWS Lambda functions in private subnets with no public IP addresses, isolated by least-privilege security groups.',
+          'Application logic reads and writes PHI to Amazon RDS (or Aurora) with encryption at rest enforced by AWS KMS customer-managed keys and SSL-enforced parameter groups on all connections.',
+          'Every AWS API call to the control plane is captured by an AWS CloudTrail organization trail, writing tamper-evident logs to an immutable S3 bucket in a dedicated security account.',
+          'Amazon Macie continuously scans S3 buckets for sensitive data patterns such as SSNs and medical record numbers, raising findings when PHI is detected outside designated buckets.',
+          'AWS Config evaluates resources against a HIPAA conformance pack; Amazon Security Hub aggregates Config findings, Amazon GuardDuty alerts, and Macie findings into a unified compliance dashboard.'
+        ]
+      }
+    ]
+  },
+
+  /* ── 5. Networking ───────────────────────────────────────── */
+  {
+    id: 'networking',
+    name: 'Networking',
+    icon: '🔗',
+    architectures: [
+      {
+        id: 'hub-spoke-tgw',
+        name: 'Hub-and-Spoke with Transit Gateway',
+        services: [
+          'AWS Transit Gateway', 'Amazon VPC', 'AWS Network Firewall',
+          'AWS RAM', 'Amazon Route 53', 'Amazon CloudWatch'
+        ],
+        description: 'A centralized routing topology where spoke VPCs connect through a shared AWS Transit Gateway, enabling transitive routing and centralized egress inspection without full-mesh VPC peering. Transit Gateway route tables segment traffic between production, development, and shared-services VPCs while a centralized inspection VPC enforces network policy at scale across all attachments.',
+        flow: [
+          'An EC2 instance in a spoke VPC initiates a connection; the spoke VPC route table directs all traffic to the AWS Transit Gateway attachment associated with that VPC.',
+          'Transit Gateway evaluates the destination against its route table entries and applies pre-inspection routing to send the traffic to the centralized inspection VPC attachment.',
+          'The inspection VPC hosts AWS Network Firewall in a dedicated subnet, applying stateful IPS rules, domain filtering, and TLS inspection to all inter-VPC and egress traffic.',
+          'Post-inspection, Transit Gateway forwards approved traffic to the correct destination: another spoke VPC, an on-premises network via a VPN or Direct Connect attachment, or an egress VPC with NAT Gateways for internet-bound traffic.',
+          'Shared services (Active Directory, DNS, security tools) in the hub VPC are reachable from all spokes via Transit Gateway without any spoke-to-spoke connectivity.',
+          'Amazon CloudWatch collects AWS Network Firewall flow logs and Transit Gateway metrics, alerting on anomalous traffic volumes or blocked connection spikes.'
+        ]
+      },
+      {
+        id: 'hybrid-direct-connect',
+        name: 'Hybrid Connectivity with Direct Connect',
+        services: [
+          'AWS Direct Connect', 'AWS Site-to-Site VPN', 'AWS Transit Gateway',
+          'AWS Direct Connect Gateway', 'Amazon Route 53 Resolver', 'Amazon VPC'
+        ],
+        description: 'Extends the corporate network into AWS over a dedicated private connection with consistent bandwidth and predictable latency, used as the primary transport for hybrid cloud workloads where internet-based VPN variability is unacceptable. AWS Direct Connect Gateway enables a single physical connection to reach VPCs across multiple AWS Regions without requiring separate connections per Region.',
+        flow: [
+          'On-premises routers establish a BGP session over a cross-connect at an AWS Direct Connect location using a hosted or dedicated connection of 1 Gbps to 100 Gbps.',
+          'The BGP session runs over a Private Virtual Interface (VIF) connected to an AWS Direct Connect Gateway, which aggregates connectivity across multiple Transit Gateways.',
+          'The Direct Connect Gateway attaches to an AWS Transit Gateway, enabling the on-premises network to reach all associated spoke VPCs through a single logical connection.',
+          'AWS Site-to-Site VPN over the internet provides an active/passive failover path; BGP route preferences are tuned with AS path prepending so VPN routes are only used when Direct Connect BGP sessions drop.',
+          'On-premises DNS resolvers forward AWS private hosted zone queries to Amazon Route 53 Resolver inbound endpoints in the shared-services VPC, enabling DNS resolution across the hybrid network.',
+          'Amazon CloudWatch monitors Direct Connect connection state, BGP status, and throughput, triggering Amazon SNS alerts when the primary path degrades.'
+        ]
+      },
+      {
+        id: 'global-multi-region',
+        name: 'Global Multi-Region',
+        services: [
+          'Amazon Route 53', 'AWS Global Accelerator', 'Amazon CloudFront',
+          'Amazon DynamoDB Global Tables', 'Amazon Aurora Global Database',
+          'Application Load Balancer'
+        ],
+        description: 'Distributes active workloads across multiple AWS Regions simultaneously to minimize latency for geographically dispersed users, satisfy data residency requirements, and survive a complete Regional outage with near-zero RTO. Managed replication services handle cross-region consistency and failover promotion, removing the need for custom synchronization code.',
+        flow: [
+          'A global user\'s DNS query is resolved by Amazon Route 53 using a latency-based or geolocation routing policy, returning an AWS Global Accelerator anycast IP address.',
+          'Global Accelerator routes the connection over the AWS global backbone to the nearest healthy Regional Application Load Balancer, bypassing the public internet for most of the path.',
+          'The Regional ALB distributes the request to the application tier; Amazon CloudFront serves cacheable responses from edge locations before requests reach the ALB.',
+          'The application tier performs reads against the local Amazon DynamoDB Global Tables replica, which accepts multi-master writes from all configured Regions simultaneously.',
+          'Write operations are accepted by the local DynamoDB endpoint and asynchronously replicated to all other Regional replicas with typically sub-second replication lag.',
+          'For relational workloads, Amazon Aurora Global Database routes writes to the primary Region\'s writer cluster and replicates to secondary Region read clusters, with an RTO of under one minute for Regional failover promotion.'
+        ]
+      }
+    ]
+  },
+
+  /* ── 6. Containers ───────────────────────────────────────── */
+  {
+    id: 'containers',
+    name: 'Containers',
+    icon: '📦',
+    architectures: [
+      {
+        id: 'eks-microservices',
+        name: 'EKS Microservices Platform',
+        services: [
+          'Amazon EKS', 'Amazon ECR', 'AWS Fargate',
+          'AWS App Mesh', 'Amazon CloudWatch', 'AWS Secrets Manager',
+          'AWS Load Balancer Controller'
+        ],
+        description: 'A production Kubernetes platform for running polyglot microservices with service mesh observability, mutual TLS between pods, and GitOps-driven deployments managed by AWS — where the control plane, etcd backups, and node upgrades are handled without operational overhead. EKS Fargate removes the need to manage EC2 worker node groups for teams wanting a fully serverless compute substrate.',
+        flow: [
+          'A developer commits code; a CI pipeline builds a container image, scans it for vulnerabilities using Amazon ECR image scanning, and pushes it to a versioned ECR repository.',
+          'A GitOps operator (Flux or ArgoCD) detects the new image tag and applies updated Kubernetes manifests to the EKS cluster via the Kubernetes API server.',
+          'The EKS scheduler places new pods on AWS Fargate profiles or managed node groups; the Amazon VPC CNI plugin assigns native VPC IP addresses to each pod.',
+          'An inbound HTTPS request is received by a Network Load Balancer provisioned by the AWS Load Balancer Controller, which routes traffic to the Kubernetes service.',
+          'AWS App Mesh injects Envoy sidecar proxies that intercept all pod-to-pod traffic, enforcing mTLS, applying traffic policies, and emitting metrics and traces to Amazon CloudWatch Container Insights.',
+          'Pods retrieve database credentials and API keys from AWS Secrets Manager at runtime using the Secrets Store CSI driver, eliminating hardcoded secrets from environment variables.'
+        ]
+      },
+      {
+        id: 'ecs-fargate-web',
+        name: 'ECS Fargate Web Service',
+        services: [
+          'Amazon ECS', 'AWS Fargate', 'Application Load Balancer',
+          'Amazon ECR', 'AWS Secrets Manager', 'Amazon CloudWatch', 'AWS CodeDeploy'
+        ],
+        description: 'Runs containerized web services with AWS-managed compute provisioning using Fargate, where ECS handles task scheduling, health checks, and rolling deployments without requiring teams to size or patch EC2 instances. This is the standard pattern for migrating containerized applications to AWS when teams want operational simplicity over Kubernetes\'s flexibility.',
+        flow: [
+          'A client request arrives at an Application Load Balancer listener configured with an HTTPS certificate from AWS Certificate Manager.',
+          'The ALB forwards the request to a registered target group whose targets are the private IP addresses of running ECS Fargate tasks.',
+          'The Fargate task runs a Docker container image pulled from Amazon ECR at launch; the ECS agent validates the image digest against the task definition\'s image URI.',
+          'The container reads secrets from AWS Secrets Manager using ECS secrets injection, which injects values as environment variables at task launch without application code changes.',
+          'Application code processes the request, writes structured logs to Amazon CloudWatch Logs via the awslogs log driver, and emits custom metrics via the CloudWatch agent sidecar.',
+          'When AWS CodeDeploy executes a blue/green deployment, it registers a new task set with the ALB, shifts traffic using a configurable linear or canary schedule, and terminates the old task set after the stability period.'
+        ]
+      },
+      {
+        id: 'blue-green-pipeline',
+        name: 'Blue/Green Deployment Pipeline',
+        services: [
+          'AWS CodePipeline', 'AWS CodeBuild', 'Amazon ECR',
+          'AWS CodeDeploy', 'Amazon ECS', 'Application Load Balancer',
+          'Amazon CloudWatch'
+        ],
+        description: 'A CI/CD pipeline that eliminates deployment downtime by provisioning a parallel (green) environment, atomically shifting ALB traffic, and preserving the original (blue) environment as an instant rollback target during a configurable bake period. CodeDeploy manages the traffic shift schedule — immediate, linear, or canary — and automatically rolls back when a CloudWatch alarm breaches its threshold.',
+        flow: [
+          'A developer merges a pull request; AWS CodePipeline detects the change via an Amazon EventBridge rule on the source repository.',
+          'CodePipeline triggers an AWS CodeBuild project that compiles the application, runs unit and integration tests, builds a Docker image, and pushes it to Amazon ECR tagged with the Git commit SHA.',
+          'CodePipeline passes the new image URI to an AWS CodeDeploy deployment group configured for ECS blue/green with a canary or linear traffic shift strategy.',
+          'CodeDeploy creates a new ECS task set (green) in the same ECS service pointing to the new image, and registers it with the ALB target group as a secondary target alongside the blue task set.',
+          'The ALB listener rule is updated to route a configurable test traffic percentage to the green task set; CloudWatch alarms monitor error rates and p99 latency on both target groups during the bake period.',
+          'After the bake period with all alarms in OK state, CodeDeploy shifts 100% of traffic to the green task set and terminates the blue task set; any alarm breach triggers an automatic traffic reversal.'
+        ]
+      }
+    ]
+  },
+
+  /* ── 7. Serverless ───────────────────────────────────────── */
+  {
+    id: 'serverless',
+    name: 'Serverless',
+    icon: '⚡',
+    architectures: [
+      {
+        id: 'event-driven-orders',
+        name: 'Event-Driven Order Processing',
+        services: [
+          'Amazon API Gateway', 'AWS Lambda', 'Amazon EventBridge',
+          'Amazon SQS', 'Amazon DynamoDB', 'Amazon SNS', 'AWS Step Functions'
+        ],
+        description: 'Decouples the order intake HTTP layer from downstream fulfillment services by publishing domain events to Amazon EventBridge, so inventory, payment, and shipping services react asynchronously without point-to-point Lambda-to-Lambda calls. This pattern improves resilience, enables independent deployability of each service, and provides a built-in audit trail via the EventBridge archive and replay feature.',
+        flow: [
+          'A customer submits a POST /order request to Amazon API Gateway, which routes it to an intake AWS Lambda function for validation.',
+          'Lambda validates the payload, writes the order with PENDING status to Amazon DynamoDB using a conditional expression, and publishes an OrderPlaced event to a custom Amazon EventBridge event bus.',
+          'EventBridge evaluates routing rules and fans the event to three Amazon SQS queues: one each for the inventory service, payment service, and fraud detection service.',
+          'Each service\'s AWS Lambda consumer polls its dedicated SQS queue independently and updates the order state in DynamoDB via conditional writes to prevent race conditions.',
+          'On successful payment capture, the payment Lambda publishes a PaymentConfirmed event, which triggers an AWS Step Functions workflow to orchestrate the fulfillment and shipping steps.',
+          'Upon shipment confirmation, an Amazon SNS topic delivers an order confirmation notification to the customer\'s email and mobile device via configured SNS endpoints.'
+        ]
+      },
+      {
+        id: 'sns-sqs-fanout',
+        name: 'Async Fan-Out with SNS and SQS',
+        services: [
+          'Amazon SNS', 'Amazon SQS', 'AWS Lambda',
+          'Amazon EventBridge', 'Amazon DynamoDB', 'Amazon CloudWatch'
+        ],
+        description: 'A messaging pattern that delivers a single published event to multiple independent subscriber queues simultaneously, enabling parallel processing by isolated consumer services that each operate at their own throughput without blocking one another. Each SQS queue provides independent visibility timeout, dead-letter queue, and Lambda concurrency configuration so one slow consumer cannot degrade another.',
+        flow: [
+          'A publisher service calls the Amazon SNS Publish API with a message payload targeting a standard SNS topic.',
+          'SNS delivers the message simultaneously to all subscribed Amazon SQS queues, with each queue receiving its own independent copy at the same time.',
+          'Each SQS queue acts as a durable buffer; Lambda event source mappings poll each queue independently with separate batch size and concurrency configurations.',
+          'Consumer Lambda functions process their queue messages independently; on an unhandled exception, the message becomes visible again after the visibility timeout for retry.',
+          'Messages that exhaust their maximum receive count are moved to the SQS dead-letter queue, which triggers an Amazon CloudWatch alarm and a notification to an operational SNS topic.',
+          'Processing results are written to Amazon DynamoDB; CloudWatch dashboards track queue depth, Lambda error rates, and DLQ message counts across all consumer pipelines.'
+        ]
+      },
+      {
+        id: 'saga-pattern',
+        name: 'Saga Pattern for Distributed Transactions',
+        services: [
+          'AWS Step Functions', 'AWS Lambda', 'Amazon DynamoDB',
+          'Amazon SQS', 'Amazon EventBridge', 'Amazon SNS'
+        ],
+        description: 'Maintains data consistency across microservices in long-running distributed transactions by orchestrating each step through an AWS Step Functions state machine and executing compensating transactions in reverse when any step fails — providing the equivalent of atomicity without distributed locking or two-phase commit. The standard pattern for order-to-cash, booking, and financial workflows that span multiple bounded contexts.',
+        flow: [
+          'A transaction request arrives and triggers an AWS Step Functions Express Workflow configured as the saga orchestrator, with the transaction ID as the execution name for idempotency.',
+          'Step Functions invokes the first task Lambda (Reserve Inventory), which atomically decrements stock in Amazon DynamoDB using a conditional expression and records the reservation in a saga log table.',
+          'On success, Step Functions invokes the second task Lambda (Charge Payment), which calls the payment processor; the result is written to the DynamoDB saga log with the workflow execution ID.',
+          'On success, Step Functions invokes the third task Lambda (Create Shipment), completing the forward path; a completion event is published to Amazon EventBridge and Amazon SNS.',
+          'If any step Lambda returns a failure or times out, Step Functions transitions to a Catch branch that invokes compensating Lambdas in reverse order — Cancel Shipment, Refund Payment, Release Inventory — each using the saga log for idempotent lookups.',
+          'Failed saga records are published to an Amazon SQS dead-letter queue for manual review; all saga state transitions are visible in the Step Functions execution history for operational debugging.'
+        ]
+      }
+    ]
+  },
+
+  /* ── 8. Disaster Recovery ────────────────────────────────── */
+  {
+    id: 'disaster-recovery',
+    name: 'Disaster Recovery',
+    icon: '🛡️',
+    architectures: [
+      {
+        id: 'pilot-light-dr',
+        name: 'Pilot Light DR',
+        services: [
+          'Amazon Route 53', 'Amazon RDS', 'Amazon EC2',
+          'AWS CloudFormation', 'Amazon S3', 'Amazon CloudWatch', 'AWS Backup'
+        ],
+        description: 'Maintains a minimal running footprint in a secondary Region — typically only the database with active replication running — while all remaining infrastructure is pre-templated and ready to launch in minutes during a declared disaster. Pilot light achieves lower standby cost than warm standby at the trade-off of a longer RTO (typically 30–60 minutes) for compute provisioning.',
+        flow: [
+          'The primary Region handles all production traffic; Amazon RDS continuously replicates to a cross-region read replica in the DR Region using asynchronous binary log replication.',
+          'AWS Backup runs scheduled backups of EC2 instance volumes and RDS snapshots, copying them to the DR Region\'s backup vault for additional data protection.',
+          'Amazon CloudWatch in the primary Region monitors key health metrics; a composite alarm triggers an Amazon SNS notification when the primary Region is deemed unhealthy.',
+          'An operator confirms the disaster and initiates failover by promoting the RDS cross-region read replica to a standalone primary instance in the DR Region.',
+          'The operator executes the pre-tested AWS CloudFormation stack in the DR Region, which provisions EC2 instances, configures the application tier, and connects them to the newly promoted RDS primary.',
+          'Amazon Route 53 health checks detect the primary endpoint failure and update DNS failover routing records to direct traffic to the DR Region\'s Application Load Balancer.'
+        ]
+      },
+      {
+        id: 'warm-standby-dr',
+        name: 'Warm Standby DR',
+        services: [
+          'Amazon Route 53', 'Amazon RDS', 'Amazon EC2 Auto Scaling',
+          'Application Load Balancer', 'AWS CloudFormation',
+          'Amazon CloudWatch', 'AWS Backup'
+        ],
+        description: 'Operates a scaled-down but fully functional replica of production in a secondary Region at minimum viable capacity — e.g., one instance per tier — so that failover requires only scaling out rather than provisioning new infrastructure, achieving RTO of minutes instead of hours. The warm standby is also used for DR testing and non-production workloads without impacting production.',
+        flow: [
+          'The primary Region handles all production traffic; Amazon RDS continuously replicates to the standby Region, and EC2 Auto Scaling groups there run at minimum instance count.',
+          'The standby Region\'s Application Load Balancer and Auto Scaling groups are fully configured in AWS CloudFormation, but the ALB receives no Route 53 production traffic under normal operation.',
+          'Amazon CloudWatch monitors the primary Region\'s ALB health check endpoint and triggers a Route 53 health check failure alert when it returns sustained errors.',
+          'Route 53 failover routing policy detects the health check failure and automatically switches the CNAME to the DR Region\'s ALB within the DNS TTL window.',
+          'The newly primary Region\'s Auto Scaling groups detect increased load and scale out to full production capacity using the configured step or target-tracking scaling policies.',
+          'The DR Region\'s Amazon RDS read replica is promoted to a writable primary; application configuration is updated via AWS Systems Manager Parameter Store to redirect the database connection string.'
+        ]
+      },
+      {
+        id: 'active-active-dr',
+        name: 'Multi-Region Active-Active',
+        services: [
+          'Amazon Route 53', 'AWS Global Accelerator', 'Amazon DynamoDB Global Tables',
+          'Amazon Aurora Global Database', 'Application Load Balancer',
+          'Amazon CloudFront', 'Amazon ElastiCache'
+        ],
+        description: 'Both Regions handle live production traffic simultaneously with globally replicated, multi-master data stores, providing an RTO and RPO approaching zero by eliminating the failover promotion step entirely. Used for mission-critical applications where any period of degraded service results in significant commercial or regulatory impact.',
+        flow: [
+          'AWS Global Accelerator routes each user to the nearest healthy Regional Application Load Balancer using anycast routing over the AWS global backbone, providing single-digit millisecond routing decisions.',
+          'The Regional ALB distributes traffic to the application tier; Amazon CloudFront serves cacheable content from edge locations in both Regions to reduce origin load.',
+          'Application writes target the local Amazon DynamoDB Global Tables endpoint, which uses multi-master replication to propagate changes to all other Regional replicas within approximately one second.',
+          'For relational workloads, writes are directed to the Amazon Aurora Global Database primary Region\'s writer endpoint and replicated to secondary Region read endpoints using dedicated replication infrastructure.',
+          'Amazon ElastiCache Global Datastore replicates the primary Redis cluster to passive replica clusters in secondary Regions; reads are served locally while cross-region write replication runs asynchronously.',
+          'If Global Accelerator health checks detect a Regional endpoint failure, traffic is rerouted to the remaining healthy Region within 30 seconds with no DNS TTL dependency, as Global Accelerator operates at the network layer.'
+        ]
+      }
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   SERVICE → PILL COLOR MAPPING
+   ═══════════════════════════════════════════════════════════════════ */
+const PILL_MAP = {
+  // AI/ML
+  'Amazon Bedrock':                           'pill-aiml',
+  'Amazon SageMaker':                         'pill-aiml',
+  'Amazon Lex':                               'pill-aiml',
+  'Amazon Rekognition':                       'pill-aiml',
+  'Amazon OpenSearch Service':                'pill-aiml',
+  'Amazon Managed Service for Apache Flink':  'pill-analytics',
+  // Compute
+  'AWS Lambda':                               'pill-compute',
+  'Amazon EC2':                               'pill-compute',
+  'Amazon ECS':                               'pill-compute',
+  'Amazon EKS':                               'pill-compute',
+  'AWS Fargate':                              'pill-compute',
+  'Amazon EC2 Auto Scaling':                  'pill-compute',
+  // Storage
+  'Amazon S3':                                'pill-storage',
+  // Database
+  'Amazon DynamoDB':                          'pill-database',
+  'Amazon RDS':                               'pill-database',
+  'Amazon Aurora':                            'pill-database',
+  'Amazon Aurora Global Database':            'pill-database',
+  'Amazon DynamoDB Global Tables':            'pill-database',
+  'Amazon ElastiCache':                       'pill-database',
+  // Networking
+  'Amazon CloudFront':                        'pill-network',
+  'Amazon Route 53':                          'pill-network',
+  'Application Load Balancer':                'pill-network',
+  'Amazon VPC':                               'pill-network',
+  'AWS Transit Gateway':                      'pill-network',
+  'AWS Global Accelerator':                   'pill-network',
+  'Amazon API Gateway':                       'pill-network',
+  'AWS Direct Connect':                       'pill-network',
+  'AWS Direct Connect Gateway':               'pill-network',
+  'AWS Site-to-Site VPN':                     'pill-network',
+  'Amazon Route 53 Resolver':                 'pill-network',
+  'AWS Load Balancer Controller':             'pill-network',
+  // Security
+  'AWS KMS':                                  'pill-security',
+  'AWS WAF':                                  'pill-security',
+  'Amazon Cognito':                           'pill-security',
+  'AWS Secrets Manager':                      'pill-security',
+  'Amazon Macie':                             'pill-security',
+  'AWS IAM Identity Center':                  'pill-security',
+  'AWS Verified Access':                      'pill-security',
+  'AWS Certificate Manager':                  'pill-security',
+  // Analytics
+  'Amazon Kinesis Data Streams':              'pill-analytics',
+  'Amazon Kinesis Data Firehose':             'pill-analytics',
+  'AWS Glue':                                 'pill-analytics',
+  'Amazon Athena':                            'pill-analytics',
+  'Amazon QuickSight':                        'pill-analytics',
+  'AWS Lake Formation':                       'pill-analytics',
+  // Messaging
+  'Amazon SNS':                               'pill-messaging',
+  'Amazon SQS':                               'pill-messaging',
+  'Amazon EventBridge':                       'pill-messaging',
+  // DevOps
+  'AWS CodePipeline':                         'pill-devops',
+  'AWS CodeBuild':                            'pill-devops',
+  'AWS CodeDeploy':                           'pill-devops',
+  'AWS Step Functions':                       'pill-devops',
+  'Amazon ECR':                               'pill-devops',
+  'AWS App Mesh':                             'pill-devops',
+  // Governance/Management
+  'AWS Control Tower':                        'pill-mgmt',
+  'AWS Organizations':                        'pill-mgmt',
+  'AWS Config':                               'pill-mgmt',
+  'AWS CloudTrail':                           'pill-mgmt',
+  'Amazon Security Hub':                      'pill-mgmt',
+  'Amazon CloudWatch':                        'pill-mgmt',
+  'AWS CloudFormation':                       'pill-mgmt',
+  'AWS RAM':                                  'pill-mgmt',
+  'AWS Backup':                               'pill-mgmt',
+  'AWS Network Firewall':                     'pill-mgmt',
+  'AWS X-Ray':                                'pill-mgmt',
+  'AWS Systems Manager':                      'pill-mgmt',
+};
+
+function pillClass(service) {
+  return PILL_MAP[service] || 'pill-mgmt';
+}
+
+function buildPills(services, limit) {
+  const shown = limit ? services.slice(0, limit) : services;
+  const extra = limit && services.length > limit ? services.length - limit : 0;
+  let html = shown.map(s =>
+    `<span class="pill ${pillClass(s)}">${s}</span>`
+  ).join('');
+  if (extra > 0) html += `<span class="pill pill-mgmt">+${extra} more</span>`;
+  return html;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NAVIGATION / STATE
+   ═══════════════════════════════════════════════════════════════════ */
+let currentState = { view: 'categories', categoryId: null, archId: null };
+
+function navigate(view, categoryId, archId, pushHistory) {
+  if (pushHistory !== false) {
+    const state = { view, categoryId, archId };
+    const url = buildUrl(state);
+    history.pushState(state, '', url);
+  }
+  renderView(view, categoryId, archId);
+}
+
+function buildUrl(state) {
+  if (state.view === 'categories') return window.location.pathname;
+  if (state.view === 'list') return `${window.location.pathname}?cat=${state.categoryId}`;
+  return `${window.location.pathname}?cat=${state.categoryId}&arch=${state.archId}`;
+}
+
+function renderView(view, categoryId, archId) {
+  currentState = { view, categoryId, archId };
+
+  // Hide all views
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (view === 'categories') {
+    document.getElementById('view-categories').classList.add('active');
+
+  } else if (view === 'list') {
+    const cat = CATEGORIES.find(c => c.id === categoryId);
+    if (!cat) return navigate('categories');
+    renderList(cat);
+    document.getElementById('view-list').classList.add('active');
+
+  } else if (view === 'detail') {
+    const cat = CATEGORIES.find(c => c.id === categoryId);
+    if (!cat) return navigate('categories');
+    const arch = cat.architectures.find(a => a.id === archId);
+    if (!arch) return navigate('list', categoryId);
+    renderDetail(cat, arch);
+    document.getElementById('view-detail').classList.add('active');
+  }
+}
+
+window.addEventListener('popstate', (e) => {
+  if (e.state) {
+    renderView(e.state.view, e.state.categoryId, e.state.archId);
+  } else {
+    renderView('categories');
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: CATEGORY GRID
+   ═══════════════════════════════════════════════════════════════════ */
+function renderCategories() {
+  const grid = document.getElementById('categories-grid');
+  grid.innerHTML = CATEGORIES.map(cat => `
+    <div class="category-card" onclick="navigate('list','${cat.id}')">
+      <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 12L10 8 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 8h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="category-card-icon">${cat.icon}</span>
+      <div class="category-card-name">${cat.name}</div>
+      <div class="category-card-count"><span>${cat.architectures.length}</span> architectures</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: ARCHITECTURE LIST
+   ═══════════════════════════════════════════════════════════════════ */
+function renderList(cat) {
+  document.getElementById('list-category-tag').innerHTML =
+    `<span class="icon">${cat.icon}</span> ${cat.name}`;
+  document.getElementById('list-heading').textContent = cat.name;
+  document.getElementById('list-subheading').textContent =
+    `${cat.architectures.length} reference architectures`;
+
+  const grid = document.getElementById('arch-grid');
+  grid.innerHTML = cat.architectures.map(arch => `
+    <div class="arch-card" onclick="navigate('detail','${cat.id}','${arch.id}')">
+      <div class="arch-card-name">${arch.name}</div>
+      <div class="service-pills">${buildPills(arch.services, 4)}</div>
+      <div class="arch-card-desc">${arch.description}</div>
+      <div class="arch-card-footer">
+        <button class="btn-view">
+          View Diagram
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: ARCHITECTURE DETAIL
+   ═══════════════════════════════════════════════════════════════════ */
+function renderDetail(cat, arch) {
+  // Header
+  document.getElementById('detail-heading').textContent = arch.name;
+  const backBtn = document.getElementById('detail-back-btn');
+  backBtn.onclick = () => navigate('list', cat.id);
+  document.getElementById('detail-back-label').textContent = `Back to ${cat.name}`;
+
+  // Diagram with PNG fallback
+  document.getElementById('detail-diagram-label').textContent = `${arch.id}.png`;
+  const diagramBody = document.getElementById('detail-diagram-body');
+  diagramBody.innerHTML = `
+    <img
+      id="arch-img-${arch.id}"
+      data-architecture="${arch.id}"
+      src="images/${arch.id}.png"
+      alt="${arch.name} architecture diagram"
+      style="display:none; width:100%; height:auto;"
+      onload="
+        this.style.display='block';
+        document.getElementById('arch-placeholder-${arch.id}').style.display='none';
+      "
+      onerror="this.remove();"
+    />
+    <div id="arch-placeholder-${arch.id}" class="diagram-placeholder-inner">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="8" y="8" width="20" height="20" rx="4" stroke="#4A7299" stroke-width="2"/>
+        <rect x="36" y="8" width="20" height="20" rx="4" stroke="#4A7299" stroke-width="2"/>
+        <rect x="22" y="36" width="20" height="20" rx="4" stroke="#4A7299" stroke-width="2"/>
+        <path d="M18 28 L18 32 Q18 36 22 36" stroke="#4A7299" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M46 28 L46 32 Q46 36 42 36" stroke="#4A7299" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p>Diagram coming soon</p>
+      <span>Place <code style="background:rgba(74,114,153,0.2);padding:1px 6px;border-radius:3px;font-family:monospace;">${arch.id}.png</code> in the <code style="background:rgba(74,114,153,0.2);padding:1px 6px;border-radius:3px;font-family:monospace;">images/</code> folder</span>
+    </div>
+  `;
+
+  // Description
+  document.getElementById('detail-description').textContent = arch.description;
+
+  // Traffic Flow
+  document.getElementById('detail-flow').innerHTML = arch.flow.map((step, i) => `
+    <li class="flow-step">
+      <div class="flow-step-num">${i + 1}</div>
+      <div class="flow-step-text">${step}</div>
+    </li>
+  `).join('');
+
+  // Services sidebar
+  document.getElementById('detail-pills').innerHTML = buildPills(arch.services);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT — parse URL on load for deep-linking
+   ═══════════════════════════════════════════════════════════════════ */
+function init() {
+  renderCategories();
+
+  const params = new URLSearchParams(window.location.search);
+  const cat = params.get('cat');
+  const arch = params.get('arch');
+
+  if (cat && arch) {
+    renderView('detail', cat, arch);
+  } else if (cat) {
+    renderView('list', cat);
+  } else {
+    renderView('categories');
+  }
+
+  // Replace initial history state so popstate works on first back press
+  history.replaceState(
+    { view: currentState.view, categoryId: currentState.categoryId, archId: currentState.archId },
+    '',
+    window.location.href
+  );
+}
+
+init();
+</script>
+</body>
+</html>

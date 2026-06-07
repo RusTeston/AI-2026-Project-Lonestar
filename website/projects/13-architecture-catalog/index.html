@@ -792,16 +792,19 @@ const CATEGORIES = [
         name: 'Data Lake on S3',
         services: [
           'Amazon S3', 'AWS Glue', 'Amazon Athena',
-          'AWS Lake Formation', 'Amazon Kinesis Data Firehose', 'Amazon QuickSight'
+          'AWS Lake Formation', 'Amazon Kinesis Data Firehose', 'Amazon QuickSight',
+          'AWS CloudTrail', 'Amazon CloudWatch'
         ],
-        description: 'A governed, schema-on-read data lake that consolidates structured, semi-structured, and unstructured data from disparate sources into tiered S3 prefixes, enabling ad-hoc SQL analytics without loading data into a warehouse first. AWS Lake Formation provides centralized column- and row-level access controls across all consumers without modifying each table definition.',
+        description: 'A governed, schema-on-read data lake that consolidates structured, semi-structured, and unstructured data from disparate sources into tiered S3 prefixes, enabling ad-hoc SQL analytics without loading data into a warehouse first. AWS Lake Formation provides centralized column-, row-, and cell-level access controls using tag-based access control (TBAC) across Athena, Glue ETL, and Redshift Spectrum, with CloudTrail audit logs capturing every data access event for compliance. AWS Glue crawlers automatically catalog new data, and Kinesis Data Firehose delivers streaming data directly to S3.',
         flow: [
           'Operational systems and streaming sources deliver events to Amazon Kinesis Data Firehose, which buffers and writes records to the S3 raw zone in Parquet or JSON format.',
           'AWS Glue crawlers run on a schedule, inferring schema from new S3 objects and registering table definitions and partition metadata in the AWS Glue Data Catalog.',
           'AWS Glue ETL jobs read from the raw zone, apply transformations and deduplication logic, and write optimized Parquet files to the S3 curated zone partitioned by date.',
-          'AWS Lake Formation governs access to all Data Catalog tables, enforcing column masking and row-level filters based on the requester\'s IAM principal.',
-          'Analysts run SQL queries against curated zone tables via Amazon Athena, which resolves schema from the Glue Data Catalog and reads S3 data in parallel using distributed Presto.',
-          'Athena query results are connected to Amazon QuickSight SPICE for cached visualizations and ML-powered insights shared across the organization.'
+          'AWS Lake Formation governs access to all Data Catalog tables, enforcing column masking, row-level filters, and tag-based access control (TBAC) based on the requester\'s IAM principal.',
+          'Analysts run SQL queries against curated zone tables via Amazon Athena, which resolves schema from the Glue Data Catalog and reads S3 data in parallel.',
+          'Amazon QuickSight connects to curated datasets via Athena for cached SPICE visualizations and business reporting shared across the organization.',
+          'AWS CloudTrail captures all Lake Formation data access events, providing a comprehensive audit trail for compliance and governance reviews.',
+          'Amazon CloudWatch monitors Glue job execution status, Athena query latency, and Firehose delivery metrics for operational health.'
         ]
       },
       {

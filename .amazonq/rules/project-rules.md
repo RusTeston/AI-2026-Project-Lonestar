@@ -56,6 +56,7 @@
 - Diagram must exactly match the approved description — every service in the description must appear as a node
 - Use proper clusters, left-to-right flow, and complete end-to-end path
 - High fidelity standard: no sparse diagrams, no missing services, no generic labels
+- ALWAYS start with a `Users("Client")` node for user-facing architectures, or the appropriate trigger node (EventBridge, S3, Admin) for backend/infrastructure patterns
 
 **STEP 4 — DEPLOY AFTER EACH**
 - Copy PNG to `website/projects/13-architecture-catalog/images/{slug}.png`

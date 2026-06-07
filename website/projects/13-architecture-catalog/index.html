@@ -697,16 +697,18 @@ const CATEGORIES = [
         name: 'Serverless AI Chatbot',
         services: [
           'Amazon Bedrock', 'AWS Lambda', 'Amazon DynamoDB',
-          'Amazon API Gateway', 'Amazon Cognito', 'Amazon CloudFront', 'Amazon S3'
+          'Amazon API Gateway', 'Amazon Cognito', 'Amazon CloudFront', 'Amazon S3', 'Amazon CloudWatch'
         ],
-        description: 'A fully serverless conversational AI application backed by Amazon Bedrock foundation models, where Lambda orchestrates conversation context stored in DynamoDB and API Gateway handles authentication via Cognito — the most widely deployed pattern for teams who want generative AI chat without managing infrastructure or paying for idle compute. CloudFront delivers the static chat interface globally from S3 with low latency.',
+        description: 'A fully serverless conversational AI application backed by the Amazon Bedrock Converse API — AWS\'s recommended interface for multi-turn chat that works consistently across all supported foundation models. Lambda orchestrates conversation context stored in DynamoDB and uses ConverseStream for real-time streaming responses back to the client. CloudFront delivers the static chat interface globally from S3, Cognito handles authentication, and Amazon Bedrock Guardrails enforce content safety policies per request without modifying application code.',
         flow: [
-          'The user opens the chat application delivered via Amazon CloudFront from static assets stored in Amazon S3, and authenticates using Amazon Cognito to receive a signed JWT.',
-          'The user submits a message; the browser calls Amazon API Gateway with the Cognito JWT, which validates the token before invoking an AWS Lambda function.',
-          'Lambda retrieves the conversation history for the session from Amazon DynamoDB using the Cognito sub as the partition key, maintaining multi-turn context.',
-          'Lambda constructs a prompt with the full conversation history and the new user message, then calls Amazon Bedrock InvokeModel API with the chosen foundation model (e.g., Claude or Amazon Nova).',
-          'Bedrock generates a response and returns it to Lambda, which writes the new turn — user message and model reply — back to DynamoDB and returns the reply through API Gateway.',
-          'The browser renders the response in the chat UI; subsequent messages repeat the cycle, with DynamoDB maintaining the full conversation context across turns.'
+          'The user opens the chat application delivered via Amazon CloudFront from static assets in Amazon S3, and authenticates with Amazon Cognito to receive a signed JWT.',
+          'The user submits a message; the browser calls Amazon API Gateway with the Cognito JWT, which validates the token before invoking the Lambda function.',
+          'Lambda retrieves the full conversation history for the session from Amazon DynamoDB using the Cognito sub as the partition key.',
+          'Lambda constructs a messages array containing the full conversation history plus the new user message and calls the Amazon Bedrock Converse API (or ConverseStream for streaming) with the configured foundation model and guardrail ID.',
+          'Amazon Bedrock Guardrails evaluates the input and output against configured content policies before returning the response to Lambda.',
+          'Lambda writes the new conversation turn — user message and model reply — back to DynamoDB and returns the streaming or complete response through API Gateway to the browser.',
+          'The browser renders the response in the chat UI; subsequent messages repeat the cycle with DynamoDB maintaining full conversation context across turns.',
+          'Lambda emits latency, error rate, and token usage metrics to Amazon CloudWatch for operational monitoring.'
         ]
       }
     ]

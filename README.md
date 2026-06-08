@@ -2,7 +2,7 @@
 
 **AI Portfolio and Project Showcase**  
 **Project Start**: March 11, 2026  
-**Latest Updates**: April 2, 2026  
+**Latest Updates**: June 8, 2026  
 **Status**: ✅ LIVE - OPERATIONAL - CI/CD ENABLED
 
 ---
@@ -43,9 +43,11 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
    - Cloud Architecture Advisor powered by Amazon Bedrock Nova Lite
    - Full-stack serverless application (Lambda + API Gateway + S3)
 
-2. **Agentic RAG** - Coming Soon
-   - Enhanced chatbot with Retrieval Augmented Generation
-   - Bedrock Knowledge Base + OpenSearch Serverless
+2. **Well-Architected RAG** - ✅ LIVE (June 8, 2026)
+   - URL: https://ai.rus-teston.com/projects/02-waf-rag/index.html
+   - RAG-powered Q&A grounded in the official AWS Well-Architected Framework PDF
+   - Serverless architecture (API Gateway + Lambda + Bedrock Titan Embeddings V2 + Nova Lite + S3)
+   - 1,823 chunks indexed, cosine similarity retrieval, SAM/IaC deployment
 
 3. **Language Translator** - ✅ LIVE (March 12, 2026)
    - URL: https://ai.rus-teston.com/projects/03-language-translator/index.html
@@ -113,6 +115,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - **Project 7**: Architecture Reviewer (API Gateway + Lambda + SQS + S3 + DynamoDB + Bedrock Nova Lite + SAM IaC)
 - **Project 8**: AI Log Analyzer (Lambda + S3 Events + Bedrock Nova Lite)
 - **Project 9**: Failover Orchestrator (EventBridge + Lambda + Step Functions + DynamoDB + Bedrock Nova Lite + SAM IaC)
+- **Project 2**: Well-Architected RAG (API Gateway + Lambda + Bedrock Titan Embeddings V2 + Nova Lite + S3)
 - **Project 10**: Perfect Prompt Builder (Lambda Function URL + Bedrock Nova Lite)
 
 **CI/CD Pipeline:**
@@ -128,7 +131,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Professional grid layout for projects
 - Project summary modals on all project pages
 - Responsive layout (desktop/tablet optimized)
-- 10 AI projects live
+- 11 AI projects live
 - No external dependencies
 
 ---
@@ -162,6 +165,8 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Expand project portfolio as new AI projects are completed
 
 **Recent Updates:**
+- ✅ **Project 02: Well-Architected RAG** (June 8, 2026): RAG Q&A grounded in AWS WAF PDF — 1,823 chunks, Titan Embeddings V2, cosine similarity, Nova Lite via Converse API, SAM deployment. Includes step-by-step summary, My RAG diagram, and AWS Best Practice RAG diagram comparison.
+- ✅ **Project 13/14 card dates** (June 8, 2026): Added Jun 8, 2026 date and yellow styling to New badge cards (02, 11-14)
 - ✅ **Project 5: Audio Player Fix** (May 11, 2026): Fixed audio player not loading — added `media-src` to CloudFront CSP, switched to pre-signed URLs for streaming (audio player) and forced download (Download MP3 button)
 - ✅ **Project 10: Perfect Prompt Builder** (April 2, 2026): Structured prompt builder with AI enhancement via Bedrock Nova Lite
 - ✅ **CloudFront + HTTPS** (March 25, 2026): `ai.rus-teston.com` served via CloudFront CDN with TLS 1.2+, security headers, PriceClass_100

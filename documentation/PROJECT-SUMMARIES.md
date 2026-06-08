@@ -1,7 +1,7 @@
 # AI Project: Lone Star — Project Summaries
 
-**All Projects Built and Deployed: March 11–22, 2026**
-**Document Created**: March 22, 2026
+**All Projects Built and Deployed: March 11–June 8, 2026**
+**Document Last Updated**: June 8, 2026
 
 ---
 
@@ -43,6 +43,47 @@ S3, API Gateway (REST), Lambda (Python 3.12), Bedrock Nova Lite, IAM, CloudWatch
 
 ### Estimated Cost
 ~$4.30/month
+
+---
+
+## Project 2: Well-Architected Framework RAG
+
+### What It Is
+A RAG-powered Q&A tool that answers questions about the AWS Well-Architected Framework. The official AWS WAF PDF (1,002 pages) was pre-processed into 1,823 text chunks, embedded with Bedrock Titan Embeddings V2, and stored in S3. At query time, the user's question is embedded and compared against all chunks using cosine similarity. The top 5 most relevant chunks are injected as context into Bedrock Nova Lite, which generates a grounded answer with page citations.
+
+### Architecture
+**Ingestion (one-time):**
+- WAF PDF (S3) → Ingestion Script (PyMuPDF) → Bedrock Titan Embeddings V2 → embeddings.json (S3, 41.9MB)
+
+**Query (runtime):**
+- User Browser → CloudFront → API Gateway → Lambda → Titan Embeddings V2 (embed question) → S3 embeddings.json (cosine similarity) → Bedrock Nova Lite (Converse API) → answer + source pages
+
+### AWS Services Used
+S3, API Gateway (REST), Lambda (Python 3.12), Bedrock Titan Embeddings V2, Bedrock Nova Lite, IAM, CloudWatch
+
+### What We Built — File by File
+| File | Purpose |
+|------|---------|
+| `ingestion.py` | One-time script — extracts text from WAF PDF, chunks, embeds via Titan V2, writes embeddings.json to S3 |
+| `lambda/query_handler.py` | Query Lambda — loads embeddings from S3, cosine similarity search, calls Nova Lite via Converse API |
+| `template.yaml` | SAM/IaC template — API Gateway + Lambda + IAM |
+| `index.html` | Frontend — question input, example questions, answer panel with source pages, step-by-step summary toggle, My RAG diagram toggle, AWS Best Practice RAG diagram toggle |
+
+### Key Design Decisions
+- No managed vector DB (avoids $700+/month OpenSearch Serverless cost) — flat JSON + in-Lambda cosine similarity
+- Embeddings cached in Lambda memory across warm invocations — 41.9MB loaded once per cold start
+- Top-k = 5 chunks per query (~2,000 tokens of context)
+- 1,823 chunks with 150-char overlap to preserve cross-boundary context
+- Open API (no Cognito) consistent with Project 1 — throttled at 10 req/sec via API Gateway
+- Includes side-by-side comparison of My RAG approach vs AWS Best Practice (Bedrock Knowledge Base + OpenSearch)
+
+### Deployment
+- SAM stack: `waf-rag`
+- API: `https://cnprlsg9sb.execute-api.us-east-1.amazonaws.com/prod/query`
+- Frontend: `s3://ai-2026-project-lonestar/projects/02-waf-rag/`
+
+### Estimated Cost
+~$1.70/month at light use (1,500 questions/month)
 
 ---
 
@@ -368,6 +409,7 @@ EventBridge Scheduler, Step Functions, Lambda (Python 3.12) × 5, Bedrock Nova L
 | Pattern | Projects |
 |---------|----------|
 | Sync request-response (API Gateway → Lambda → AI) | 1 |
+| RAG (API Gateway → Lambda → Embeddings → S3 cosine similarity → Nova Lite) | 2 |
 | Sync request-response (Function URL → Lambda → AWS service) | 3 |
 | Async event-driven (Function URL → S3 → Lambda → AI → S3, frontend polls) | 4, 5, 8 |
 | Async queue-based (API Gateway → SQS → Lambda → AI → DynamoDB, frontend polls) | 7 |
@@ -377,7 +419,8 @@ EventBridge Scheduler, Step Functions, Lambda (Python 3.12) × 5, Bedrock Nova L
 ### AI Services Used
 | Service | Projects |
 |---------|----------|
-| Bedrock Nova Lite | 1, 4, 6, 7, 8, 9 |
+| Bedrock Nova Lite | 1, 2, 4, 6, 7, 8, 9 |
+| Bedrock Titan Embeddings V2 | 2 |
 | AWS Translate | 3 |
 | Amazon Polly | 5 |
 | AWS Textract | 4, 5 |

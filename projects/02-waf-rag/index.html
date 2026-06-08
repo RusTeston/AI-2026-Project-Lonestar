@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Well-Architected RAG | AI Projects</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        linear-gradient(160deg, #0C1A3A 0%, #0A3050 50%, #0E3558 100%);
+      --surface:   #112347;
+      --surface-2: #16294E;
+      --border:    #1E3A5C;
+      --border-b:  #2A4F7A;
+      --text:      #E8F4FD;
+      --muted:     #7FA8C9;
+      --dim:       #4A7299;
+      --yellow:    #E0FF4F;
+      --radius:    12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(12,26,58,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .badge {
+      background: var(--yellow); color: #0C1A3A;
+      font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+    }
+    .topbar-title { font-size: 15px; font-weight: 700; }
+    .back-link {
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      text-decoration: none; transition: color 200ms;
+    }
+    .back-link:hover { color: var(--yellow); }
+
+    /* ── Layout ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    .page-header { margin-bottom: 40px; }
+    .page-header h1 {
+      font-size: clamp(28px, 4vw, 40px); font-weight: 800;
+      color: var(--yellow); letter-spacing: -0.03em; margin-bottom: 10px;
+    }
+    .page-header p { font-size: 15px; color: var(--muted); max-width: 580px; }
+
+    .meta-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .meta-pill {
+      font-size: 12px; font-weight: 600; padding: 4px 12px;
+      border-radius: 100px; border: 1px solid;
+    }
+    .pill-blue   { background: rgba(37,99,235,0.15);  color: #60A5FA; border-color: rgba(37,99,235,0.3); }
+    .pill-purple { background: rgba(124,58,237,0.15); color: #A78BFA; border-color: rgba(124,58,237,0.3); }
+    .pill-orange { background: rgba(217,119,6,0.15);  color: #FBB034; border-color: rgba(217,119,6,0.3); }
+
+    /* ── Ask Panel ── */
+    .ask-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .ask-panel label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--muted); margin-bottom: 10px; letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .input-row { display: flex; gap: 10px; }
+    textarea {
+      flex: 1; background: #0C1A3A; border: 1px solid var(--border-b);
+      border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif;
+      font-size: 14px; line-height: 1.6; padding: 12px 16px;
+      resize: vertical; min-height: 80px;
+      transition: border-color 200ms;
+      outline: none;
+    }
+    textarea:focus { border-color: var(--yellow); }
+    textarea::placeholder { color: var(--dim); }
+
+    .btn-ask {
+      align-self: flex-end;
+      background: var(--yellow); color: #0C1A3A;
+      border: none; border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+      padding: 12px 24px; cursor: pointer;
+      transition: opacity 200ms, transform 100ms;
+      white-space: nowrap;
+    }
+    .btn-ask:hover { opacity: 0.9; }
+    .btn-ask:active { transform: scale(0.98); }
+    .btn-ask:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .example-questions { margin-top: 14px; }
+    .example-label { font-size: 11px; color: var(--dim); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .examples { display: flex; flex-wrap: wrap; gap: 8px; }
+    .example-btn {
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 100px; padding: 5px 14px; cursor: pointer;
+      transition: color 200ms, border-color 200ms, background 200ms;
+    }
+    .example-btn:hover {
+      color: var(--yellow); border-color: rgba(224,255,79,0.4);
+      background: rgba(224,255,79,0.06);
+    }
+
+    /* ── Answer Panel ── */
+    .answer-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      display: none;
+    }
+    .answer-panel.visible { display: block; }
+
+    .answer-header {
+      padding: 14px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .answer-header-left { display: flex; align-items: center; gap: 10px; }
+    .answer-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--yellow);
+    }
+    .answer-header span { font-size: 12px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .sources-badge {
+      font-size: 11px; font-weight: 600; color: var(--dim);
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 100px; padding: 3px 10px;
+    }
+
+    .answer-body { padding: 24px; }
+    .answer-text {
+      font-size: 14px; color: var(--text); line-height: 1.85;
+      white-space: pre-wrap;
+    }
+
+    .sources-row {
+      display: flex; flex-wrap: wrap; align-items: center;
+      gap: 6px; margin-top: 20px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .sources-label { font-size: 11px; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-right: 4px; }
+    .source-page {
+      font-size: 11px; font-weight: 600; color: #60A5FA;
+      background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.25);
+      border-radius: 4px; padding: 2px 8px;
+    }
+
+    /* ── Loading state ── */
+    .loading-indicator {
+      display: none; align-items: center; gap: 12px;
+      padding: 20px 24px; color: var(--muted); font-size: 14px;
+    }
+    .loading-indicator.visible { display: flex; }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid var(--border);
+      border-top-color: var(--yellow); border-radius: 50%;
+      animation: spin 0.7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error ── */
+    .error-msg {
+      display: none; padding: 16px 24px;
+      font-size: 13px; color: #F87171;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── Info strip ── */
+    .info-strip {
+      margin-top: 32px; padding: 16px 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 12px; color: var(--dim); line-height: 1.7;
+    }
+    .info-strip strong { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="badge">AI</span>
+    <span class="topbar-title">Well-Architected RAG</span>
+  </div>
+  <a href="../../index.html" class="back-link">← Back to AI Projects</a>
+</header>
+
+<main class="container">
+
+  <div class="page-header">
+    <h1>Well-Architected<br>Framework Q&amp;A</h1>
+    <p>Ask any question about the AWS Well-Architected Framework. Answers are grounded in the official AWS documentation using RAG — Retrieval-Augmented Generation.</p>
+    <div class="meta-pills">
+      <span class="meta-pill pill-purple">Amazon Bedrock</span>
+      <span class="meta-pill pill-blue">Titan Embeddings V2</span>
+      <span class="meta-pill pill-blue">Nova Lite</span>
+      <span class="meta-pill pill-orange">1,823 chunks indexed</span>
+    </div>
+  </div>
+
+  <!-- Ask Panel -->
+  <div class="ask-panel">
+    <label for="question-input">Ask a question</label>
+    <div class="input-row">
+      <textarea
+        id="question-input"
+        placeholder="e.g. What are the five pillars of the Well-Architected Framework?"
+        rows="3"
+      ></textarea>
+      <button class="btn-ask" id="ask-btn" onclick="ask()">Ask</button>
+    </div>
+
+    <div class="example-questions">
+      <p class="example-label">Try an example</p>
+      <div class="examples">
+        <button class="example-btn" onclick="setQuestion(this)">What are the five pillars?</button>
+        <button class="example-btn" onclick="setQuestion(this)">How does AWS define operational excellence?</button>
+        <button class="example-btn" onclick="setQuestion(this)">What is the shared responsibility model?</button>
+        <button class="example-btn" onclick="setQuestion(this)">How should I design for fault tolerance?</button>
+        <button class="example-btn" onclick="setQuestion(this)">What are best practices for cost optimization?</button>
+        <button class="example-btn" onclick="setQuestion(this)">How do I implement least privilege access?</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-indicator" id="loading">
+    <div class="spinner"></div>
+    <span>Searching 1,823 chunks and generating answer…</span>
+  </div>
+
+  <!-- Answer Panel -->
+  <div class="answer-panel" id="answer-panel">
+    <div class="answer-header">
+      <div class="answer-header-left">
+        <div class="answer-dot"></div>
+        <span>Answer</span>
+      </div>
+      <span class="sources-badge" id="sources-badge"></span>
+    </div>
+    <div class="answer-body">
+      <div class="answer-text" id="answer-text"></div>
+      <div class="sources-row" id="sources-row"></div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-msg" id="error-msg"></div>
+
+  <!-- Info strip -->
+  <div class="info-strip">
+    <strong>How it works:</strong> Your question is embedded using Amazon Bedrock Titan Embeddings V2 and compared against 1,823 pre-indexed chunks from the official AWS Well-Architected Framework PDF using cosine similarity. The top 5 most relevant chunks are injected as context into Amazon Bedrock Nova Lite, which generates a grounded answer with page citations.
+  </div>
+
+</main>
+
+<script>
+  const API_URL = 'https://cnprlsg9sb.execute-api.us-east-1.amazonaws.com/prod/query';
+
+  function setQuestion(btn) {
+    document.getElementById('question-input').value = btn.textContent;
+    document.getElementById('question-input').focus();
+  }
+
+  async function ask() {
+    const input = document.getElementById('question-input');
+    const question = input.value.trim();
+    if (!question) return;
+
+    const askBtn     = document.getElementById('ask-btn');
+    const loading    = document.getElementById('loading');
+    const answerPanel = document.getElementById('answer-panel');
+    const answerText = document.getElementById('answer-text');
+    const sourcesBadge = document.getElementById('sources-badge');
+    const sourcesRow = document.getElementById('sources-row');
+    const errorMsg   = document.getElementById('error-msg');
+
+    // Reset
+    answerPanel.classList.remove('visible');
+    errorMsg.classList.remove('visible');
+    loading.classList.add('visible');
+    askBtn.disabled = true;
+
+    try {
+      const resp = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await resp.json();
+
+      if (!resp.ok || data.error) {
+        throw new Error(data.error || 'Request failed');
+      }
+
+      answerText.textContent = data.answer;
+
+      // Sources
+      const pages = data.sources || [];
+      sourcesBadge.textContent = `${pages.length} source pages`;
+      sourcesRow.innerHTML = '<span class="sources-label">Sources</span>' +
+        pages.map(p => `<span class="source-page">p. ${p}</span>`).join('');
+
+      answerPanel.classList.add('visible');
+
+    } catch (err) {
+      errorMsg.textContent = `Error: ${err.message}`;
+      errorMsg.classList.add('visible');
+    } finally {
+      loading.classList.remove('visible');
+      askBtn.disabled = false;
+    }
+  }
+
+  // Enter key support (Shift+Enter for newline)
+  document.getElementById('question-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      ask();
+    }
+  });
+</script>
+
+</body>
+</html>

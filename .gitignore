@@ -6,3 +6,6 @@
 __pycache__/
 *.pyc
 *.zip
+*.pdf
+generated-diagrams/
+.aws-sam/

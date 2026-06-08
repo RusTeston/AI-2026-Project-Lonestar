@@ -199,6 +199,40 @@
       font-size: 12px; color: var(--dim); line-height: 1.7;
     }
     .info-strip strong { color: var(--muted); }
+
+    /* ── Toggle buttons & panels ── */
+    .summary-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-top: 16px; padding: 12px 20px;
+      background: rgba(224,255,79,0.08); border: 1px solid rgba(224,255,79,0.25);
+      border-radius: var(--radius); font-size: 13px; font-weight: 600;
+      color: var(--yellow); cursor: pointer; width: 100%;
+      transition: background 200ms, border-color 200ms;
+    }
+    .summary-toggle:hover { background: rgba(224,255,79,0.14); border-color: rgba(224,255,79,0.5); }
+    .summary-toggle.open { border-radius: var(--radius) var(--radius) 0 0; }
+    .toggle-icon { transition: transform 300ms ease; flex-shrink: 0; }
+    .summary-toggle.open .toggle-icon { transform: rotate(180deg); }
+    .toggle-panel {
+      display: none; background: var(--surface);
+      border: 1px solid rgba(224,255,79,0.25); border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 24px 28px;
+    }
+    .toggle-panel.open { display: block; }
+    .step {
+      display: flex; gap: 16px; padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+      background: var(--bg-start, #0C1A3A); border: 1px solid var(--border-b);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--yellow); margin-top: 2px;
+    }
+    .step-body { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
+    .step-body strong { color: var(--text); }
   </style>
 </head>
 <body>
@@ -278,10 +312,46 @@
     <strong>How it works:</strong> Your question is embedded using Amazon Bedrock Titan Embeddings V2 and compared against 1,823 pre-indexed chunks from the official AWS Well-Architected Framework PDF using cosine similarity. The top 5 most relevant chunks are injected as context into Amazon Bedrock Nova Lite, which generates a grounded answer with page citations.
   </div>
 
+  <!-- Step-by-Step Toggle -->
+  <button id="toggle-steps" class="summary-toggle" onclick="togglePanel('steps')">
+    <span>📋 &nbsp;What I Built — Step by Step</span>
+    <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div id="panel-steps" class="toggle-panel">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Source Document Preparation</strong><br>The official AWS Well-Architected Framework PDF (14MB, 1,002 pages) was uploaded to Amazon S3 as the knowledge source. This is the raw document that everything else is built on.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Text Extraction</strong><br>Using PyMuPDF, text was extracted from all 1,002 pages of the PDF. Each page's raw text was cleaned and normalized — removing extra whitespace and formatting artifacts — to produce clean readable text ready for processing.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Chunking</strong><br>The extracted text was split into 1,823 overlapping chunks of approximately 400 tokens (~1,200 characters) each, with a 150-character overlap between consecutive chunks. The overlap ensures that concepts falling on a chunk boundary aren't lost — both neighboring chunks will contain that context.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Embedding Generation</strong><br>Each of the 1,823 chunks was sent to Amazon Bedrock Titan Embeddings V2, which converted each chunk into a vector — a list of numbers that mathematically represents the semantic meaning of that text. Chunks with similar meaning produce vectors that are close together in vector space. All 1,823 vectors were written to a single embeddings.json file (41.9MB) and stored in S3.</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Query Time: Embed the Question</strong><br>When a user types a question, it is sent to AWS Lambda via API Gateway. Lambda immediately sends the question text to Bedrock Titan Embeddings V2 and gets back a vector for the question — using the exact same embedding model used during ingestion so the vector space is consistent.</div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Cosine Similarity Search</strong><br>Lambda loads the embeddings.json file from S3 into memory (cached after the first cold start) and computes the cosine similarity between the question vector and all 1,823 chunk vectors. Cosine similarity measures the angle between two vectors — a score of 1.0 means identical meaning, 0.0 means completely unrelated. The top 5 highest-scoring chunks are selected as the most relevant context.</div></div>
+    <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Prompt Construction and Generation</strong><br>Lambda builds a prompt containing the user's question plus the full text of the 5 retrieved chunks as context. This prompt is sent to Amazon Bedrock Nova Lite via the Converse API. Nova Lite is instructed to answer using only the provided context and to cite source page numbers. This is the RAG pattern — the model isn't relying on training memory, it's reading the actual retrieved document text to form its answer.</div></div>
+    <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Response Delivery</strong><br>Nova Lite's answer, along with the source page numbers from the retrieved chunks, is returned through Lambda → API Gateway → back to the browser. The frontend displays the answer and shows which pages of the WAF document the answer was drawn from.</div></div>
+  </div>
+
+  <!-- Architecture Diagram Toggle -->
+  <button id="toggle-diagram" class="summary-toggle" onclick="togglePanel('diagram')" style="margin-top: 12px;">
+    <span>🏗️ &nbsp;RAG Architecture Diagram</span>
+    <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div id="panel-diagram" class="toggle-panel" style="text-align: center; padding: 24px;">
+    <img src="waf-rag-architecture.png" alt="WAF RAG Architecture Diagram" style="max-width:100%; height:auto; border-radius:8px;" />
+  </div>
+
 </main>
 
 <script>
   const API_URL = 'https://cnprlsg9sb.execute-api.us-east-1.amazonaws.com/prod/query';
+
+  function togglePanel(id) {
+    const panel  = document.getElementById('panel-' + id);
+    const toggle = document.getElementById('toggle-' + id);
+    panel.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
 
   function setQuestion(btn) {
     document.getElementById('question-input').value = btn.textContent;

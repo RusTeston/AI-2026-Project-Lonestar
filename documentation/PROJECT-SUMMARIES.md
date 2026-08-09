@@ -395,6 +395,221 @@ EventBridge Scheduler, Step Functions, Lambda (Python 3.12) × 5, Bedrock Nova L
 
 ---
 
+## Project 10: Perfect Prompt Builder
+
+### What It Is
+A structured prompt engineering tool that guides users through building high-quality prompts for any foundation model. Users fill in Role, Task, Context, Constraints, Output Format, Verification, and Examples fields. The tool assembles a formatted prompt, then optionally sends it to Bedrock Nova Lite for AI-powered scoring, improvement suggestions, and an enhanced version of the prompt.
+
+### Architecture
+**Synchronous request-response:**
+- User Browser → S3 (static frontend) → Lambda Function URL → Bedrock Nova Lite → score + improvements + enhanced prompt
+
+### AWS Services Used
+S3, Lambda Function URL (Python 3.12), Bedrock Nova Lite, IAM, CloudWatch
+
+### What We Built — File by File
+| File | Purpose |
+|------|---------|
+| `frontend/index.html` | Single-file app — 7 structured input fields (Role, Task, Context, Constraints, Output Format, Verification, Examples), Generate Prompt button, Enhance with AI button, score circle, improvement cards, enhanced prompt output |
+
+### Key Design Decisions
+- Client-side prompt assembly — no backend needed for generation, only for AI enhancement
+- Score circle (0–100) with color tiers: green (≥75), yellow (≥50), red (<50)
+- Improvement suggestions rendered as individual cards with 💡 prefix
+- Enhanced prompt shown alongside original for easy comparison
+- Demo button pre-fills a realistic AWS migration scenario
+- Role dropdown with 6 presets + custom option
+- Lambda Function URL: `https://n7taftgspogdij7l4g2ercpnsi0srofk.lambda-url.us-east-1.on.aws/`
+
+### Deployment
+- Lambda: Function URL
+- Frontend: `s3://ai-2026-project-lonestar/projects/10-prompt-builder/`
+- Deployed manually via bash scripts
+
+### Estimated Cost
+~$1-2/month (light Bedrock usage for enhancement only)
+
+---
+
+## Project 11: Architecture Diagram Studio
+
+### What It Is
+A dual-panel architecture diagram generator that produces SVG diagrams from plain-language descriptions. Users can describe an on-premises infrastructure (left panel) and an AWS architecture (right panel) independently, then trigger a migration analysis comparing the two. Diagrams can be downloaded as SVG or PNG and expanded to fullscreen.
+
+### Architecture
+**Synchronous request-response:**
+- User Browser → S3 (static frontend) → Lambda Function URL → Bedrock Nova Lite → SVG diagram or migration analysis HTML
+
+### AWS Services Used
+S3, Lambda Function URL (Python 3.12), Bedrock Nova Lite, IAM, CloudWatch
+
+### What We Built — File by File
+| File | Purpose |
+|------|---------|
+| `website/projects/11-architecture-studio/index.html` | Dual-panel UI — On-Prem panel (blue) and AWS panel (orange), fullscreen modal, SVG/PNG download, migration analysis output |
+
+### Key Design Decisions
+- Single Lambda Function URL handles three request types: `onprem`, `aws`, and `migration`
+- Lambda returns raw SVG for diagrams; returns HTML fragment for migration analysis
+- Migration trigger button only appears when both panels have generated diagrams
+- Client-side PNG conversion using Canvas API (2x scale for high resolution)
+- Fullscreen modal with per-panel download buttons
+- Ctrl+Enter keyboard shortcut to generate
+- Lambda Function URL: `https://6mcb5tctfchpldojluzolhh6gu0ajpqj.lambda-url.us-east-1.on.aws/`
+- Same Lambda URL shared with Project 12 (On-Prem to AWS Translator)
+
+### Deployment
+- Lambda: Function URL
+- Frontend: `s3://ai-2026-project-lonestar/projects/11-architecture-studio/`
+- Deployed via CI/CD (GitHub Actions)
+
+### Estimated Cost
+~$2-4/month
+
+---
+
+## Project 12: On-Prem to AWS Translator
+
+### What It Is
+A single-input translation tool that takes a plain-language description of on-premises infrastructure and returns a structured AWS architecture recommendation plus a full migration analysis. Output includes an AWS architecture description (copyable for use in diagramming tools), a component mapping table (on-prem → AWS service), migration benefits, and a phased migration roadmap. Includes a direct link to open the Architecture Diagram Studio with the description pre-loaded.
+
+### Architecture
+**Synchronous request-response:**
+- User Browser → S3 (static frontend) → Lambda Function URL → Bedrock Nova Lite → AWS description + migration analysis HTML
+
+### AWS Services Used
+S3, Lambda Function URL (Python 3.12), Bedrock Nova Lite, IAM, CloudWatch
+
+### What We Built — File by File
+| File | Purpose |
+|------|---------|
+| `website/projects/12-aws-translator/index.html` | Single-page app — textarea input, character counter (4,000 limit), AWS description output with copy button, migration analysis HTML rendered inline, "Build a Diagram in Architecture Studio" CTA button |
+
+### Key Design Decisions
+- Request type `translate` sent to shared Lambda URL (same as Project 11)
+- Lambda returns `aws_description` (plain text) + `html` (styled migration analysis fragment)
+- Copy button auto-copies description to clipboard when user clicks "Build a Diagram in Architecture Studio"
+- Opens Architecture Studio in new tab with description ready to paste into AWS panel
+- Dark navy theme with yellow-green accent (`#E0FF4F`) matching Lonestar design language
+- Lambda Function URL: `https://6mcb5tctfchpldojluzolhh6gu0ajpqj.lambda-url.us-east-1.on.aws/`
+
+### Deployment
+- Lambda: Function URL (shared with Project 11)
+- Frontend: `s3://ai-2026-project-lonestar/projects/12-aws-translator/`
+- Deployed via CI/CD (GitHub Actions)
+
+### Estimated Cost
+~$1-2/month (shared Lambda with Project 11)
+
+---
+
+## Project 13: AWS Architecture Catalog
+
+### What It Is
+A curated static catalog of AWS reference architectures with diagrams and best-practice descriptions. Users browse a searchable, filterable catalog of common AWS architecture patterns. Each entry includes a description, the AWS services involved, and a reference architecture diagram.
+
+### Architecture
+**Static frontend only:**
+- User Browser → CloudFront → S3 (static HTML + images)
+
+### AWS Services Used
+S3, CloudFront, IAM
+
+### What We Built — File by File
+| File | Purpose |
+|------|---------|
+| `website/projects/13-architecture-catalog/index.html` | Static catalog page — searchable/filterable architecture entries, sidebar navigation, detail panel with diagram and description |
+| `website/projects/13-architecture-catalog/images/` | Architecture diagram PNGs (one per catalog entry) |
+
+### Key Design Decisions
+- No backend — fully static, zero runtime cost
+- All architecture data embedded in the HTML as a JavaScript array
+- Diagrams generated using the Python `diagrams` package and stored as PNGs
+- Each diagram follows the high-fidelity standard: left-to-right flow, proper clusters, every service as a node
+- Content researched against AWS documentation before each diagram was drawn
+
+### Deployment
+- Frontend: `s3://ai-2026-project-lonestar/projects/13-architecture-catalog/`
+- Deployed via CI/CD (GitHub Actions)
+
+### Estimated Cost
+~$0/month (static only, CloudFront free tier)
+
+---
+
+## Project 14: AWS Service Reference
+
+### What It Is
+A searchable AWS service reference guide with tiered categorization. Services are organized into 9 tiers by how frequently they appear in real-world architectures (e.g., "Appears in virtually every architecture", "Core compute and data", "AI and ML (rapidly rising)"). Each entry includes a plain-English definition.
+
+### Architecture
+**Static frontend only:**
+- User Browser → CloudFront → S3 (static HTML)
+
+### AWS Services Used
+S3, CloudFront, IAM
+
+### What We Built — File by File
+| File | Purpose |
+|------|---------|
+| `website/projects/14-aws-service-reference/index.html` | Static reference page — search bar, tier-grouped service cards, definitions, tier badges |
+
+### Key Design Decisions
+- No backend — fully static, zero runtime cost
+- All service data embedded as a JavaScript array (~75 services)
+- 9 tiers: Appears in virtually every architecture, Core compute and data, Networking, Storage and database (specialized), Messaging and integration, Security and governance, DevOps, Analytics and data, AI and ML (rapidly rising)
+- Live search filters across service names and definitions
+- Designed as a quick-reference companion to Project 13 (Architecture Catalog)
+
+### Deployment
+- Frontend: `s3://ai-2026-project-lonestar/projects/14-aws-service-reference/`
+- Deployed via CI/CD (GitHub Actions)
+
+### Estimated Cost
+~$0/month (static only, CloudFront free tier)
+
+---
+
+## Project 15: Course Specification Builder
+
+### What It Is
+A client-side course design questionnaire for instructional designers and training requestors. Users answer up to ~150 questions across 12 sections covering business need, target audience, performance expectations, learning objectives, scope, source materials, delivery format, instructional approach, assessment, measurement, stakeholders, and schedule. Answers auto-save to localStorage. On completion, users can download a full Q&A PDF or a structured Markdown course specification document.
+
+### Architecture
+**Client-side only:**
+- User Browser → CloudFront → S3 (static HTML, no backend)
+
+### AWS Services Used
+S3, CloudFront, IAM
+
+### What We Built — File by File
+| File | Purpose |
+|------|---------|
+| `website/projects/15-course-spec-builder/index.html` | Single-file app — access code gate, requestor info screen, 12-section questionnaire with sidebar nav, progress bar, review screen, PDF download (jsPDF), Markdown download (Blob) |
+| `website/projects/15-course-spec-builder/spec.md` | Technical specification document for the project |
+
+### Key Design Decisions
+- Access code gate (`8675309`) — prevents public access without distribution
+- localStorage auto-save with 500ms debounce — no data loss on refresh or accidental close
+- Schema versioning (`csb:v1:session`) — detects stale saved data and prompts user
+- jsPDF for PDF generation — runs entirely in-browser, no server needed
+- Markdown export uses Blob API — structured spec document for course developers
+- Two output formats: full Q&A PDF (for requestor records) and condensed Markdown spec (for course developers)
+- Section status dots: not started (grey), in-progress (yellow), complete (green), missing required (red)
+- Required fields validated on section exit, not on every keystroke
+- "Not applicable" toggle on optional questions
+- Filename sanitization: PDF named `firstname-lastname-course-request.pdf`, Markdown named `course-title-spec.md`
+- No external dependencies except jsPDF CDN
+
+### Deployment
+- Frontend: `s3://ai-2026-project-lonestar/projects/15-course-spec-builder/`
+- Deployed via CI/CD (GitHub Actions)
+
+### Estimated Cost
+~$0/month (static only, CloudFront free tier)
+
+---
+
 ## Cross-Project Evolution
 
 ### Deployment Pattern Evolution

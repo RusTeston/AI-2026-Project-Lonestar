@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Specification Builder</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --color-bg: #f7f7f8;
+    --color-surface: #ffffff;
+    --color-border: #d8d8dc;
+    --color-text: #1c1c1e;
+    --color-text-muted: #55555a;
+    --color-primary: #1a4d8f;
+    --color-primary-dark: #123a6c;
+    --color-success: #1c7a3e;
+    --color-warning: #a35b00;
+    --color-error: #b3261e;
+    --focus-ring: 0 0 0 3px rgba(26,77,143,0.4);
+    font-size: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+  }
+  #app { min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: var(--color-primary); }
+  button {
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.65em 1.3em;
+    border-radius: 6px;
+    border: 1px solid var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+  }
+  .btn:hover:not(:disabled) { background: var(--color-primary-dark); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-primary);
+  }
+  .btn-secondary:hover:not(:disabled) { background: #eef2f8; }
+  .btn-danger {
+    background: var(--color-surface);
+    color: var(--color-error);
+    border-color: var(--color-error);
+  }
+  .btn-danger:hover { background: #fdeceb; }
+  .container {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    width: 100%;
+  }
+  .center-screen {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 100%;
+  }
+  .card h1 { margin-top: 0; font-size: 1.4rem; }
+  .field { margin-bottom: 1.25rem; }
+  .field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  .field .hint { font-size: 0.85rem; color: var(--color-text-muted); margin-top: 0.25rem; }
+  input[type="text"], input[type="email"], textarea, select {
+    width: 100%;
+    padding: 0.6em 0.75em;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    background: #fff;
+    color: var(--color-text);
+  }
+  textarea { min-height: 5.5em; resize: vertical; }
+  .error-text { color: var(--color-error); font-size: 0.9rem; margin-top: 0.35rem; }
+  .radio-group, .na-toggle { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 0.35rem; }
+  .radio-group label, .na-toggle label { font-weight: 400; display: flex; align-items: center; gap: 0.4rem; }
+  header.topbar {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  header.topbar .title { font-weight: 700; font-size: 1.05rem; }
+  .layout {
+    flex: 1;
+    display: flex;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 1.5rem;
+    padding: 1.5rem 1.25rem 4rem;
+  }
+  nav.section-menu {
+    flex: 0 0 240px;
+  }
+  nav.section-menu ul { list-style: none; margin: 0; padding: 0; }
+  nav.section-menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0.55em 0.6em;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    color: var(--color-text);
+  }
+  nav.section-menu button:hover { background: #eef2f8; }
+  nav.section-menu button[aria-current="true"] { background: #e3ebf6; font-weight: 700; }
+  .status-dot { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 50%; background: #b6b6bc; }
+  .status-dot.in-progress { background: #d9a300; }
+  .status-dot.complete { background: var(--color-success); }
+  .status-dot.missing { background: var(--color-error); }
+  .status-label { font-size: 0.72rem; color: var(--color-text-muted); }
+  main.question-area { flex: 1; min-width: 0; }
+  .progressbar-outer {
+    height: 8px;
+    background: #e6e6e9;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+  .progressbar-inner { height: 100%; background: var(--color-primary); transition: width 0.2s ease; }
+  .question-block { margin-bottom: 1.75rem; }
+  .question-block label.qlabel { font-weight: 600; display: block; margin-bottom: 0.4rem; }
+  .required-flag { color: var(--color-error); font-weight: 700; margin-left: 0.15rem; }
+  .validation-banner {
+    background: #fdeceb;
+    border: 1px solid var(--color-error);
+    color: var(--color-error);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.92rem;
+  }
+  .validation-banner ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+  .validation-banner a { color: var(--color-error); font-weight: 600; }
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 2rem; gap: 1rem; flex-wrap: wrap; }
+  .section-heading { margin-top: 0; }
+  .helper-text { background: #eef2f8; border-radius: 6px; padding: 0.75rem 1rem; font-size: 0.9rem; margin-bottom: 1.25rem; color: var(--color-text-muted); }
+  .review-section { border-top: 1px solid var(--color-border); padding-top: 1.25rem; margin-top: 1.25rem; }
+  .review-question { margin-bottom: 1rem; }
+  .review-question .qtext { font-weight: 600; }
+  .review-question .answer { white-space: pre-wrap; color: var(--color-text-muted); }
+  .review-question .revise-link { font-size: 0.85rem; margin-left: 0.5rem; }
+  .download-row { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+  .download-row .btn { flex: 1 1 260px; }
+  .footer-links { margin-top: 2rem; font-size: 0.85rem; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  dialog.confirm-dialog {
+    border: none; border-radius: 10px; padding: 0; max-width: 420px; width: 90%;
+  }
+  dialog.confirm-dialog::backdrop { background: rgba(0,0,0,0.4); }
+  .dialog-inner { padding: 1.5rem; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; }
+  .banner-notice {
+    background: #fff6e5; border: 1px solid #d9a300; color: #7a5600;
+    border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; font-size: 0.9rem;
+  }
+  @media (max-width: 768px) {
+    .layout { flex-direction: column; }
+    nav.section-menu { flex: none; }
+    nav.section-menu ul { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    nav.section-menu li { flex: 1 1 auto; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ CONFIG ============ */
+const CONFIG = {
+  ACCESS_CODE: "8675309",
+  STORAGE_KEY: "csb:v1:session",
+  SCHEMA_VERSION: 1
+};
+
+/* ============ QUESTION BANK ============ */
+const questionBank = [
+  { id: "s1", title: "Business Need and Purpose", questions: [
+    { id: "s1q1", text: "What business problem is this course intended to solve?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s1q2", text: "What triggered the request for training?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s1q3", text: "Why is training the appropriate solution?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s1q4", text: "What is happening today that should change?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s1q5", text: "What should learners do differently after completing the course?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s1q6", text: "What business result should improve?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s1q7", text: "What happens if the course is not created?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s1q8", text: "Is this training required, recommended or optional?", type: "radio", options: ["Required", "Recommended", "Optional"], required: false, notApplicableAllowed: false },
+    { id: "s1q9", text: "Is the course connected to a larger initiative, product launch, policy, certification or organizational change?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s1q10", text: "How will the sponsor determine whether the course was worth creating?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s1q11", text: "If this course is successful, what will learners be doing differently 30 days after completing it?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s2", title: "Target Audience", questions: [
+    { id: "s2q1", text: "Who exactly will take the course?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s2q2", text: "What are their roles or job titles?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q3", text: "Approximately how many learners are expected?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s2q4", text: "Are there multiple learner groups or personas?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q5", text: "Where are the learners located?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q6", text: "What languages do they use?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q7", text: "What level of experience do they have?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q8", text: "What do they already know about the topic?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s2q9", text: "What common knowledge gaps do they have?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q10", text: "What misconceptions or mistakes are common?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q11", text: "What tools, systems or processes do they currently use?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q12", text: "What motivates them to learn this?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q13", text: "What might make them resist or ignore the training?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q14", text: "How much time can they realistically devote to it?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q15", text: "Are there accessibility, language, cultural, technical or scheduling considerations?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s2q16", text: "Will managers need to support or reinforce the learning?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s3", title: "Performance Expectations", questions: [
+    { id: "s3q1", text: "What specific tasks must learners perform?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q2", text: "What decisions must they be able to make?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q3", text: "What problems must they be able to solve?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q4", text: "What conversations must they be able to conduct?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q5", text: "What tools or systems must they be able to use?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q6", text: "What does successful performance look like?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q7", text: "What does poor performance look like?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q8", text: "What are the most common errors?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q9", text: "Which mistakes carry the greatest business, customer, financial, security or compliance risk?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q10", text: "How frequently will learners perform these tasks?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q11", text: "Under what conditions will they perform them?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q12", text: "Will they perform independently or with assistance?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q13", text: "What reference materials will they have while working?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q14", text: "How is performance currently measured?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s3q15", text: "Can an experienced employee demonstrate the desired performance?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s4", title: "Learning Objectives", helperText: "Tip: use observable objective verbs such as explain, identify, select, configure, demonstrate, diagnose, compare, troubleshoot, create and complete. Avoid vague standalone terms such as understand, learn and be familiar with.", questions: [
+    { id: "s4q1", text: "What should learners be able to do by the end of the course?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s4q2", text: "Which outcomes involve knowledge?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s4q3", text: "Which outcomes involve practical skills?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s4q4", text: "Which outcomes involve judgment or decision-making?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s4q5", text: "Which outcomes involve changes in behavior or attitude?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s4q6", text: "Which objectives are essential?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s4q7", text: "Which objectives are useful but optional?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s4q8", text: "What level of proficiency is required: awareness, basic application, independent performance or mastery?", type: "radio", options: ["Awareness", "Basic application", "Independent performance", "Mastery"], required: false, notApplicableAllowed: false },
+    { id: "s4q9", text: "Must learners remember the information, or can they use reference materials?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s4q10", text: "How will each objective be demonstrated or measured?", type: "textarea", required: true, notApplicableAllowed: false }
+  ]},
+  { id: "s5", title: "Scope and Boundaries", questions: [
+    { id: "s5q1", text: "What topics must be included?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s5q2", text: "What topics should be excluded?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q3", text: "What are the three to five most important things learners need to retain?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q4", text: "What content is required by policy, regulation, certification or leadership?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q5", text: "What content is helpful but not essential?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q6", text: "What prerequisites should learners complete first?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q7", text: "Should advanced topics be placed in a separate course?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q8", text: "Are there sensitive or confidential topics?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q9", text: "Does the course need to distinguish among different roles, products, processes or scenarios?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q10", text: "Are there topics that must be reviewed by Legal, Compliance, Security, HR or another department?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q11", text: "Is this one course, a course series or part of a larger learning path?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s5q12", text: "What is explicitly out of scope?", type: "textarea", required: true, notApplicableAllowed: false }
+  ]},
+  { id: "s6", title: "Source Materials and Subject-Matter Expertise", questions: [
+    { id: "s6q1", text: "Who is the primary subject-matter expert?", type: "text", required: true, notApplicableAllowed: false },
+    { id: "s6q2", text: "Who has final authority when sources disagree?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q3", text: "What source materials already exist?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q4", text: "Which sources are considered authoritative?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s6q5", text: "Are there current policies, procedures, job aids, videos, presentations, recordings or examples?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q6", text: "Are the materials accurate and up to date?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q7", text: "When were they last reviewed?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s6q8", text: "Are there known gaps in the existing materials?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q9", text: "Can existing materials be reused or modified?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q10", text: "Are there copyright, licensing, confidentiality or brand restrictions?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q11", text: "Can real customer or employee examples be used?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q12", text: "Must examples be anonymized?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q13", text: "Are screenshots or product demonstrations required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q14", text: "Is access available to the system, tool or environment being taught?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q15", text: "Can the subject-matter expert provide examples of both successful and unsuccessful performance?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s6q16", text: "Who will resolve questions discovered during development?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s7", title: "Course Format and Delivery", questions: [
+    { id: "s7q1", text: "How will the course be delivered?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s7q2", text: "Will it be self-paced, instructor-led, virtual, in person, blended or cohort-based?", type: "select", options: ["Self-paced", "Instructor-led", "Virtual", "In person", "Blended", "Cohort-based"], required: false, notApplicableAllowed: false },
+    { id: "s7q3", text: "Where will the course be hosted?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q4", text: "Is an LMS required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q5", text: "What technical standard is required, such as SCORM, xAPI, video, HTML or PDF?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q6", text: "What is the preferred course length?", type: "text", required: true, notApplicableAllowed: false },
+    { id: "s7q7", text: "Should the course be completed in one sitting?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q8", text: "Should it be divided into short modules?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q9", text: "Will learners use desktop computers, tablets or mobile devices?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q10", text: "Will audio be available or appropriate?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q11", text: "Are captions, transcripts, keyboard navigation, screen-reader support or other accessibility features required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q12", text: "Are there bandwidth or device limitations?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q13", text: "Will learners need a lab, sandbox, simulation or practice environment?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q14", text: "Should learners be able to download job aids or reference materials?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q15", text: "Is there a required visual style, template or branding standard?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s7q16", text: "Should the course feel formal, conversational, technical, scenario-based or something else?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s8", title: "Instructional Approach", questions: [
+    { id: "s8q1", text: "Should the course begin with concepts, a demonstration, a problem or a realistic scenario?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q2", text: "What real-world situations should learners practice?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q3", text: "Are there common customer, employee or workplace scenarios that should be included?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q4", text: "Should learners make decisions and see the consequences?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q5", text: "Should the course include guided practice?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s8q6", text: "Should learners practice independently?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q7", text: "Would simulations, case studies, role-plays, demonstrations or hands-on labs be appropriate?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q8", text: "Should learners receive feedback after each activity?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q9", text: "What tone should the course use?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q10", text: "Should examples be role-specific?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q11", text: "Are stories, characters or recurring scenarios appropriate?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q12", text: "What supporting job aids should be created?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q13", text: "What information belongs in the course versus a searchable reference guide?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s8q14", text: "How should the learning be reinforced after completion?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s9", title: "Assessment and Completion", helperText: "Assessment evidence should match the objective: a knowledge check for explaining a concept, a scenario for choosing an action, a simulation for using a system, a rubric-scored project for creating a deliverable.", questions: [
+    { id: "s9q1", text: "How will learners prove they achieved the objectives?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q2", text: "Is a formal assessment required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q3", text: "Should the course use knowledge checks, scenarios, demonstrations, projects, observations or a final exam?", type: "textarea", required: true, notApplicableAllowed: false },
+    { id: "s9q4", text: "What score is required to pass?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s9q5", text: "How many attempts are permitted?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s9q6", text: "Should learners receive feedback after incorrect answers?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q7", text: "Must assessment questions be randomized?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q8", text: "Is there a required question bank?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q9", text: "Should learners demonstrate a skill rather than answer questions about it?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q10", text: "Are there critical behaviors that must be assessed?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q11", text: "Can learners test out of the course?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q12", text: "What constitutes completion?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q13", text: "Is a certificate required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q14", text: "Does completion expire?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q15", text: "Will refresher training or recertification be required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s9q16", text: "Who will review and approve the assessment?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s10", title: "Measurement and Business Impact", helperText: "Possible measures: assessment performance, task accuracy, time to proficiency, reduction in errors, support/escalation volume, customer satisfaction, manager observation, productivity, compliance, technical win rate, time to complete a process.", questions: [
+    { id: "s10q1", text: "What does success look like immediately after training?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q2", text: "What should change 30, 60 or 90 days afterward?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q3", text: "What performance data is currently available?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q4", text: "Is there a baseline against which results can be compared?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q5", text: "Which metrics should improve?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q6", text: "How will learner confidence be measured?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q7", text: "How will managers observe behavior change?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q8", text: "Will learners be surveyed?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q9", text: "Will managers or customers provide feedback?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q10", text: "Who will collect and analyze the results?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q11", text: "When will the course be evaluated?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s10q12", text: "What result would indicate that the course needs revision?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s11", title: "Stakeholders and Approvals", questions: [
+    { id: "s11q1", text: "Who requested the course?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s11q2", text: "Who owns the final business outcome?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s11q3", text: "Who is the primary subject-matter expert?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s11q4", text: "Who represents the learners?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q5", text: "Who will review instructional accuracy?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q6", text: "Who will review branding and visual design?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q7", text: "Is Legal, Compliance, Security, HR or Accessibility review required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q8", text: "Who has final approval?", type: "text", required: true, notApplicableAllowed: false },
+    { id: "s11q9", text: "Who can make scope decisions?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q10", text: "How many review cycles are expected?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s11q11", text: "How will feedback be collected and consolidated?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q12", text: "What happens when reviewers disagree?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q13", text: "What are the review deadlines?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s11q14", text: "Who signs off on the final course?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]},
+  { id: "s12", title: "Schedule, Resources and Constraints", questions: [
+    { id: "s12q1", text: "When must the course launch?", type: "text", required: true, notApplicableAllowed: false },
+    { id: "s12q2", text: "What is driving that deadline?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q3", text: "Are there intermediate milestones?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q4", text: "Is the deadline fixed or negotiable?", type: "radio", options: ["Fixed", "Negotiable"], required: false, notApplicableAllowed: false },
+    { id: "s12q5", text: "What budget is available?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q6", text: "Who will help develop the course?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q7", text: "What development tools are available?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q8", text: "Are voice-over, video, animation or professional production resources available?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q9", text: "How much subject-matter-expert time is available?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q10", text: "Are there technical, legal, branding or procurement limitations?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q11", text: "What dependencies could delay development?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q12", text: "Is a pilot required?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q13", text: "How many learners should participate in the pilot?", type: "text", required: false, notApplicableAllowed: true },
+    { id: "s12q14", text: "How much time is available for revisions?", type: "textarea", required: false, notApplicableAllowed: true },
+    { id: "s12q15", text: "What is the minimum viable version of the course if time becomes limited?", type: "textarea", required: false, notApplicableAllowed: true }
+  ]}
+];
+
+const requestorFields = [
+  { id: "firstName", label: "First name", type: "text" },
+  { id: "lastName", label: "Last name", type: "text" },
+  { id: "courseTitle", label: "Working course title", type: "text" },
+  { id: "department", label: "Department / business unit", type: "text" },
+  { id: "role", label: "Role / job title", type: "text" },
+  { id: "email", label: "Email address", type: "email" }
+];
+
+/* Mapping of markdown summary sections to question IDs (easy to extend) */
+const specSectionMap = {
+  businessNeed: "s1q1",
+  desiredChange: "s1q5",
+  audience: "s2q1",
+  existingKnowledge: "s2q8",
+  objectives: "s4q1",
+  objectiveMeasure: "s4q10",
+  scopeIn: "s5q1",
+  scopeOut: "s5q12",
+  primarySme: "s6q1",
+  authoritativeSources: "s6q4",
+  delivery: "s7q1",
+  length: "s7q6",
+  guidedPractice: "s8q5",
+  assessment: "s9q3",
+  finalApproval: "s11q8",
+  launchDate: "s12q1"
+};
+
+/* ============ STATE ============ */
+function defaultState() {
+  const now = new Date().toISOString();
+  return {
+    schemaVersion: CONFIG.SCHEMA_VERSION,
+    createdAt: now,
+    updatedAt: now,
+    accessGranted: false,
+    requestor: { firstName: "", lastName: "", courseTitle: "", department: "", role: "", email: "" },
+    answers: {},
+    currentSectionId: questionBank[0].id,
+    completedSections: []
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+    if (!raw) return { state: defaultState(), versionMismatch: false };
+    const parsed = JSON.parse(raw);
+    const versionMismatch = parsed.schemaVersion !== CONFIG.SCHEMA_VERSION;
+    return { state: Object.assign(defaultState(), parsed), versionMismatch };
+  } catch (e) {
+    return { state: defaultState(), versionMismatch: false };
+  }
+}
+
+const loaded = loadState();
+let state = loaded.state;
+let showVersionNotice = loaded.versionMismatch;
+let screen = state.accessGranted
+  ? (state.requestor.email ? "questionnaire" : "requestorInfo")
+  : "accessGate";
+let reviewMode = false;
+let attemptedLeaveSections = new Set();
+let accessError = "";
+
+let saveTimer = null;
+function persist() {
+  state.updatedAt = new Date().toISOString();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state));
+  }, 500);
+}
+
+/* ============ VALIDATION ============ */
+function getAnswer(qid) {
+  return state.answers[qid] || { value: "", notApplicable: false };
+}
+function setAnswerValue(qid, value) {
+  const cur = getAnswer(qid);
+  state.answers[qid] = { value, notApplicable: cur.notApplicable && value === "" ? cur.notApplicable : false };
+  persist();
+}
+function setAnswerNA(qid, na) {
+  const cur = getAnswer(qid);
+  state.answers[qid] = { value: na ? "" : cur.value, notApplicable: na };
+  persist();
+}
+function isQuestionAnswered(q) {
+  if (!q.required) return true;
+  const a = getAnswer(q.id);
+  if (q.notApplicableAllowed && a.notApplicable) return true;
+  return a.value.trim().length > 0;
+}
+function isRequestorComplete() {
+  return requestorFields.every(f => state.requestor[f.id] && state.requestor[f.id].trim().length > 0)
+    && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.requestor.email.trim());
+}
+function sectionMissingRequired(section) {
+  return section.questions.filter(q => q.required && !isQuestionAnswered(q));
+}
+function sectionStatus(section) {
+  const missing = sectionMissingRequired(section);
+  const anyAnswered = section.questions.some(q => {
+    const a = getAnswer(q.id);
+    return a.value.trim().length > 0 || a.notApplicable;
+  });
+  if (missing.length > 0 && attemptedLeaveSections.has(section.id)) return "missing";
+  if (missing.length === 0 && anyAnswered) return "complete";
+  if (missing.length === 0 && !anyAnswered && section.questions.every(q => !q.required)) {
+    return anyAnswered ? "complete" : "not-started";
+  }
+  if (anyAnswered) return "in-progress";
+  return "not-started";
+}
+function allMissingRequired() {
+  const missing = [];
+  if (!isRequestorComplete()) {
+    requestorFields.forEach(f => {
+      if (!state.requestor[f.id] || !state.requestor[f.id].trim()) {
+        missing.push({ sectionId: "requestor", sectionTitle: "Requestor Information", qid: f.id, qtext: f.label });
+      }
+    });
+  }
+  questionBank.forEach(section => {
+    sectionMissingRequired(section).forEach(q => {
+      missing.push({ sectionId: section.id, sectionTitle: section.title, qid: q.id, qtext: q.text });
+    });
+  });
+  return missing;
+}
+function isQuestionnaireComplete() {
+  return allMissingRequired().length === 0;
+}
+
+/* ============ FILENAME SANITIZER ============ */
+function sanitizeFilenameSegment(str) {
+  return (str || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60);
+}
+function pdfFilename() {
+  const first = sanitizeFilenameSegment(state.requestor.firstName);
+  const last = sanitizeFilenameSegment(state.requestor.lastName);
+  const base = [first, last].filter(Boolean).join("-");
+  return base ? `${base}-course-request.pdf` : "course-request.pdf";
+}
+function mdFilename() {
+  const title = sanitizeFilenameSegment(state.requestor.courseTitle);
+  return title ? `${title}-spec.md` : "course-spec.md";
+}
+
+/* ============ RENDER HELPERS ============ */
+const app = document.getElementById("app");
+function el(tag, attrs = {}, children = []) {
+  const e = document.createElement(tag);
+  Object.entries(attrs).forEach(([k, v]) => {
+    if (k === "class") e.className = v;
+    else if (k === "html") e.innerHTML = v;
+    else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2), v);
+    else if (v !== undefined && v !== null) e.setAttribute(k, v);
+  });
+  (Array.isArray(children) ? children : [children]).forEach(c => {
+    if (c === null || c === undefined) return;
+    e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  });
+  return e;
+}
+
+function render() {
+  app.innerHTML = "";
+  if (screen === "accessGate") app.appendChild(renderAccessGate());
+  else if (screen === "requestorInfo") app.appendChild(renderRequestorInfo());
+  else if (screen === "questionnaire") app.appendChild(renderQuestionnaireShell());
+  else if (screen === "review") app.appendChild(renderReview());
+  else if (screen === "complete") app.appendChild(renderComplete());
+}
+
+/* ============ ACCESS GATE ============ */
+function renderAccessGate() {
+  const wrap = el("div", { class: "center-screen" });
+  const card = el("div", { class: "card" });
+  card.appendChild(el("h1", {}, "Course Specification Builder"));
+  card.appendChild(el("p", {}, "Enter your access code to begin."));
+  const form = el("form", {});
+  const field = el("div", { class: "field" });
+  const label = el("label", { for: "accessCodeInput" }, "Access code");
+  const input = el("input", { type: "text", id: "accessCodeInput", autocomplete: "off", "aria-describedby": accessError ? "accessError" : "" });
+  field.appendChild(label);
+  field.appendChild(input);
+  if (accessError) {
+    field.appendChild(el("div", { class: "error-text", id: "accessError", role: "alert" }, accessError));
+  }
+  form.appendChild(field);
+  const submit = el("button", { class: "btn", type: "submit", style: "width:100%" }, "Continue");
+  form.appendChild(submit);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (input.value.trim() === CONFIG.ACCESS_CODE) {
+      state.accessGranted = true;
+      persist();
+      screen = "requestorInfo";
+      render();
+    } else {
+      accessError = "That code isn't correct. Please try again.";
+      render();
+    }
+  });
+  card.appendChild(form);
+  wrap.appendChild(card);
+  return wrap;
+}
+
+/* ============ REQUESTOR INFO ============ */
+function renderRequestorInfo() {
+  const wrap = el("div", { class: "container" });
+  wrap.appendChild(el("h1", {}, "Tell us about you and your course"));
+  wrap.appendChild(el("p", {}, "These details appear on both downloadable files."));
+  const form = el("form", {});
+  const errors = {};
+
+  requestorFields.forEach(f => {
+    const field = el("div", { class: "field" });
+    const inputId = "req_" + f.id;
+    field.appendChild(el("label", { for: inputId }, [f.label, el("span", { class: "required-flag", "aria-hidden": "true" }, "*")]));
+    const input = el("input", {
+      type: f.type,
+      id: inputId,
+      value: state.requestor[f.id] || "",
+      required: "true",
+      "aria-required": "true"
+    });
+    input.addEventListener("input", () => {
+      state.requestor[f.id] = input.value;
+      persist();
+    });
+    field.appendChild(input);
+    form.appendChild(field);
+  });
+
+  const errorBanner = el("div", { class: "validation-banner", role: "alert", style: "display:none" });
+  form.insertBefore(errorBanner, form.firstChild);
+
+  const submit = el("button", { class: "btn", type: "submit" }, "Continue to Questionnaire");
+  form.appendChild(submit);
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const missing = requestorFields.filter(f => !state.requestor[f.id] || !state.requestor[f.id].trim());
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((state.requestor.email || "").trim());
+    if (missing.length > 0 || !emailValid) {
+      errorBanner.style.display = "block";
+      errorBanner.innerHTML = "";
+      errorBanner.appendChild(el("strong", {}, "Please fix the following:"));
+      const ul = el("ul", {});
+      missing.forEach(f => ul.appendChild(el("li", {}, `${f.label} is required.`)));
+      if (!emailValid && !missing.some(f => f.id === "email")) {
+        ul.appendChild(el("li", {}, "Email address must be a valid email format."));
+      }
+      errorBanner.appendChild(ul);
+      return;
+    }
+    screen = "questionnaire";
+    render();
+  });
+
+  wrap.appendChild(form);
+  return wrap;
+}
+
+/* ============ QUESTIONNAIRE ============ */
+function currentSectionIndex() {
+  return questionBank.findIndex(s => s.id === state.currentSectionId);
+}
+
+function renderSectionMenu() {
+  const nav = el("nav", { class: "section-menu", "aria-label": "Questionnaire sections" });
+  const ul = el("ul", {});
+  questionBank.forEach(section => {
+    const status = sectionStatus(section);
+    const li = el("li", {});
+    const btn = el("button", {
+      type: "button",
+      "aria-current": section.id === state.currentSectionId ? "true" : "false"
+    });
+    const dot = el("span", { class: "status-dot " + status, "aria-hidden": "true" });
+    const labelWrap = el("span", {});
+    labelWrap.appendChild(document.createTextNode(section.title));
+    labelWrap.appendChild(el("span", { class: "status-label" }, " — " + statusLabelText(status)));
+    btn.appendChild(dot);
+    btn.appendChild(labelWrap);
+    btn.addEventListener("click", () => {
+      state.currentSectionId = section.id;
+      persist();
+      render();
+      focusSectionHeading();
+    });
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+  nav.appendChild(ul);
+  const reviewLink = el("button", { type: "button", class: "btn btn-secondary", style: "width:100%; margin-top:0.75rem;" }, "Go to Review");
+  reviewLink.addEventListener("click", () => { screen = "review"; render(); });
+  nav.appendChild(reviewLink);
+  return nav;
+}
+
+function statusLabelText(status) {
+  switch (status) {
+    case "complete": return "Complete";
+    case "missing": return "Missing required";
+    case "in-progress": return "In progress";
+    default: return "Not started";
+  }
+}
+
+function renderQuestionField(q) {
+  const block = el("div", { class: "question-block" });
+  const a = getAnswer(q.id);
+  const inputId = "q_" + q.id;
+  const label = el("label", { class: "qlabel", for: inputId }, [
+    q.text,
+    q.required ? el("span", { class: "required-flag", "aria-hidden": "true" }, "*") : null
+  ]);
+  block.appendChild(label);
+
+  let inputEl;
+  if (q.type === "textarea") {
+    inputEl = el("textarea", { id: inputId, "aria-required": q.required ? "true" : "false" });
+    inputEl.value = a.value;
+    inputEl.disabled = a.notApplicable;
+    inputEl.addEventListener("input", () => { setAnswerValue(q.id, inputEl.value); updateSectionMenuOnly(); });
+  } else if (q.type === "text") {
+    inputEl = el("input", { type: "text", id: inputId, "aria-required": q.required ? "true" : "false" });
+    inputEl.value = a.value;
+    inputEl.disabled = a.notApplicable;
+    inputEl.addEventListener("input", () => { setAnswerValue(q.id, inputEl.value); updateSectionMenuOnly(); });
+  } else if (q.type === "select") {
+    inputEl = el("select", { id: inputId, "aria-required": q.required ? "true" : "false" });
+    inputEl.appendChild(el("option", { value: "" }, "Select one…"));
+    (q.options || []).forEach(opt => {
+      const o = el("option", { value: opt }, opt);
+      if (a.value === opt) o.selected = true;
+      inputEl.appendChild(o);
+    });
+    inputEl.disabled = a.notApplicable;
+    inputEl.addEventListener("change", () => { setAnswerValue(q.id, inputEl.value); updateSectionMenuOnly(); });
+  } else if (q.type === "radio") {
+    inputEl = el("div", { class: "radio-group", role: "radiogroup", "aria-required": q.required ? "true" : "false" });
+    (q.options || []).forEach((opt, idx) => {
+      const rid = inputId + "_" + idx;
+      const radioLabel = el("label", { for: rid });
+      const radio = el("input", { type: "radio", name: inputId, id: rid, value: opt });
+      radio.checked = a.value === opt;
+      radio.disabled = a.notApplicable;
+      radio.addEventListener("change", () => { setAnswerValue(q.id, opt); updateSectionMenuOnly(); });
+      radioLabel.appendChild(radio);
+      radioLabel.appendChild(document.createTextNode(opt));
+      inputEl.appendChild(radioLabel);
+    });
+  }
+  block.appendChild(inputEl);
+
+  if (q.notApplicableAllowed) {
+    const naWrap = el("div", { class: "na-toggle" });
+    const naId = inputId + "_na";
+    const naLabel = el("label", { for: naId });
+    const naCheckbox = el("input", { type: "checkbox", id: naId });
+    naCheckbox.checked = a.notApplicable;
+    naCheckbox.addEventListener("change", () => {
+      setAnswerNA(q.id, naCheckbox.checked);
+      render();
+      focusSectionHeading(true);
+    });
+    naLabel.appendChild(naCheckbox);
+    naLabel.appendChild(document.createTextNode("Not applicable"));
+    naWrap.appendChild(naLabel);
+    block.appendChild(naWrap);
+  }
+
+  return block;
+}
+
+function updateSectionMenuOnly() {
+  const navHost = document.querySelector("nav.section-menu");
+  if (navHost) {
+    const fresh = renderSectionMenu();
+    navHost.replaceWith(fresh);
+  }
+}
+
+function focusSectionHeading(skipScroll) {
+  requestAnimationFrame(() => {
+    const heading = document.querySelector(".section-heading");
+    if (heading) {
+      heading.setAttribute("tabindex", "-1");
+      heading.focus();
+      if (!skipScroll) heading.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+}
+
+function renderQuestionnaireShell() {
+  const wrap = el("div", {});
+  const idx = currentSectionIndex();
+  const section = questionBank[idx];
+
+  const top = el("header", { class: "topbar" });
+  top.appendChild(el("div", { class: "title" }, state.requestor.courseTitle ? `Course Spec: ${state.requestor.courseTitle}` : "Course Specification Builder"));
+  const clearBtn = el("button", { class: "btn btn-danger", type: "button" }, "Clear saved progress");
+  clearBtn.addEventListener("click", () => confirmClearProgress());
+  top.appendChild(clearBtn);
+  wrap.appendChild(top);
+
+  const layout = el("div", { class: "layout" });
+  layout.appendChild(renderSectionMenu());
+
+  const main = el("main", { class: "question-area" });
+
+  const completedCount = questionBank.filter(s => sectionStatus(s) === "complete").length;
+  const progressPct = Math.round((completedCount / questionBank.length) * 100);
+  const progressOuter = el("div", { class: "progressbar-outer", role: "progressbar", "aria-valuenow": String(progressPct), "aria-valuemin": "0", "aria-valuemax": "100", "aria-label": "Overall completion" });
+  progressOuter.appendChild(el("div", { class: "progressbar-inner", style: `width:${progressPct}%` }));
+  main.appendChild(progressOuter);
+
+  main.appendChild(el("h2", { class: "section-heading" }, `${idx + 1}. ${section.title}`));
+  if (section.helperText) {
+    main.appendChild(el("div", { class: "helper-text" }, section.helperText));
+  }
+
+  const missing = sectionMissingRequired(section);
+  if (missing.length > 0 && attemptedLeaveSections.has(section.id)) {
+    const banner = el("div", { class: "validation-banner", role: "alert", "aria-live": "polite" });
+    banner.appendChild(el("strong", {}, "This section is missing required answers:"));
+    const ul = el("ul", {});
+    missing.forEach(q => {
+      const a = el("a", { href: "#q_" + q.id });
+      a.textContent = q.text;
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("q_" + q.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById("q_" + q.id)?.focus();
+      });
+      const li = el("li", {}, a);
+      ul.appendChild(li);
+    });
+    banner.appendChild(ul);
+    main.appendChild(banner);
+  }
+
+  const liveRegion = el("div", { "aria-live": "polite", class: "sr-only" });
+  main.appendChild(liveRegion);
+
+  section.questions.forEach(q => main.appendChild(renderQuestionField(q)));
+
+  const navBtns = el("div", { class: "nav-buttons" });
+  const backBtn = el("button", { class: "btn btn-secondary", type: "button" }, "Back");
+  backBtn.disabled = idx === 0;
+  backBtn.addEventListener("click", () => {
+    state.currentSectionId = questionBank[idx - 1].id;
+    persist();
+    render();
+    focusSectionHeading();
+  });
+  navBtns.appendChild(backBtn);
+
+  if (idx < questionBank.length - 1) {
+    const nextBtn = el("button", { class: "btn", type: "button" }, "Next");
+    nextBtn.addEventListener("click", () => {
+      attemptedLeaveSections.add(section.id);
+      state.currentSectionId = questionBank[idx + 1].id;
+      persist();
+      render();
+      focusSectionHeading();
+    });
+    navBtns.appendChild(nextBtn);
+  } else {
+    const finishBtn = el("button", { class: "btn", type: "button" }, "Go to Review");
+    finishBtn.addEventListener("click", () => {
+      attemptedLeaveSections.add(section.id);
+      screen = "review";
+      render();
+    });
+    navBtns.appendChild(finishBtn);
+  }
+  main.appendChild(navBtns);
+
+  layout.appendChild(main);
+  wrap.appendChild(layout);
+  return wrap;
+}
+
+/* ============ REVIEW SCREEN ============ */
+function renderReview() {
+  const wrap = el("div", {});
+  const top = el("header", { class: "topbar" });
+  top.appendChild(el("div", { class: "title" }, "Review your answers"));
+  const backToQ = el("button", { class: "btn btn-secondary", type: "button" }, "Back to Questionnaire");
+  backToQ.addEventListener("click", () => { screen = "questionnaire"; render(); });
+  top.appendChild(backToQ);
+  wrap.appendChild(top);
+
+  const container = el("div", { class: "container" });
+  container.appendChild(el("h1", { class: "section-heading", tabindex: "-1" }, "Review"));
+
+  const missing = allMissingRequired();
+  if (missing.length > 0) {
+    const banner = el("div", { class: "validation-banner", role: "alert" });
+    banner.appendChild(el("strong", {}, `${missing.length} required question${missing.length === 1 ? "" : "s"} still need${missing.length === 1 ? "s" : ""} an answer:`));
+    const ul = el("ul", {});
+    missing.forEach(m => {
+      const a = el("a", { href: "#" });
+      a.textContent = `${m.sectionTitle}: ${m.qtext}`;
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (m.sectionId === "requestor") { screen = "requestorInfo"; render(); return; }
+        state.currentSectionId = m.sectionId;
+        attemptedLeaveSections.add(m.sectionId);
+        persist();
+        screen = "questionnaire";
+        render();
+      });
+      ul.appendChild(el("li", {}, a));
+    });
+    banner.appendChild(ul);
+    container.appendChild(banner);
+  } else {
+    container.appendChild(el("div", { class: "helper-text" }, "All required questions are answered. You're ready to download."));
+  }
+
+  // Requestor info
+  const reqSection = el("div", { class: "review-section" });
+  const reqHeadRow = el("div", { style: "display:flex; justify-content:space-between; align-items:center;" });
+  reqHeadRow.appendChild(el("h2", {}, "Requestor Information"));
+  const reviseReq = el("a", { href: "#", class: "revise-link" }, "Revise");
+  reviseReq.addEventListener("click", (e) => { e.preventDefault(); screen = "requestorInfo"; render(); });
+  reqHeadRow.appendChild(reviseReq);
+  reqSection.appendChild(reqHeadRow);
+  requestorFields.forEach(f => {
+    const q = el("div", { class: "review-question" });
+    q.appendChild(el("div", { class: "qtext" }, f.label));
+    q.appendChild(el("div", { class: "answer" }, state.requestor[f.id] ? state.requestor[f.id] : "Not provided"));
+    reqSection.appendChild(q);
+  });
+  container.appendChild(reqSection);
+
+  questionBank.forEach(section => {
+    const sec = el("div", { class: "review-section" });
+    const headRow = el("div", { style: "display:flex; justify-content:space-between; align-items:center;" });
+    headRow.appendChild(el("h2", {}, section.title));
+    const revise = el("a", { href: "#", class: "revise-link" }, "Revise");
+    revise.addEventListener("click", (e) => {
+      e.preventDefault();
+      state.currentSectionId = section.id;
+      persist();
+      screen = "questionnaire";
+      render();
+    });
+    headRow.appendChild(revise);
+    sec.appendChild(headRow);
+    section.questions.forEach(q => {
+      const a = getAnswer(q.id);
+      const qd = el("div", { class: "review-question" });
+      qd.appendChild(el("div", { class: "qtext" }, q.text));
+      let answerText;
+      if (a.notApplicable) answerText = "Not applicable";
+      else if (a.value.trim()) answerText = a.value;
+      else answerText = "Not provided";
+      qd.appendChild(el("div", { class: "answer" }, answerText));
+      sec.appendChild(qd);
+    });
+    container.appendChild(sec);
+  });
+
+  const complete = isQuestionnaireComplete();
+  const downloadRow = el("div", { class: "download-row" });
+  const pdfBtn = el("button", { class: "btn", type: "button", disabled: !complete ? "true" : null }, "Download My Questions and Answers");
+  if (!complete) pdfBtn.setAttribute("aria-describedby", "downloadHelp");
+  pdfBtn.addEventListener("click", () => { if (complete) { generatePDF(); screen = "complete"; render(); } });
+
+  const mdBtn = el("button", { class: "btn btn-secondary", type: "button", disabled: !complete ? "true" : null }, "Download Course Specification");
+  mdBtn.addEventListener("click", () => { if (complete) { generateMarkdown(); screen = "complete"; render(); } });
+
+  downloadRow.appendChild(pdfBtn);
+  downloadRow.appendChild(mdBtn);
+  container.appendChild(downloadRow);
+  if (!complete) {
+    container.appendChild(el("p", { id: "downloadHelp", class: "hint" }, "Downloads unlock once every required question above is answered."));
+  } else {
+    container.appendChild(el("p", { class: "hint" }, "“Download My Questions and Answers” produces a plain-language PDF. “Download Course Specification” produces a structured planning document for whoever develops your course."));
+  }
+
+  wrap.appendChild(container);
+  return wrap;
+}
+
+/* ============ COMPLETE SCREEN ============ */
+let lastDownloadType = null;
+function renderComplete() {
+  const wrap = el("div", { class: "center-screen" });
+  const card = el("div", { class: "card" });
+  card.appendChild(el("h1", {}, "Download complete"));
+  const msg = lastDownloadType === "pdf"
+    ? "Your PDF has been downloaded."
+    : lastDownloadType === "md"
+      ? "Your specification file has been downloaded."
+      : "Your file has been downloaded.";
+  card.appendChild(el("p", {}, msg));
+  card.appendChild(el("p", {}, "You can go back to Review to download the other file, or keep your progress for later."));
+  const backBtn = el("button", { class: "btn", type: "button", style: "width:100%; margin-bottom:0.75rem;" }, "Back to Review");
+  backBtn.addEventListener("click", () => { screen = "review"; render(); });
+  card.appendChild(backBtn);
+  const clearBtn = el("button", { class: "btn btn-danger", type: "button", style: "width:100%;" }, "Clear saved progress");
+  clearBtn.addEventListener("click", () => confirmClearProgress());
+  card.appendChild(clearBtn);
+  wrap.appendChild(card);
+  return wrap;
+}
+
+/* ============ CLEAR PROGRESS DIALOG ============ */
+function confirmClearProgress() {
+  const dialog = el("dialog", { class: "confirm-dialog" });
+  const inner = el("div", { class: "dialog-inner" });
+  inner.appendChild(el("h2", {}, "Clear saved progress?"));
+  inner.appendChild(el("p", {}, "This will permanently delete your saved answers on this device. This cannot be undone."));
+  const actions = el("div", { class: "dialog-actions" });
+  const cancel = el("button", { class: "btn btn-secondary", type: "button" }, "Cancel");
+  cancel.addEventListener("click", () => { dialog.close(); dialog.remove(); });
+  const confirm = el("button", { class: "btn btn-danger", type: "button" }, "Delete my progress");
+  confirm.addEventListener("click", () => {
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    state = defaultState();
+    screen = "accessGate";
+    attemptedLeaveSections = new Set();
+    dialog.close();
+    dialog.remove();
+    render();
+  });
+  actions.appendChild(cancel);
+  actions.appendChild(confirm);
+  inner.appendChild(actions);
+  dialog.appendChild(inner);
+  document.body.appendChild(dialog);
+  dialog.showModal();
+}
+
+/* ============ PDF GENERATION ============ */
+function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "pt", format: "letter" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 54;
+  const maxWidth = pageWidth - margin * 2;
+  let y = margin;
+  let pageNum = 1;
+
+  function newPageIfNeeded(lineHeight) {
+    if (y + lineHeight > pageHeight - margin) {
+      addFooter();
+      doc.addPage();
+      pageNum++;
+      y = margin;
+    }
+  }
+  function addFooter() {
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(120);
+    doc.text(`${state.requestor.courseTitle || "Course Request"} — ${state.requestor.firstName} ${state.requestor.lastName}`, margin, pageHeight - 28);
+    doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 28, { align: "right" });
+    doc.setTextColor(0);
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  const titleLines = doc.splitTextToSize(state.requestor.courseTitle || "Course Request", maxWidth);
+  titleLines.forEach(line => { doc.text(line, margin, y); y += 26; });
+  y += 6;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  const infoLines = [
+    `Requestor: ${state.requestor.firstName} ${state.requestor.lastName}`,
+    `Department: ${state.requestor.department}`,
+    `Role: ${state.requestor.role}`,
+    `Email: ${state.requestor.email}`,
+    `Completion date: ${new Date().toLocaleDateString()}`
+  ];
+  infoLines.forEach(line => { newPageIfNeeded(16); doc.text(line, margin, y); y += 16; });
+  y += 14;
+
+  questionBank.forEach((section, sIdx) => {
+    newPageIfNeeded(26);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text(`${sIdx + 1}. ${section.title}`, margin, y);
+    y += 22;
+
+    section.questions.forEach(q => {
+      const a = getAnswer(q.id);
+      let answerText;
+      if (a.notApplicable) answerText = "Not applicable";
+      else if (a.value.trim()) answerText = a.value.trim();
+      else answerText = "Not provided";
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      const qLines = doc.splitTextToSize(q.text, maxWidth);
+      newPageIfNeeded(14 * qLines.length + 6);
+      qLines.forEach(line => { doc.text(line, margin, y); y += 14; });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      const aLines = doc.splitTextToSize(answerText, maxWidth);
+      aLines.forEach(line => { newPageIfNeeded(14); doc.text(line, margin, y); y += 14; });
+      y += 8;
+    });
+    y += 6;
+  });
+
+  addFooter();
+  doc.save(pdfFilename());
+  lastDownloadType = "pdf";
+}
+
+/* ============ MARKDOWN GENERATION ============ */
+function ans(qid) {
+  const a = getAnswer(qid);
+  if (a.notApplicable) return "_Not applicable._";
+  if (a.value.trim()) return a.value.trim();
+  return "_Not provided._";
+}
+
+function generateMarkdown() {
+  const r = state.requestor;
+  const date = new Date().toLocaleDateString();
+  let md = "";
+  md += `# Course Specification: ${r.courseTitle || "_Not provided._"}\n\n`;
+  md += `**Requested by:** ${r.firstName} ${r.lastName} (${r.role || "_Not provided._"}, ${r.department || "_Not provided._"})\n`;
+  md += `**Contact:** ${r.email}\n`;
+  md += `**Date generated:** ${date}\n\n`;
+
+  md += `## 1. Business Need\n${ans(specSectionMap.businessNeed)}\n\n`;
+  md += `**Desired change in learner behavior:** ${ans(specSectionMap.desiredChange)}\n\n`;
+
+  md += `## 2. Target Audience\n${ans(specSectionMap.audience)}\n\n`;
+  md += `**Existing knowledge:** ${ans(specSectionMap.existingKnowledge)}\n\n`;
+
+  md += `## 3. Learning Objectives\n${ans(specSectionMap.objectives)}\n\n`;
+  md += `**How objectives will be measured:** ${ans(specSectionMap.objectiveMeasure)}\n\n`;
+
+  md += `## 4. Scope\n**In scope:** ${ans(specSectionMap.scopeIn)}\n**Out of scope:** ${ans(specSectionMap.scopeOut)}\n\n`;
+
+  md += `## 5. Source Materials & Subject-Matter Expertise\n**Primary SME:** ${ans(specSectionMap.primarySme)}\n**Authoritative sources:** ${ans(specSectionMap.authoritativeSources)}\n\n`;
+
+  md += `## 6. Delivery Format\n${ans(specSectionMap.delivery)}\n**Expected length:** ${ans(specSectionMap.length)}\n\n`;
+
+  md += `## 7. Instructional Approach\n**Guided practice:** ${ans(specSectionMap.guidedPractice)}\n\n`;
+
+  md += `## 8. Assessment\n${ans(specSectionMap.assessment)}\n\n`;
+
+  md += `## 9. Approvals\n**Final approval:** ${ans(specSectionMap.finalApproval)}\n\n`;
+
+  md += `## 10. Timeline\n**Launch date/deadline:** ${ans(specSectionMap.launchDate)}\n\n`;
+
+  md += `---\n\n## Appendix: Full Questionnaire Responses\n\n`;
+  md += `_This appendix preserves every question and answer exactly as submitted, organized by section, for reference._\n\n`;
+  questionBank.forEach(section => {
+    md += `### ${section.title}\n`;
+    section.questions.forEach(q => {
+      md += `**${q.text}**\n${ans(q.id)}\n\n`;
+    });
+  });
+
+  const blob = new Blob([md], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = mdFilename();
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  lastDownloadType = "md";
+}
+
+/* ============ VERSION MISMATCH NOTICE ============ */
+function maybeShowVersionNotice() {
+  if (!showVersionNotice) return;
+  const dialog = el("dialog", { class: "confirm-dialog" });
+  const inner = el("div", { class: "dialog-inner" });
+  inner.appendChild(el("h2", {}, "Saved progress from an earlier version"));
+  inner.appendChild(el("p", {}, "Your saved progress was from an earlier version of this form and may not match exactly. You can continue or start over."));
+  const actions = el("div", { class: "dialog-actions" });
+  const startOver = el("button", { class: "btn btn-danger", type: "button" }, "Start over");
+  startOver.addEventListener("click", () => {
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    state = defaultState();
+    screen = "accessGate";
+    showVersionNotice = false;
+    dialog.close(); dialog.remove();
+    render();
+  });
+  const cont = el("button", { class: "btn", type: "button" }, "Continue anyway");
+  cont.addEventListener("click", () => {
+    state.schemaVersion = CONFIG.SCHEMA_VERSION;
+    showVersionNotice = false;
+    dialog.close(); dialog.remove();
+  });
+  actions.appendChild(startOver);
+  actions.appendChild(cont);
+  inner.appendChild(actions);
+  dialog.appendChild(inner);
+  document.body.appendChild(dialog);
+  dialog.showModal();
+}
+
+/* ============ INIT ============ */
+render();
+if (showVersionNotice) maybeShowVersionNotice();
+</script>
+</body>
+</html>

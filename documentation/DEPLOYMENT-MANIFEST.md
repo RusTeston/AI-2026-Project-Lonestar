@@ -1,6 +1,6 @@
 # AI Project: Lone Star — Deployment Manifest
 
-**Last Updated**: March 25, 2026
+**Last Updated**: August 9, 2026
 
 ---
 
@@ -12,8 +12,11 @@
 - **API Endpoint**: https://ri802yjmt0.execute-api.us-east-1.amazonaws.com/prod/chat
 - **Deployment**: Manual (bash scripts)
 
-### Project 2: Agentic RAG 🚧 Not Deployed
-- **Status**: Planning phase
+### Project 2: Well-Architected RAG ✅ LIVE
+- **Live URL**: https://ai.rus-teston.com/projects/02-waf-rag/index.html
+- **Backend**: API Gateway + Lambda + Bedrock Titan Embeddings V2 + Nova Lite + S3
+- **SAM Stack**: `waf-rag`
+- **Deployment**: SAM/IaC
 
 ### Project 3: Language Translator ✅ LIVE
 - **Live URL**: https://ai.rus-teston.com/projects/03-language-translator/index.html
@@ -54,6 +57,36 @@
 - **SAM Stack**: `project-09-failover-orchestrator`
 - **Deployment**: SAM/IaC
 
+### Project 10: Perfect Prompt Builder ✅ LIVE
+- **Live URL**: https://ai.rus-teston.com/projects/10-prompt-builder/index.html
+- **Backend**: Lambda Function URL + Bedrock Nova Lite
+- **Deployment**: Manual (bash scripts)
+
+### Project 11: Architecture Diagram Studio ✅ LIVE
+- **Live URL**: https://ai.rus-teston.com/projects/11-architecture-studio/index.html
+- **Backend**: Lambda Function URL + Bedrock Nova Lite
+- **Deployment**: Manual (bash scripts)
+
+### Project 12: On-Prem to AWS Translator ✅ LIVE
+- **Live URL**: https://ai.rus-teston.com/projects/12-aws-translator/index.html
+- **Backend**: Lambda Function URL + Bedrock Nova Lite
+- **Deployment**: Manual (bash scripts)
+
+### Project 13: AWS Architecture Catalog ✅ LIVE
+- **Live URL**: https://ai.rus-teston.com/projects/13-architecture-catalog/index.html
+- **Backend**: Static (S3 + CloudFront)
+- **Deployment**: CI/CD (GitHub Actions)
+
+### Project 14: AWS Service Reference ✅ LIVE
+- **Live URL**: https://ai.rus-teston.com/projects/14-aws-service-reference/index.html
+- **Backend**: Static (S3 + CloudFront)
+- **Deployment**: CI/CD (GitHub Actions)
+
+### Project 15: Course Spec Builder ✅ LIVE
+- **Live URL**: https://ai.rus-teston.com/projects/15-course-spec-builder/index.html
+- **Backend**: Client-side only (S3 + CloudFront, no Lambda)
+- **Deployment**: CI/CD (GitHub Actions)
+
 ---
 
 ## 🏗️ Infrastructure Inventory
@@ -80,7 +113,8 @@
 ### AI Services
 | Service | Projects |
 |---------|----------|
-| Bedrock Nova Lite (`us.amazon.nova-lite-v1:0`) | 1, 4, 6, 7, 8, 9 |
+| Bedrock Nova Lite (`us.amazon.nova-lite-v1:0`) | 1, 2, 4, 6, 7, 8, 9, 10, 11, 12 |
+| Bedrock Titan Embeddings V2 | 2 |
 | AWS Translate | 3 |
 | Amazon Polly | 5 |
 | AWS Textract | 4, 5 |
@@ -88,9 +122,9 @@
 ---
 
 ## 🎨 Frontend Features
-- **Project Summary Modals**: All 8 project pages have clickable project labels that open a summary modal overlay
+- **Project Summary Modals**: All project pages have clickable project labels that open a summary modal overlay
 - **Light theme** (Projects 1, 3, 4, 5, 8): White modal with blue headings
-- **Dark theme** (Projects 6, 7, 9): Dark modal matching page accent colors
+- **Dark theme** (Projects 6, 7, 9, 10–15): Dark modal matching page accent colors
 - **Error page**: Space-themed 404 page at `/error.html`
 
 ---
@@ -103,7 +137,9 @@
 | Projects 4, 5, 8: Event-driven | ~$5-12/month each |
 | Projects 6, 7, 9: SAM projects | ~$1-2/month each |
 | CloudFront (PriceClass_100) | ~$0-1/month |
-| **Total** | ~$30-50/month |
+| Projects 10, 11, 12: Lambda Function URL + Bedrock | ~$2-4/month each |
+| Projects 13, 14, 15: Static (CloudFront only) | ~$0/month |
+| **Total** | ~$35-60/month |
 
 ---
 

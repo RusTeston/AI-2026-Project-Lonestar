@@ -2,7 +2,7 @@
 
 **AI Portfolio and Project Showcase**  
 **Project Start**: March 11, 2026  
-**Latest Updates**: June 8, 2026  
+**Latest Updates**: August 9, 2026  
 **Status**: ✅ LIVE - OPERATIONAL - CI/CD ENABLED
 
 ---
@@ -31,6 +31,11 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 
 ### **website/** - Live Website Files
 - `index.html` - Main portfolio page
+- **projects/11-architecture-studio/** - Architecture Diagram Studio
+- **projects/12-aws-translator/** - On-Prem to AWS Translator
+- **projects/13-architecture-catalog/** - AWS Architecture Catalog
+- **projects/14-aws-service-reference/** - AWS Service Reference
+- **projects/15-course-spec-builder/** - Course Spec Builder
 
 
 ---
@@ -92,6 +97,31 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
     - Structured prompt builder with AI-powered enhancement using Bedrock Nova Lite
     - Serverless architecture (Lambda Function URL + Bedrock Nova Lite + S3)
 
+11. **Architecture Diagram Studio** - ✅ LIVE (June 8, 2026)
+    - URL: https://ai.rus-teston.com/projects/11-architecture-studio/index.html
+    - AI-powered AWS and on-premises architecture diagram generator with migration analysis
+    - Serverless architecture (Lambda Function URL + Bedrock Nova Lite + S3)
+
+12. **On-Prem to AWS Translator** - ✅ LIVE (June 8, 2026)
+    - URL: https://ai.rus-teston.com/projects/12-aws-translator/index.html
+    - Translates on-premises infrastructure descriptions into AWS equivalent architectures
+    - Serverless architecture (Lambda Function URL + Bedrock Nova Lite + S3)
+
+13. **AWS Architecture Catalog** - ✅ LIVE (June 8, 2026)
+    - URL: https://ai.rus-teston.com/projects/13-architecture-catalog/index.html
+    - Curated catalog of AWS reference architectures with diagrams and best-practice descriptions
+    - Static frontend (S3 + CloudFront)
+
+14. **AWS Service Reference** - ✅ LIVE (June 8, 2026)
+    - URL: https://ai.rus-teston.com/projects/14-aws-service-reference/index.html
+    - Searchable AWS service reference with tiered categorization and definitions
+    - Static frontend (S3 + CloudFront)
+
+15. **Course Spec Builder** - ✅ LIVE (August 9, 2026)
+    - URL: https://ai.rus-teston.com/projects/15-course-spec-builder/index.html
+    - 12-section course specification questionnaire with localStorage persistence, PDF + Markdown export
+    - Client-side only (S3 + CloudFront, no backend)
+
 ---
 
 ## 🏗️ Infrastructure
@@ -117,6 +147,11 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - **Project 9**: Failover Orchestrator (EventBridge + Lambda + Step Functions + DynamoDB + Bedrock Nova Lite + SAM IaC)
 - **Project 2**: Well-Architected RAG (API Gateway + Lambda + Bedrock Titan Embeddings V2 + Nova Lite + S3)
 - **Project 10**: Perfect Prompt Builder (Lambda Function URL + Bedrock Nova Lite)
+- **Project 11**: Architecture Diagram Studio (Lambda Function URL + Bedrock Nova Lite)
+- **Project 12**: On-Prem to AWS Translator (Lambda Function URL + Bedrock Nova Lite)
+- **Project 13**: AWS Architecture Catalog (Static — S3 + CloudFront)
+- **Project 14**: AWS Service Reference (Static — S3 + CloudFront)
+- **Project 15**: Course Spec Builder (Static — S3 + CloudFront, client-side only)
 
 **CI/CD Pipeline:**
 - **GitHub Repos**: Public repos at github.com/RusTeston
@@ -131,7 +166,7 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Professional grid layout for projects
 - Project summary modals on all project pages
 - Responsive layout (desktop/tablet optimized)
-- 11 AI projects live
+- 15 AI projects live
 - No external dependencies
 
 ---
@@ -165,6 +200,8 @@ AI Project: Lone Star is a portfolio website showcasing AI development projects 
 - Expand project portfolio as new AI projects are completed
 
 **Recent Updates:**
+- ✅ **Repo Cleanup** (August 9, 2026): Moved unused files to POSSIBLE_DELETE_ME, deleted originals (screenshots, generated-diagrams, 02-agentic-rag abandoned folder)
+- ✅ **Project 15: Course Spec Builder** (August 9, 2026): 12-section questionnaire, localStorage auto-save, jsPDF PDF export, Markdown download, access code gate
 - ✅ **Project 02: Well-Architected RAG** (June 8, 2026): RAG Q&A grounded in AWS WAF PDF — 1,823 chunks, Titan Embeddings V2, cosine similarity, Nova Lite via Converse API, SAM deployment. Includes step-by-step summary, My RAG diagram, and AWS Best Practice RAG diagram comparison.
 - ✅ **Project 13/14 card dates** (June 8, 2026): Added Jun 8, 2026 date and yellow styling to New badge cards (02, 11-14)
 - ✅ **Project 5: Audio Player Fix** (May 11, 2026): Fixed audio player not loading — added `media-src` to CloudFront CSP, switched to pre-signed URLs for streaming (audio player) and forced download (Download MP3 button)

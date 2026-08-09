@@ -1,7 +1,7 @@
 # AI Project: Lone Star — Project Summaries
 
-**All Projects Built and Deployed: March 11–June 8, 2026**
-**Document Last Updated**: June 8, 2026
+**All Projects Built and Deployed: March 11–August 9, 2026**
+**Document Last Updated**: August 9, 2026
 
 ---
 
@@ -400,10 +400,12 @@ EventBridge Scheduler, Step Functions, Lambda (Python 3.12) × 5, Bedrock Nova L
 ### Deployment Pattern Evolution
 | Projects | Deployment Method |
 |----------|------------------|
-| 1, 3, 4, 5, 8 | Manual bash scripts, Lambda Function URLs |
+| 1, 3, 4, 5, 8, 10, 11, 12 | Manual bash scripts, Lambda Function URLs |
 | 7 | First SAM/IaC project (established the pattern) |
 | 6 | Second SAM/IaC project |
 | 9 | Third SAM/IaC project (most complex — Step Functions + EventBridge) |
+| 2 | SAM/IaC (waf-rag stack) |
+| 13, 14, 15 | CI/CD (GitHub Actions, static frontend only) |
 
 ### Architecture Pattern Evolution
 | Pattern | Projects |
@@ -415,11 +417,13 @@ EventBridge Scheduler, Step Functions, Lambda (Python 3.12) × 5, Bedrock Nova L
 | Async queue-based (API Gateway → SQS → Lambda → AI → DynamoDB, frontend polls) | 7 |
 | Scheduled agent (EventBridge → Lambda chain → SES email) | 6 |
 | Orchestrated pipeline (EventBridge → Lambda → Step Functions → AI → DynamoDB) | 9 |
+| Sync request-response (Function URL → Lambda → Bedrock) | 10, 11, 12 |
+| Static client-side (S3 + CloudFront, no backend) | 13, 14, 15 |
 
 ### AI Services Used
 | Service | Projects |
 |---------|----------|
-| Bedrock Nova Lite | 1, 2, 4, 6, 7, 8, 9 |
+| Bedrock Nova Lite | 1, 2, 4, 6, 7, 8, 9, 10, 11, 12 |
 | Bedrock Titan Embeddings V2 | 2 |
 | AWS Translate | 3 |
 | Amazon Polly | 5 |
@@ -428,10 +432,11 @@ EventBridge Scheduler, Step Functions, Lambda (Python 3.12) × 5, Bedrock Nova L
 ### All Projects Live At
 https://ai.rus-teston.com (CloudFront CDN + HTTPS)
 
-### Frontend Features (March 25, 2026)
-- All 8 project pages have clickable project summary modals
+### Frontend Features (March 25, 2026 onward)
+- All project pages have clickable project summary modals
 - Light theme modal (Projects 1, 3, 4, 5, 8) — white background, blue headings
-- Dark theme modal (Projects 6, 7, 9) — dark background, theme-matching accents
+- Dark theme modal (Projects 6, 7, 9–15) — dark background, theme-matching accents
+- Projects 11–15 use yellow "New" tile styling on landing page
 - Project 9: Restore Healthy button clears AI verdict and incident timeline
 
 ---

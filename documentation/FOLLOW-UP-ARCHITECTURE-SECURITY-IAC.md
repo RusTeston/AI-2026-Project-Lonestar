@@ -59,6 +59,11 @@
 - Project 8: AI Log Analyzer
 - Project 9: Failover Orchestrator (added March 22, 2026)
 - Project 10: Perfect Prompt Builder (added April 2, 2026)
+- Project 11: Architecture Diagram Studio (added June 8, 2026)
+- Project 12: On-Prem to AWS Translator (added June 8, 2026)
+- Project 13: AWS Architecture Catalog (static — security N/A)
+- Project 14: AWS Service Reference (static — security N/A)
+- Project 15: Course Spec Builder (static, client-side only — security N/A)
 
 ---
 
@@ -92,6 +97,11 @@ Apply the following to each project (one at a time):
 - Project 8: AI Log Analyzer - ✅ COMPLETE
 - Project 9: Failover Orchestrator - ✅ COMPLETE (SAM/IaC, Step Functions, new project)
 - Project 10: Perfect Prompt Builder - ✅ COMPLETE (Lambda Function URL, Bedrock)
+- Project 11: Architecture Diagram Studio - ⏸️ TODO
+- Project 12: On-Prem to AWS Translator - ⏸️ TODO
+- Project 13: AWS Architecture Catalog - N/A (static, no backend)
+- Project 14: AWS Service Reference - N/A (static, no backend)
+- Project 15: Course Spec Builder - N/A (static, client-side only)
 
 ---
 
